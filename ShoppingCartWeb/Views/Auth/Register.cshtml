@@ -1,0 +1,96 @@
+﻿@model ShoppingCartWeb.Models.VM.CategoryMasterVM
+
+<form asp-action="Register">
+    <br />
+    <div class="container border p-3">
+        <h1 class="text-primary">Register</h1>
+        <hr/>
+
+        <div class="row">
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="col-2">
+                <label asp-for="Registration.FirstName" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Registration.FirstName" class="form-control" />
+                <span asp-validation-for="Registration.FirstName" class="text-danger"></span>
+            </div>
+
+            <div class="col-2">
+                <label asp-for="Registration.LastName" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Registration.LastName" class="form-control" />
+                <span asp-validation-for="Registration.LastName" class="text-danger"></span>
+            </div>
+
+            <div class="col-2">
+                <label asp-for="Registration.Gender" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Registration.Gender" class="form-control" />
+                <span asp-validation-for="Registration.Gender" class="text-danger"></span>
+            </div>
+
+            <div class="col-2">
+                <label asp-for="Registration.DateOfBirth" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Registration.DateOfBirth" class="form-control" />
+                <span asp-validation-for="Registration.DateOfBirth" class="text-danger"></span>
+            </div>
+
+            <div class="col-2">
+                <label asp-for="Registration.Email" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Registration.Email" class="form-control" />
+                <span asp-validation-for="Registration.Email" class="text-danger"></span>
+            </div>
+
+            <div class="col-2">
+                <label asp-for="Registration.ContactNo" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Registration.ContactNo" class="form-control" />
+                <span asp-validation-for="Registration.ContactNo" class="text-danger"></span>
+            </div>
+
+            <div class="col-2">
+                <label asp-for="Registration.Address" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Registration.Address" class="form-control" />
+                <span asp-validation-for="Registration.Address" class="text-danger"></span>
+            </div>
+
+            <div class="col-2">
+                <label asp-for="Registration.PostalCode" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Registration.PostalCode" class="form-control" />
+                <span asp-validation-for="Registration.PostalCode" class="text-danger"></span>
+            </div>
+
+            <div class="col-2">
+                <label asp-for="Registration.CategoryId" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <select asp-for="Registration.CategoryId" class="form-select" asp-items="@Model.CategoryList">
+                    <option disabled selected>--Select Role--</option>
+                </select>
+                <span asp-validation-for="Registration.CategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="col-5">
+                <button type="submit" class="form-control btn-success" value="Submit">Register</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts 
+{
+    <partial name="_ValidationScriptsPartial" />
+}
