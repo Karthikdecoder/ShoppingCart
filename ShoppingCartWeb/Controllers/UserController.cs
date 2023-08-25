@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,18 +16,20 @@ using System.Security.Claims;
 
 namespace ShoppingCartWeb.Controllers
 {
-    public class AuthController : Controller
+    public class UserController : Controller
     {
-        private readonly IAuthService _authService;
+        private readonly IUserService _userService;
         private readonly IRoleService _roleService;
         private readonly ICategoryService _categoryService;
+        private readonly IMapper _mapper;
         private string _Role;
-        public AuthController(IAuthService authService, IHttpContextAccessor httpContextAccessor, IRoleService roleService, ICategoryService categoryService)
+        public UserController(IUserService userService, IHttpContextAccessor httpContextAccessor, IRoleService roleService, ICategoryService categoryService, IMapper mapper)
         {
-            _authService = authService;
+            _userService = userService;
             _Role = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Role);
             _roleService = roleService;
             _categoryService = categoryService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -40,7 +43,7 @@ namespace ShoppingCartWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginRequestDTO obj)
         {
-            APIResponse response = await _authService.LoginAsync<APIResponse>(obj);
+            APIResponse response = await _userService.LoginAsync<APIResponse>(obj);
 
             if (response != null && response.IsSuccess)
             {
@@ -69,50 +72,16 @@ namespace ShoppingCartWeb.Controllers
         [HttpGet]
         public async Task<IActionResult> Register()
         {
-            CategoryMasterVM categoryMaster = new();
-
-            var response = await _categoryService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
-
-            if (response != null && response.IsSuccess) 
-            {
-                categoryMaster.CategoryList = JsonConvert.DeserializeObject<List<CategoryMasterDTO>>(Convert.ToString(response.Result)).Select(i => new SelectListItem
-                    {
-                        Text = i.CategoryName,
-                        Value = i.CategoryId.ToString()
-                    }); 
-            }
-
-            return View(categoryMaster);
-        }
-
-        //[Authorize(Roles = "Admin")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RoleMasterCreateVM obj)
-        {
-
-            APIResponse result = await _authService.RegisterAsync<APIResponse>(obj.Registration, HttpContext.Session.GetString(SD.SessionToken));
-
-            if (result != null && result.IsSuccess)
-            {
-                return RedirectToAction("Login", "Auth");
-            }
-            return View();
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> UserRegister()
-        {
             UserRegisterationVM userRegister = new();
 
-            var registrationResponse = await _authService.GetAllRegistrationAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+            var registrationResponse = await _userService.GetAllUserAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
 
             if (registrationResponse != null && registrationResponse.IsSuccess)
             {
                 userRegister.RegistrationList = JsonConvert.DeserializeObject<List<RegistrationDTO>>(Convert.ToString(registrationResponse.Result)).Select(i => new SelectListItem
                 {
                     Text = i.Email,
-                    Value = i.UserRegistrationId.ToString()
+                    Value = i.RegistrationId.ToString()
                 });
             }
 
@@ -135,10 +104,10 @@ namespace ShoppingCartWeb.Controllers
         //[Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UserRegister(UserRegisterationVM obj)
+        public async Task<IActionResult> Register(UserRegisterationVM obj)
         {
 
-            APIResponse result = await _authService.UserRegisterAsync<APIResponse>(obj.User, HttpContext.Session.GetString(SD.SessionToken));
+            APIResponse result = await _userService.RegisterAsync<APIResponse>(obj.User, HttpContext.Session.GetString(SD.SessionToken));
 
             if (result != null && result.IsSuccess)
             {

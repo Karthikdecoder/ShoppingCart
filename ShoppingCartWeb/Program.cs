@@ -12,14 +12,17 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 
-builder.Services.AddHttpClient<IAuthService, AuthService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddHttpClient<IUserService, UserService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddHttpClient<IRoleService, RoleService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 
 builder.Services.AddHttpClient<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+builder.Services.AddHttpClient<IRegistrationService, RegistrationService>();
+builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 
 builder.Services.AddDistributedMemoryCache();
 
@@ -76,6 +79,6 @@ app.UseSession();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Auth}/{action=Login}/{id?}");
+    pattern: "{controller=User}/{action=Login}/{id?}");
 
 app.Run();

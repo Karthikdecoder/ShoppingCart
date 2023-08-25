@@ -22,9 +22,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(option => // here the connec
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-builder.Services.AddScoped<IRoleMasterRepository, RoleMasterRepository>();
+builder.Services.AddScoped<IRegistrationRepository, RegistrationRepository>();
 
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+//builder.Services.AddScoped<IRoleMasterRepository, RoleMasterRepository>();
+
+//builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 builder.Services.AddControllers(option =>
 {

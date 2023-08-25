@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using ShoppingCartAPI.Models.Dto;
 
 namespace ShoppingCartAPI.Models
 {
@@ -17,6 +18,13 @@ namespace ShoppingCartAPI.Models
         [RegularExpression(@"^[a-zA-Z '-]{1,20}$", ErrorMessage = "Invalid Last Name")]
         public string LastName { get; set; }
 
+        public CategoryMaster CategoryMaster { get; set; }
+
+        [Required]
+        [ForeignKey("CategoryMaster")]
+        public int CategoryId { get; set; }
+
+        [Required(ErrorMessage = "Gender is required")]
         [RegularExpression("^(Male|Female|Other)$", ErrorMessage = "Gender must be 'Male', 'Female', or 'Other'.")]
         public string Gender { get; set; }
 
@@ -37,16 +45,21 @@ namespace ShoppingCartAPI.Models
         [StringLength(100, MinimumLength = 10, ErrorMessage = "Address must be between 10 and 100 characters")]
         public string Address { get; set; }
 
+        [Required(ErrorMessage = "Postal Code is required")]
         [RegularExpression(@"^\d{6}$", ErrorMessage = "Postal code must be a 6-digit number.")]
         public string PostalCode { get; set; }
 
-        public CategoryMaster CategoryMaster { get; set; }
+        public StateMaster StateMaster { get; set; }
 
         [Required]
-        [ForeignKey("CategoryMaster")]
-        public int CategoryId { get; set; }
+        [ForeignKey("StateMaster")]
+        public int StateId { get; set; }
 
+        public CountryMaster CountryMaster { get; set; }
 
+        [Required]
+        [ForeignKey("CountryMaster")]
+        public int CountryId { get; set; }
 
         public int CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }

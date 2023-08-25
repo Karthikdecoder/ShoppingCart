@@ -9,11 +9,11 @@ namespace ShoppingCartWeb.Models.Dto
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int UserId { get; set; }
 
-        //[Required(ErrorMessage = "Username is required.")]
-        //[EmailAddress(ErrorMessage = "Invalid username format.")]
-        //public string UserName { get; set; }
+        [Required(ErrorMessage = "UserName is required")]
+        [EmailAddress(ErrorMessage = "Invalid UserName")]
+        public string UserName { get; set; }
 
-        [Required(ErrorMessage = "Password is required.")]
+        [Required(ErrorMessage = "Password is required")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
@@ -24,9 +24,6 @@ namespace ShoppingCartWeb.Models.Dto
         [Required]
         [ForeignKey("RoleMaster")]
         public int RoleId { get; set; }
-
-
-
         public int CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
         public int UpdatedBy { get; set; }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using ShoppingCartAPI.Models;
+using ShoppingCartAPI.Models.Dto;
 using ShoppingCartAPI.Repository.IRepository;
 using System.Net;
 using System.Security.Claims;
@@ -25,10 +26,10 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpGet]
-        [Route("GetCategory")]
+        [Route("GetCategories")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<APIResponse>> GetCategory()
+        public async Task<ActionResult<APIResponse>> GetCategories()
         {
             try
             {
@@ -46,157 +47,159 @@ namespace ShoppingCartAPI.Controllers
             return _response;
         }
 
-        //[HttpGet]
-        //[Route("GetRole")]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<APIResponse>> GetRole(int roleId)
-        //{
-        //    try
-        //    {
-        //        if (roleId == 0)
-        //        {
-        //            _response.StatusCode = HttpStatusCode.BadRequest;
-        //            return BadRequest(_response);
-        //        }
+        [HttpGet]
+        [Route("GetCategory")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<APIResponse>> GetCategory(int categoryId)
+        {
+            try
+            {
+                if (categoryId == 0)
+                {
+                    _response.StatusCode = HttpStatusCode.BadRequest;
+                    return BadRequest(_response);
+                }
 
-        //        var role = await _dbCategory.GetAsync(u => u.RoleId == roleId && u.IsDeleted == false);
+                var role = await _dbCategory.GetAsync(u => u.CategoryId == categoryId && u.IsDeleted == false);
 
-        //        if (role == null)
-        //        {
-        //            _response.StatusCode = HttpStatusCode.NotFound;
-        //            return NotFound(_response);
-        //        }
+                if (role == null)
+                {
+                    _response.StatusCode = HttpStatusCode.NotFound;
+                    return NotFound(_response);
+                }
 
-        //        _response.Result = _mapper.Map<RoleMasterDTO>(role);
-        //        _response.StatusCode = HttpStatusCode.OK;
-        //        return Ok(_response);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _response.IsSuccess = false;
-        //        _response.ResponseMessage = new List<string>() { ex.ToString() };
-        //    }
+                _response.Result = _mapper.Map<CategoryMasterDTO>(role);
+                _response.StatusCode = HttpStatusCode.OK;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
 
-        //    return _response;
-        //}
+            return _response;
+        }
 
-        //[HttpPost]
-        //[Route("CreateRole")]
-        ////[Authorize(Roles = "admin")]
-        //[ProducesResponseType(StatusCodes.Status201Created)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<APIResponse>> CreateRole([FromBody] RoleMasterDTO roleMasterDTO)
-        //{
-        //    try
-        //    {
-        //        if (await _dbCategory.GetAsync(u => u.RoleName == roleMasterDTO.RoleName && u.IsDeleted == false) != null)
-        //        {
-        //            ModelState.AddModelError("ErrorMessages", "Role already exists!");
-        //            return BadRequest(ModelState);
-        //        }
-                
-        //        if (roleMasterDTO == null)
-        //        {
-        //            return BadRequest(roleMasterDTO);
-        //        }
+        [HttpPost]
+        [Route("CreateCategory")]
+        //[Authorize(Roles = "admin")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<APIResponse>> CreateCategory([FromBody] CategoryMasterDTO categoryMasterDTO)
+        {
+            try
+            {
+                if (await _dbCategory.GetAsync(u => u.CategoryName == categoryMasterDTO.CategoryName && u.IsDeleted == false) != null)
+                {
+                    ModelState.AddModelError("ErrorMessages", "Category already exists!");
+                    return BadRequest(ModelState);
+                }
 
-        //        RoleMaster roleMaster = _mapper.Map<RoleMaster>(roleMasterDTO);
+                if (categoryMasterDTO == null)
+                {
+                    return BadRequest(categoryMasterDTO);
+                }
 
-        //        roleMaster.CreatedOn = DateTime.Now;
-        //        roleMaster.UpdatedOn = DateTime.Now;
-        //        roleMaster.IsDeleted = false;
-        //        await _dbCategory.CreateAsync(roleMaster);
+                CategoryMaster categoryMaster = _mapper.Map<CategoryMaster>(categoryMasterDTO);
 
-        //        _response.Result = _mapper.Map<RoleMasterDTO>(roleMaster);
-        //        _response.StatusCode = HttpStatusCode.Created;
+                categoryMaster.CreatedOn = DateTime.Now;
+                categoryMaster.UpdatedOn = DateTime.Now;
+                categoryMaster.IsDeleted = false;
+                await _dbCategory.CreateAsync(categoryMaster);
 
-        //        return CreatedAtRoute("GetRole", new { id = roleMaster.RoleId }, _response);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _response.IsSuccess = false;
-        //        _response.ResponseMessage = new List<string>() { ex.ToString() };
-        //    }
-        //    return _response;
-        //}
+                _response.Result = _mapper.Map<CategoryMasterDTO>(categoryMaster);
+                _response.StatusCode = HttpStatusCode.Created;
 
-        ////[Authorize(Roles = "admin")]
-        //[HttpDelete]
-        //[Route("RemoveRole")]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //public async Task<ActionResult<APIResponse>> RemoveRole(int roleId)
-        //{
-        //    try
-        //    {
-        //        if (roleId == 0)
-        //        {
-        //            _response.StatusCode = HttpStatusCode.BadRequest;
-        //            return BadRequest(_response);
-        //        }
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
 
-        //        var role = await _dbCategory.GetAsync(u => u.RoleId == roleId && u.IsDeleted == false);
+        //[Authorize(Roles = "admin")]
+        [HttpDelete]
+        [Route("RemoveCategory")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponse>> RemoveCategory(int categoryId)
+        {
+            try
+            {
+                if (categoryId == 0)
+                {
+                    _response.StatusCode = HttpStatusCode.BadRequest;
+                    return BadRequest(_response);
+                }
 
-        //        if (role == null)
-        //        {
-        //            _response.StatusCode = HttpStatusCode.NotFound;
-        //            return NotFound(_response);
-        //        }
+                var category = await _dbCategory.GetAsync(u => u.CategoryId == categoryId && u.IsDeleted == false);
 
-        //        role.IsDeleted = true;
-        //        await _dbCategory.UpdateAsync(role);
+                if (category == null)
+                {
+                    _response.StatusCode = HttpStatusCode.NotFound;
+                    return NotFound(_response);
+                }
 
-        //        _response.StatusCode = HttpStatusCode.NoContent;
-        //        _response.IsSuccess = true;
-        //        return Ok(_response);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _response.IsSuccess = false;
-        //        _response.ResponseMessage = new List<string>() { ex.ToString() };
-        //    }
-        //    return _response;
-        //}
+                category.IsDeleted = true;
+                await _dbCategory.UpdateAsync(category);
 
-        //[HttpPut]
-        //[Route("UpdateRole")]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //public async Task<ActionResult<APIResponse>> UpdateRole([FromBody] RoleMasterDTO roleMasterDTO)
-        //{
-        //    try
-        //    {
-        //        if (roleMasterDTO == null)
-        //        {
-        //            return BadRequest();
-        //        }
+                _response.StatusCode = HttpStatusCode.NoContent;
+                _response.IsSuccess = true;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
 
-        //        if (await _dbCategory.GetAsync(u => u.RoleId == roleMasterDTO.RoleId) == null)
-        //        {
-        //            ModelState.AddModelError("ErrorMessages", "Role ID is Invalid!");
-        //            return BadRequest(ModelState);
-        //        }
+        [HttpPut]
+        [Route("UpdateCategory")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponse>> UpdateCategory([FromBody] CategoryMasterDTO categoryMasterDTO)
+        {
+            try
+            {
+                if (categoryMasterDTO == null)
+                {
+                    return BadRequest();
+                }
 
-        //        RoleMaster model = _mapper.Map<RoleMaster>(roleMasterDTO);
+                int categoryId = categoryMasterDTO.CategoryId;
 
-        //        model.UpdatedOn = DateTime.Now;
-        //        model.IsDeleted = false;
-        //        await _dbCategory.UpdateAsync(model);
+                if (await _dbCategory.GetAsync(u => u.CategoryId == categoryId) == null)
+                {
+                    ModelState.AddModelError("ErrorMessages", "Category ID is Invalid!");
+                    return BadRequest(ModelState);
+                }
 
-        //        _response.StatusCode = HttpStatusCode.NoContent;
-        //        _response.IsSuccess = true;
-        //        return Ok(_response);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _response.IsSuccess = false;
-        //        _response.ResponseMessage = new List<string>() { ex.ToString() };
-        //    }
-        //    return _response;
-        //}
+                CategoryMaster model = _mapper.Map<CategoryMaster>(categoryMasterDTO);
+
+                model.UpdatedOn = DateTime.Now;
+                model.IsDeleted = false;
+                await _dbCategory.UpdateAsync(model);
+
+                _response.StatusCode = HttpStatusCode.NoContent;
+                _response.IsSuccess = true;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
     }
 }

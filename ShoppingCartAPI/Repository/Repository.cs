@@ -21,6 +21,7 @@ namespace ShoppingCartAPI.Repository
         {
             IQueryable<T> query = dbSet;
 
+
             if (filter != null)
             {
                 query = query.Where(filter);
@@ -50,7 +51,7 @@ namespace ShoppingCartAPI.Repository
         {
             IQueryable<T> query = dbSet;
 
-            if (!tracked)
+            if (tracked)
             {
                 query = query.AsNoTracking();
             }

@@ -37,7 +37,7 @@ namespace ShoppingCartWeb.Services
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
-                Url = registrationUrl + "/api/UsersAuth/GetRegistration",
+                Url = registrationUrl + "/api/Registration/GetRegistration",
                 Token = token
             });
         }

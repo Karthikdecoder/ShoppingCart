@@ -4,13 +4,15 @@ using System.Linq.Expressions;
 
 namespace ShoppingCartAPI.Repository.IRepository
 {
-    public interface IUserRepository 
+    public interface IUserRepository  : IRepository<User>
     {
-        Task<List<User>> GetAllUserAsync();
-        Task<List<Registration>> GetAllRegistrationAsync();
-        bool IsUniqueUser(string email);
         Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO);
-        Task<Registration> Register(RegistrationDTO registerationRequestDTO, string userId);
-        Task<User> UserRegister(UserDTO registerationRequestDTO, string userId);
+        Task<List<User>> GetAllUserAsync();
+        Task<User> GetUserAsync(int userId);
+        Task<User> UpdateUserAsync(User User, string userId);
+        Task<User> RegisterAsync(UserDTO User, string userId);
+        Task RemoveAsync(User User);
+        Task SaveAsync();
+        bool IsUniqueUser(string Email);
     }
 }

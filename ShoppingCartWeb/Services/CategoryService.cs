@@ -30,7 +30,7 @@ namespace ShoppingCartWeb.Services
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
-                Url = categoryURL + "/api/CategoryMaster/GetCategory",
+                Url = categoryURL + "/api/CategoryMaster/GetCategories",
                 Token = token
             });
         }

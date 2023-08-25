@@ -2,70 +2,111 @@
 <!DOCTYPE html>
 <html lang="en">
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor httpAcc
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ShoppingCartWeb</title>
-    <link rel="stylesheet" href="~/css/bootstrap.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/ShoppingCartWeb.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ShoppingCart | Home Page</title>
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
 </head>
-
-<body>
-    <div class="container-fluid">
-        <div class="row">
-            <nav class="col-md-2 d-none d-md-block bg-primary sidebar">
-                <div class="position-sticky">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">ShoppingCartWeb</a>
-                        </li>
-                        @if (httpAcc.HttpContext.Session.GetString(SD.SessionToken) != null &&
+<body class="hold-transition sidebar-mini">
+    <!-- Site wrapper -->
+    <div class="wrapper">
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Righ navbar links -->
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+                @if (httpAcc.HttpContext.Session.GetString(SD.SessionToken) != null &&
                         httpAcc.HttpContext.Session.GetString(SD.SessionToken).ToString().Length > 0)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Auth" asp-action="Logout">Logout</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Auth" asp-action="Register">Register</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Auth" asp-action="UserRegister">UserRegister</a>
-                            </li>
-                        }
-                    </ul>
-                </div>
-            </nav>
+                 {   
+                         <li class="nav-item d-none d-sm-inline-block">
+                            <a class="nav-link text-dark" asp-controller="User" asp-action="Logout">Logout</a>
+                         </li>
+                 }
+            </ul>
+        </nav>
+        @if (httpAcc.HttpContext.Session.GetString(SD.SessionToken) != null &&
+                               httpAcc.HttpContext.Session.GetString(SD.SessionToken).ToString().Length > 0)
+        {
+            <!-- /.navbar -->
+            <!-- Main Sidebar Container -->
+            <aside class="main-sidebar sidebar-dark-primary elevation-4">
+                <!-- Brand Logo -->
+            <a href="../../index3.html" class="brand-link">
 
-            <main class="col-md-10 col-lg-10 col-sm-12">
-                <header class="navbar navbar-expand-md navbar-light bg-light border-bottom box-shadow mb-3">
-                    <div class="container-fluid">
-                        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ShoppingCartWeb</a>
-                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                            <span class="navbar-toggler-icon"></span>
-                        </button>
+                <span class="brand-text font-weight-light">Shopping Cart</span>
+            </a>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+
+                <!-- Sidebar Menu -->
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <!-- Add icons to the links using the .nav-icon class
+                             with font-awesome or any other icon font library -->
+                             
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Registration" asp-action="IndexRegistration">Register</a>
+                            </li>
+                        
+
+                    </ul>
+                </nav>
+                <!-- /.sidebar-menu -->
+            </div>
+            <!-- /.sidebar -->
+        </aside>
+        }
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            
+            <!-- Main content -->
+            <section class="content">
+
+                <main class="col-md-10 col-lg-10 col-sm-12">
+                    <header class="navbar navbar-expand-md navbar-light bg-light border-bottom box-shadow mb-3">
+                        <div class="container-fluid">
+                            
+                        </div>
+                    </header>
+                    <div class="container">
+                        <main role="main" class="pb-3">
+                            @RenderBody()
+                        </main>
                     </div>
-                </header>
-                <div class="container">
-                    <main role="main" class="pb-3">
-                        @RenderBody()
-                    </main>
-                </div>
-            </main>
+                </main>
         </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2023 - ShoppingCartWeb - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </section>
+            <!-- /.content -->
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+        <!-- /.content-wrapper -->
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
+    </div>
+    <!-- ./wrapper -->
+    <!-- jQuery -->
+    <script src="../../plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="../../dist/js/adminlte.min.js"></script>
+    <!-- AdminLTE for demo purposes -->
+    <script src="../../dist/js/demo.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

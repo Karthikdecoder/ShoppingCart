@@ -16,10 +16,10 @@ namespace ShoppingCartAPI.Repository
 
         public async Task<RoleMaster> UpdateAsync(RoleMaster entity)
         {
-            _db.RoleMasterTable.Update(entity);
-            await _db.SaveChangesAsync(); 
+            _db.RoleMaster.Update(entity);
+            await _db.SaveChangesAsync();
 
-            return entity; 
+            return entity;
         }
     }
 }

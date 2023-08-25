@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using ShoppingCartAPI.Models;
+using ShoppingCartAPI.Models.Dto;
 using ShoppingCartAPI.Repository.IRepository;
 using System.Net;
 using System.Security.Claims;
@@ -180,7 +181,6 @@ namespace ShoppingCartAPI.Controllers
                     ModelState.AddModelError("ErrorMessages", "Role ID is Invalid!");
                     return BadRequest(ModelState);
                 }
-
                 RoleMaster model = _mapper.Map<RoleMaster>(roleMasterDTO);
 
                 model.UpdatedOn = DateTime.Now;
