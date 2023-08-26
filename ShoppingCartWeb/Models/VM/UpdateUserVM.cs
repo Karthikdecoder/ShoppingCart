@@ -4,18 +4,18 @@ using ShoppingCartWeb.Models.Dto;
 
 namespace ShoppingCartWeb.Models.VM
 {
-    public class UserRegisterationVM
+    public class UpdateUserVM
     {
-        public UserRegisterationVM()
+        public UpdateUserVM()
         {
             User = new UserDTO();
         }
         public UserDTO User { get; set; }
 
         [ValidateNever]
-        public IEnumerable<SelectListItem> RegistrationList { get; set; }
+        public IEnumerable<SelectListItem> registrationList { get; set; }
 
         [ValidateNever]
-        public IEnumerable<SelectListItem> RoleList { get; set; }
+        public IEnumerable<SelectListItem> roleList { get; set; }
     }
 }

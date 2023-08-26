@@ -17,6 +17,7 @@ namespace ShoppingCartAPI.Controllers
     {
         private readonly IRegistrationRepository _registrationRepo;
         private readonly IMapper _mapper;
+
         protected APIResponse _response;
         private string _userId;
         public RegistrationController(IRegistrationRepository registrationRepo, IHttpContextAccessor httpContextAccessor, IMapper mapper)
@@ -36,7 +37,7 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                IEnumerable<Registration> registrationList = await _registrationRepo.GetAllAsync(includeProperties: "CategoryMaster");
+                IEnumerable<Registration> registrationList = await _registrationRepo.GetAllAsync(includeProperties : "CategoryMaster,StateMaster,CountryMaster");
                 _response.Result = _mapper.Map<List<RegistrationDTO>>(registrationList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);

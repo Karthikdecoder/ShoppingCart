@@ -1,11 +1,11 @@
-﻿@model ShoppingCartWeb.Models.VM.CreateRegistrationVM
+﻿@model ShoppingCartWeb.Models.VM.UpdateRegistrationVM
 
-<form asp-action="CreateRegistration">
+<form asp-action="UpdateRegistration">
     <br />
     <div class="container border p-3">
-        <h1 class="text-primary">Create Registration</h1>
-        <hr/>
-
+        <h1 class="text-primary">Update Registration</h1>
+        <hr />
+        <input hidden asp-for="Registration.RegistrationId" />
         <div class="row">
             <div asp-validation-summary="All" class="text-danger"></div>
 
@@ -72,7 +72,7 @@
                 <input asp-for="Registration.PostalCode" class="form-control" />
                 <span asp-validation-for="Registration.PostalCode" class="text-danger"></span>
             </div>
-
+            
             <div class="col-2">
                 <label asp-for="Registration.CategoryId" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
@@ -80,7 +80,7 @@
                 <select asp-for="Registration.CategoryId" class="form-select" asp-items="@Model.CategoryList">
                     <option disabled selected>--Select Category--</option>
                 </select>
-                <span asp-validation-for="Registration.CategoryId" class="text-danger"></span>
+                <span asp-validation-for="Registration.RegistrationId" class="text-danger"></span>
             </div>
 
             <div class="col-2">
@@ -104,7 +104,7 @@
             </div>
 
             <div class="col-5 offset-2">
-                <a asp-action="Index" asp-controller="Home" class="btn-primary btn form-control ">Back to List</a>
+                <a asp-action="IndexUser" asp-controller="User" class="btn-primary btn form-control ">Back to List</a>
             </div>
             <div class="col-5">
                 <input type="submit" value="Register" class="btn btn-success form-control" />
@@ -113,7 +113,7 @@
     </div>
 </form>
 
-@section Scripts 
-{
+@section Scripts
+    {
     <partial name="_ValidationScriptsPartial" />
 }

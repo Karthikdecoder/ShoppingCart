@@ -18,17 +18,21 @@ namespace ShoppingCartWeb.Controllers
 {
     public class RegistrationController : Controller
     {
-        private readonly IUserService _authService;
+        private readonly IRegistrationService _registrationService;
         private readonly IRoleService _roleService;
         private readonly ICategoryService _categoryService;
-        private readonly IMapper _mapper;
+		private readonly IStateService _stateService;
+		private readonly ICountryService _countryService;
+		private readonly IMapper _mapper;
         private string _Role;
-        public RegistrationController(IUserService authService, IHttpContextAccessor httpContextAccessor, IRoleService roleService, ICategoryService categoryService, IMapper mapper)
+        public RegistrationController(IRegistrationService registrationService, IHttpContextAccessor httpContextAccessor, IRoleService roleService, ICategoryService categoryService, IStateService stateService, ICountryService countryService, IMapper mapper)
         {
-            _authService = authService;
+            _registrationService = registrationService;
             _Role = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Role);
             _roleService = roleService;
             _categoryService = categoryService;
+            _stateService = stateService;
+            _countryService = countryService;
             _mapper = mapper;
         }
 
@@ -36,7 +40,7 @@ namespace ShoppingCartWeb.Controllers
 		{
 			List<RegistrationDTO> list = new();
 
-			var response = await _authService.GetAllUserAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+			var response = await _registrationService.GetAllRegistrationAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
 
 			if (response != null && response.IsSuccess)
 			{
@@ -49,96 +53,201 @@ namespace ShoppingCartWeb.Controllers
 		[HttpGet]
         public async Task<IActionResult> CreateRegistration()
         {
-            CategoryMasterVM categoryMaster = new();
+			CreateRegistrationVM createRegisterationVM = new();
 
-            var response = await _categoryService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+            var categoryResponse = await _categoryService.GetAllCategoryAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
 
-            if (response != null && response.IsSuccess) 
+            if (categoryResponse != null && categoryResponse.IsSuccess) 
             {
-                categoryMaster.CategoryList = JsonConvert.DeserializeObject<List<CategoryMasterDTO>>(Convert.ToString(response.Result)).Select(i => new SelectListItem
+                createRegisterationVM.CategoryList = JsonConvert.DeserializeObject<List<CategoryMasterDTO>>(Convert.ToString(categoryResponse.Result)).Select(i => new SelectListItem
                     {
                         Text = i.CategoryName,
                         Value = i.CategoryId.ToString()
                     }); 
             }
 
-            return View(categoryMaster);
+			var stateResponse = await _stateService.GetAllStateAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+
+			if (stateResponse != null && stateResponse.IsSuccess)
+			{
+				createRegisterationVM.StateList = JsonConvert.DeserializeObject<List<StateMasterDTO>>(Convert.ToString(stateResponse.Result)).Select(i => new SelectListItem
+				{
+					Text = i.StateName,
+					Value = i.StateId.ToString()
+				});
+			}
+
+            var countryResponse = await _countryService.GetAllCountryAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+
+			if (countryResponse != null && countryResponse.IsSuccess)
+			{
+				createRegisterationVM.CountryList = JsonConvert.DeserializeObject<List<CountryMasterDTO>>(Convert.ToString(countryResponse.Result)).Select(i => new SelectListItem
+				{
+					Text = i.CountryName,
+					Value = i.CountryId.ToString()
+				});
+			}
+
+			return View(createRegisterationVM);
         }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> CreateRegistration(RoleMasterCreateVM obj)
-        //{
-
-        //    APIResponse result = await _authService.RegisterAsync<APIResponse>(obj.Registration, HttpContext.Session.GetString(SD.SessionToken));
-
-        //    if (result != null && result.IsSuccess)
-        //    {
-        //        return RedirectToAction("Login", "Auth");
-        //    }
-        //    return View();
-
-        //}
-
-        public async Task<IActionResult> UpdateRegistration(int registrationId)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateRegistration(CreateRegistrationVM obj)
         {
-            UpdateRegistrationVM updateRegistrationVM = new();
-            var response = await _authService.GetUserAsync<APIResponse>(registrationId, HttpContext.Session.GetString(SD.SessionToken));
 
-            if (response != null && response.IsSuccess)
+            APIResponse result = await _registrationService.CreateRegistrationAsync<APIResponse>(obj.Registration, HttpContext.Session.GetString(SD.SessionToken));
+
+            if (result != null && result.IsSuccess)
             {
-                RegistrationDTO model = JsonConvert.DeserializeObject<RegistrationDTO>(Convert.ToString(response.Result));
-                updateRegistrationVM.Registration = _mapper.Map<RegistrationDTO>(model);
+                return RedirectToAction("Home", "Index");
+            }
+            return View();
+
+        }
+
+		public async Task<IActionResult> UpdateRegistration(int registrationId)
+		{
+			UpdateRegistrationVM updateRegistrationVM = new();
+			var registrationResponse = await _registrationService.GetRegistrationAsync<APIResponse>(registrationId, HttpContext.Session.GetString(SD.SessionToken));
+
+			if (registrationResponse != null && registrationResponse.IsSuccess)
+			{
+				RegistrationDTO model = JsonConvert.DeserializeObject<RegistrationDTO>(Convert.ToString(registrationResponse.Result));
+				updateRegistrationVM.Registration = _mapper.Map<RegistrationDTO>(model);
+			}
+
+			var categoryResponse = await _categoryService.GetAllCategoryAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+
+			if (categoryResponse != null && categoryResponse.IsSuccess)
+			{
+				updateRegistrationVM.CategoryList = JsonConvert.DeserializeObject<List<CategoryMasterDTO>>(Convert.ToString(categoryResponse.Result)).Select(i => new SelectListItem
+				{
+					Text = i.CategoryName,
+					Value = i.CategoryId.ToString()
+				});
+			}
+
+			var stateResponse = await _stateService.GetAllStateAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+
+			if (stateResponse != null && stateResponse.IsSuccess)
+			{
+				updateRegistrationVM.StateList = JsonConvert.DeserializeObject<List<StateMasterDTO>>(Convert.ToString(stateResponse.Result)).Select(i => new SelectListItem
+				{
+					Text = i.StateName,
+					Value = i.StateId.ToString()
+				});
+			}
+
+			var countryResponse = await _countryService.GetAllCountryAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+
+			if (countryResponse != null && countryResponse.IsSuccess)
+			{
+				updateRegistrationVM.CountryList = JsonConvert.DeserializeObject<List<CountryMasterDTO>>(Convert.ToString(countryResponse.Result)).Select(i => new SelectListItem
+				{
+					Text = i.CountryName,
+					Value = i.CountryId.ToString()
+				});
+			}
+
+			return NotFound();
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> UpdateRegistration(UpdateRegistrationVM model)
+		{
+			if (ModelState.IsValid)
+			{
+				var response = await _registrationService.UpdateRegistrationAsync<APIResponse>(model.Registration, HttpContext.Session.GetString(SD.SessionToken));
+
+				if (response != null && response.IsSuccess)
+				{
+					return RedirectToAction(nameof(IndexRegistration));
+				}
+				else
+				{
+					if (response.ErrorMessages.Count > 0) 
+					{
+						ModelState.AddModelError("ErrorMessages", response.ErrorMessages.FirstOrDefault());
+					}
+				}
+			}
+
+			var updateResponse = await _registrationService.GetAllRegistrationAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+			if (updateResponse != null && updateResponse.IsSuccess)
+			{
+				model.Registration = (RegistrationDTO)JsonConvert.DeserializeObject<List<RegistrationDTO>>
+					(Convert.ToString(updateResponse.Result)).Select(i => new SelectListItem
+					{
+						Text = i.FirstName,
+						Value = i.RegistrationId.ToString()
+					}); ;
+			}
+
+			return View(model);
+		}
+
+
+		public async Task<IActionResult> RemoveRegistration(int registrationId)
+        {
+            RemoveRegistrationVM removeRegistrationVM = new();
+            var registrationResponse = await _registrationService.GetRegistrationAsync<APIResponse>(registrationId, HttpContext.Session.GetString(SD.SessionToken));
+
+            if (registrationResponse != null && registrationResponse.IsSuccess)
+            {
+                RegistrationDTO model = JsonConvert.DeserializeObject<RegistrationDTO>(Convert.ToString(registrationResponse.Result));
+                removeRegistrationVM.Registration = model;
             }
 
-            response = await _categoryService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
-            if (response != null && response.IsSuccess)
+            var categoryResponse = await _categoryService.GetAllCategoryAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+
+            if (categoryResponse != null && categoryResponse.IsSuccess)
             {
-                updateRegistrationVM.CategoryList = JsonConvert.DeserializeObject<List<CategoryMasterDTO>>(Convert.ToString(response.Result)).Select(i => new SelectListItem
+                removeRegistrationVM.CategoryList = JsonConvert.DeserializeObject<List<CategoryMasterDTO>>(Convert.ToString(categoryResponse.Result)).Select(i => new SelectListItem
                 {
                     Text = i.CategoryName,
                     Value = i.CategoryId.ToString()
                 });
-                return View(updateRegistrationVM);
+            }
+
+            var stateResponse = await _stateService.GetAllStateAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+
+            if (stateResponse != null && stateResponse.IsSuccess)
+            {
+                removeRegistrationVM.StateList = JsonConvert.DeserializeObject<List<StateMasterDTO>>(Convert.ToString(stateResponse.Result)).Select(i => new SelectListItem
+                {
+                    Text = i.StateName,
+                    Value = i.StateId.ToString()
+                });
+            }
+
+            var countryResponse = await _countryService.GetAllCountryAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+
+            if (countryResponse != null && countryResponse.IsSuccess)
+            {
+                removeRegistrationVM.CountryList = JsonConvert.DeserializeObject<List<CountryMasterDTO>>(Convert.ToString(countryResponse.Result)).Select(i => new SelectListItem
+                {
+                    Text = i.CountryName,
+                    Value = i.CountryId.ToString()
+                });
             }
 
             return NotFound();
         }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> UpdateRegistration(UpdateRegistrationVM model)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        var response = await _villaNumberService.UpdateAsync<APIResponse>(model.VillaNumber, HttpContext.Session.GetString(SD.SessionToken));
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveRegistration(RemoveRegistrationVM removeRegistration)
+        {
+            var response = await _registrationService.DeleteRegistrationAsync<APIResponse>(removeRegistration.Registration.RegistrationId, HttpContext.Session.GetString(SD.SessionToken));
 
-        //        if (response != null && response.IsSuccess)
-        //        {
-        //            return RedirectToAction(nameof(IndexVillaNumber));
-        //        }
-        //        else
-        //        {
-        //            if (response.ErrorMessages.Count > 0) // error here!!!!!!!!
-        //            {
-        //                ModelState.AddModelError("ErrorMessages", response.ErrorMessages.FirstOrDefault());
-        //            }
-        //        }
-        //    }
-
-        //    var resp = await _villaService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
-        //    if (resp != null && resp.IsSuccess)
-        //    {
-        //        model.VillaList = JsonConvert.DeserializeObject<List<VillaDTO>>
-        //            (Convert.ToString(resp.Result)).Select(i => new SelectListItem
-        //            {
-        //                Text = i.Name,
-        //                Value = i.Id.ToString()
-        //            }); ;
-        //    }
-
-        //    return View(model);
-        //}
+            if (response != null && response.IsSuccess)
+            {
+                return RedirectToAction(nameof(IndexRegistration));
+            }
+            return View(removeRegistration);
+        }
     }
 
 }

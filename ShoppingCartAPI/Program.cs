@@ -24,10 +24,13 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<IRegistrationRepository, RegistrationRepository>();
 
+builder.Services.AddScoped<IRoleMasterRepository, RoleMasterRepository>();
 
-//builder.Services.AddScoped<IRoleMasterRepository, RoleMasterRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
-//builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICountryRepository, CountryRepository>();
+
+builder.Services.AddScoped<IStateRepository, StateRepository>();
 
 builder.Services.AddControllers(option =>
 {

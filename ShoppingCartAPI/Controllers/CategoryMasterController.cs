@@ -26,10 +26,10 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpGet]
-        [Route("GetCategories")]
+        [Route("GetAllCategory")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<APIResponse>> GetCategories()
+        public async Task<ActionResult<APIResponse>> GetAllCategory()
         {
             try
             {

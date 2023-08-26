@@ -25,58 +25,66 @@
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
                 @if (httpAcc.HttpContext.Session.GetString(SD.SessionToken) != null &&
-                        httpAcc.HttpContext.Session.GetString(SD.SessionToken).ToString().Length > 0)
-                 {   
-                         <li class="nav-item d-none d-sm-inline-block">
-                            <a class="nav-link text-dark" asp-controller="User" asp-action="Logout">Logout</a>
-                         </li>
-                 }
+                httpAcc.HttpContext.Session.GetString(SD.SessionToken).ToString().Length > 0)
+                {
+                    <li class="nav-item d-none d-sm-inline-block">
+                        <a class="nav-link text-dark" asp-controller="User" asp-action="Logout">Logout</a>
+                    </li>
+                }
             </ul>
         </nav>
         @if (httpAcc.HttpContext.Session.GetString(SD.SessionToken) != null &&
-                               httpAcc.HttpContext.Session.GetString(SD.SessionToken).ToString().Length > 0)
+        httpAcc.HttpContext.Session.GetString(SD.SessionToken).ToString().Length > 0)
         {
             <!-- /.navbar -->
             <!-- Main Sidebar Container -->
             <aside class="main-sidebar sidebar-dark-primary elevation-4">
                 <!-- Brand Logo -->
-            <a href="../../index3.html" class="brand-link">
+                <a href="../../index3.html" class="brand-link">
 
-                <span class="brand-text font-weight-light">Shopping Cart</span>
-            </a>
+                    <span class="brand-text font-weight-light">Shopping Cart</span>
+                </a>
 
-            <!-- Sidebar -->
-            <div class="sidebar">
+                <!-- Sidebar -->
+                <div class="sidebar">
 
-                <!-- Sidebar Menu -->
-                <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                        <!-- Add icons to the links using the .nav-icon class
-                             with font-awesome or any other icon font library -->
-                             
+                    <!-- Sidebar Menu -->
+                    <nav class="mt-2">
+                        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                            <!-- Add icons to the links using the .nav-icon class
+                                 with font-awesome or any other icon font library -->
+
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Registration" asp-action="IndexRegistration">Register</a>
+                                <a class="nav-link text-white" asp-controller="Registration" asp-action="IndexRegistration">Registration</a>
                             </li>
-                        
 
-                    </ul>
-                </nav>
-                <!-- /.sidebar-menu -->
-            </div>
-            <!-- /.sidebar -->
-        </aside>
+                        </ul>
+
+                        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                            <!-- Add icons to the links using the .nav-icon class
+                                 with font-awesome or any other icon font library -->
+
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="User" asp-action="IndexUser">User</a>
+                            </li>
+
+                        </ul>
+                    </nav>
+                    <!-- /.sidebar-menu -->
+                </div>
+                <!-- /.sidebar -->
+            </aside>
         }
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
-            
+
             <!-- Main content -->
             <section class="content">
 
                 <main class="col-md-10 col-lg-10 col-sm-12">
                     <header class="navbar navbar-expand-md navbar-light bg-light border-bottom box-shadow mb-3">
                         <div class="container-fluid">
-                            
                         </div>
                     </header>
                     <div class="container">
@@ -85,18 +93,18 @@
                         </main>
                     </div>
                 </main>
+            </section>
         </div>
     </div>
 
-            </section>
-            <!-- /.content -->
-        </div>
-        <!-- /.content-wrapper -->
-        <!-- Control Sidebar -->
-        <aside class="control-sidebar control-sidebar-dark">
-            <!-- Control sidebar content goes here -->
-        </aside>
-        <!-- /.control-sidebar -->
+    <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+        <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
     </div>
     <!-- ./wrapper -->
     <!-- jQuery -->
@@ -110,3 +118,5 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
+

@@ -6,7 +6,7 @@
 			<h1 class="text-primary">Registered Members List</h1>
 		</div>
 		<div class="col text-end pt-1">
-			<a asp-controller="Auth" asp-action="CreateRegistration" class="btn btn-outline-primary"><i class="bi bi-plus-square-fill"></i> Register new member </a>
+			<a asp-controller="Registration" asp-action="CreateRegistration" class="btn btn-outline-primary"><i class="bi bi-plus-square-fill"></i> Register new member </a>
 		</div>
 	</div>
 
@@ -65,8 +65,8 @@
 					<td>@item.StateMaster.StateName</td>
 					<td>@item.CountryMaster.CountryName</td>
 					<td>
-						<a asp-controller="VillaNumber" asp-action="UpdateVillaNumber" asp-route-villaNo="@item.RegistrationId" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
-						<a asp-controller="VillaNumber" asp-action="DeleteVillaNumber" asp-route-villaNo="@item.RegistrationId" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
+						<a asp-controller="Registration" asp-action="UpdateRegistration" asp-route-registrationno="@item.RegistrationId" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
+						<a asp-controller="Registration" asp-action="RemoveRegistration" asp-route-registrationno="@item.RegistrationId" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
 					</td>
 				</tr>
 			}

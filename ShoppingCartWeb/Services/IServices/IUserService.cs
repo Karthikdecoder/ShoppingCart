@@ -11,6 +11,6 @@ namespace ShoppingCartWeb.Services.IServices
         Task<T> GetAllUserAsync<T>(string token);
         Task<T> GetUserAsync<T>(int id, string token);
         Task<T> UpdateUserAsync<T>(UserDTO dto, string token);
-        Task<T> DeleteUserAsync<T>(int id, string token);
+        Task<T> RemoveUserAsync<T>(int id, string token);
     }
 }

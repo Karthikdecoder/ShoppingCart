@@ -4,9 +4,9 @@ using ShoppingCartWeb.Models.Dto;
 
 namespace ShoppingCartWeb.Models.VM
 {
-    public class UpdateRegistrationVM
-    {
-		public UpdateRegistrationVM()
+	public class CreateRegistrationVM
+	{
+		public CreateRegistrationVM()
 		{
 			Registration = new RegistrationDTO();
 		}

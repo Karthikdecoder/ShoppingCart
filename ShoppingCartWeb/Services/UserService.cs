@@ -53,7 +53,7 @@ namespace ShoppingCartWeb.Services
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
-                Url = userURL + "/api/User/GetUser/" + userId,
+                Url = userURL + "/api/User/GetUser?userId=" + userId,
                 Token = token
             });
         }
@@ -69,7 +69,7 @@ namespace ShoppingCartWeb.Services
             });
         }
 
-        public Task<T> DeleteUserAsync<T>(int userId, string token)
+        public Task<T> RemoveUserAsync<T>(int userId, string token)
         {
             return SendAsync<T>(new APIRequest()
             {

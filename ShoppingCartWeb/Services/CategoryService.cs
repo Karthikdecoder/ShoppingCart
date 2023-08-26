@@ -15,32 +15,37 @@ namespace ShoppingCartWeb.Services
 
             categoryURL = configuration.GetValue<string>("ServiceUrls:ShoppingCartAPI");
         }
-        public Task<T> CreateAsync<T>(CategoryMasterDTO categoryMasterDTO, string token)
+        public Task<T> CreateCategoryAsync<T>(CategoryMasterDTO categoryMasterDTO, string token)
         {
             throw new NotImplementedException();
         }
 
-        public Task<T> DeleteAsync<T>(int roleId, string token)
+        public Task<T> RemoveCategoryAsync<T>(int categoryId, string token)
         {
             throw new NotImplementedException();
         }
 
-        public Task<T> GetAllAsync<T>(string token)
+        public Task<T> GetAllCategoryAsync<T>(string token)
         {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
-                Url = categoryURL + "/api/CategoryMaster/GetCategories",
+                Url = categoryURL + "/api/CategoryMaster/GetAllCategory",
                 Token = token
             });
         }
 
-        public Task<T> GetAsync<T>(int roleId, string token)
+        public Task<T> GetCategoryAsync<T>(int categoryId, string token)
         {
-            throw new NotImplementedException();
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.GET,
+                Url = categoryURL + "/api/CategoryMaster/GetCategory?categoryId?=" + categoryId,
+                Token = token
+            });
         }
 
-        public Task<T> UpdateAsync<T>(CategoryMasterDTO categoryMasterDTO, string token)
+        public Task<T> UpdateCategoryAsync<T>(CategoryMasterDTO categoryMasterDTO, string token)
         {
             throw new NotImplementedException();
         }

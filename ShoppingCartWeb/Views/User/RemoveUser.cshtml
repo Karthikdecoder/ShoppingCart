@@ -1,59 +1,59 @@
-﻿@model ShoppingCartWeb.Models.VM.RegisterVM
+﻿@model ShoppingCartWeb.Models.VM.RemoveUserVM
 
-<form asp-action="UserRegister">
+<form asp-action="RemoveUser">
     <br />
     <div class="container border p-3">
-        <h1 class="text-primary">User Register</h1>
+        <h1 class="text-primary">Remove User</h1>
         <hr />
-
+        <input hidden asp-for="User.UserId" />
         <div class="row">
-            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="col-2">
+                <label asp-for="User.UserId" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="User.UserId" disabled class="form-control" />
+            </div>
 
             <div class="col-2">
                 <label asp-for="User.UserName" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
             <div class="col-10 pb-3">
-                <input asp-for="User.UserName" class="form-control" />
-                <span asp-validation-for="User.UserName" class="text-danger"></span>
+                <input asp-for="User.UserName" disabled class="form-control" />
             </div>
 
             <div class="col-2">
                 <label asp-for="User.Password" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
             <div class="col-10 pb-3">
-                <input asp-for="User.Password" class="form-control" />
-                <span asp-validation-for="User.Password" class="text-danger"></span>
+                <input asp-for="User.Password" disabled class="form-control" />
             </div>
 
             <div class="col-2">
                 <label asp-for="User.RegistrationId" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
             <div class="col-10 pb-3">
-                <select asp-for="User.RegistrationId" class="form-select" asp-items="@Model.registrationList">
-                    <option disabled selected>--Select Name--</option>
+                <select asp-for="User.RegistrationId" disabled class="form-select" asp-items="@Model.registrationList">
+                    <option disabled selected>--Select Registration--</option>
                 </select>
-                <span asp-validation-for="User.RegistrationId" class="text-danger"></span>
             </div>
 
             <div class="col-2">
                 <label asp-for="User.RoleId" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
             <div class="col-10 pb-3">
-                <select asp-for="User.RoleId" class="form-select" asp-items="@Model.roleList">
+                <select asp-for="User.RoleId" disabled class="form-select" asp-items="@Model.roleList">
                     <option disabled selected>--Select Role--</option>
                 </select>
-                <span asp-validation-for="User.RoleId" class="text-danger"></span>
             </div>
-
 
             <div class="col-5 offset-2">
-                <a asp-action="Register" asp-controller="User" class="btn-primary btn form-control ">Back to List</a>
+                <a asp-action="IndexUser" asp-controller="User" class="btn-primary btn form-control ">Back to List</a>
             </div>
             <div class="col-5">
-                <input type="submit" value="Register" class="btn btn-success form-control" />
+                <input type="submit" value="Delete" class="btn btn-success form-control" />
             </div>
         </div>
-
     </div>
 </form>
 

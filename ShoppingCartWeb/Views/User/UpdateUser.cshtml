@@ -1,11 +1,11 @@
-﻿@model ShoppingCartWeb.Models.VM.RegisterVM
+﻿@model ShoppingCartWeb.Models.VM.UpdateUserVM
 
-<form asp-action="UserRegister">
+<form asp-action="UpdateUser">
     <br />
     <div class="container border p-3">
-        <h1 class="text-primary">User Register</h1>
+        <h1 class="text-primary">Update User</h1>
         <hr />
-
+        <input hidden asp-for="User.UserId" />
         <div class="row">
             <div asp-validation-summary="All" class="text-danger"></div>
 
@@ -25,12 +25,13 @@
                 <span asp-validation-for="User.Password" class="text-danger"></span>
             </div>
 
+            
             <div class="col-2">
                 <label asp-for="User.RegistrationId" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
             <div class="col-10 pb-3">
                 <select asp-for="User.RegistrationId" class="form-select" asp-items="@Model.registrationList">
-                    <option disabled selected>--Select Name--</option>
+                    <option disabled selected>--Select Registration--</option>
                 </select>
                 <span asp-validation-for="User.RegistrationId" class="text-danger"></span>
             </div>
@@ -45,15 +46,13 @@
                 <span asp-validation-for="User.RoleId" class="text-danger"></span>
             </div>
 
-
             <div class="col-5 offset-2">
-                <a asp-action="Register" asp-controller="User" class="btn-primary btn form-control ">Back to List</a>
+                <a asp-action="IndexUser" asp-controller="User" class="btn-primary btn form-control ">Back to List</a>
             </div>
             <div class="col-5">
                 <input type="submit" value="Register" class="btn btn-success form-control" />
             </div>
         </div>
-
     </div>
 </form>
 

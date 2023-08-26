@@ -24,6 +24,12 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddHttpClient<IRegistrationService, RegistrationService>();
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 
+builder.Services.AddHttpClient<ICountryService, CountryService>();
+builder.Services.AddScoped<ICountryService, CountryService>();
+
+builder.Services.AddHttpClient<IStateService, StateService>();
+builder.Services.AddScoped<IStateService, StateService>();
+
 builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSession(options =>
