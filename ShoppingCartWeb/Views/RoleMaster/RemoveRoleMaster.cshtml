@@ -1,0 +1,42 @@
+﻿@model ShoppingCartWeb.Models.Dto.RoleMasterDTO
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form asp-action="RemoveRoleMaster">
+    <br />
+    <div class="container border p-3">
+        <h1 class="text-primary">Remove Role</h1>
+        <hr />
+        <input hidden asp-for="RoleId" />
+        <div class="row">
+
+            <div class="col-2">
+                <label asp-for="RoleId" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="RoleId" disabled class="form-control" />
+            </div>
+
+            <div class="col-2">
+                <label asp-for="RoleName" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="RoleName" disabled class="form-control" />
+            </div>
+
+            <div class="col-5 offset-2">
+                <a asp-action="IndexRoleMaster" asp-controller="RoleMaster" class="btn-primary btn form-control ">Back to List</a>
+            </div>
+            <div class="col-5">
+                <input type="submit" value="Delete" class="btn btn-success form-control" />
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts
+    {
+    <partial name="_ValidationScriptsPartial" />
+}

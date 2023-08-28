@@ -15,14 +15,14 @@ namespace ShoppingCartAPI.Controllers
         protected APIResponse _response;
         private readonly IMapper _mapper;
         private readonly IRoleMasterRepository _dbRoles;
-        private string _userID;
+        private string _userId;
 
         public RoleMasterController(IRoleMasterRepository roleMasterRepository, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _dbRoles = roleMasterRepository;
             _mapper = mapper;
             _response = new();
-            _userID = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.SerialNumber);
+            _userId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
 
         [HttpGet]
@@ -106,15 +106,22 @@ namespace ShoppingCartAPI.Controllers
 
                 RoleMaster roleMaster = _mapper.Map<RoleMaster>(roleMasterDTO);
 
+                if (_userId == null)
+                {
+                    _userId = "0";
+                }
+
                 roleMaster.CreatedOn = DateTime.Now;
+                roleMaster.CreatedBy = int.Parse(_userId);
                 roleMaster.UpdatedOn = DateTime.Now;
+                roleMaster.UpdatedBy = int.Parse(_userId);
                 roleMaster.IsDeleted = false;
                 await _dbRoles.CreateAsync(roleMaster);
 
                 _response.Result = _mapper.Map<RoleMasterDTO>(roleMaster);
                 _response.StatusCode = HttpStatusCode.Created;
 
-                return Ok();
+                return Ok(_response);
             }
             catch (Exception ex)
             {
@@ -183,7 +190,13 @@ namespace ShoppingCartAPI.Controllers
                 }
                 RoleMaster model = _mapper.Map<RoleMaster>(roleMasterDTO);
 
+                if (_userId == null)
+                {
+                    _userId = "0";
+                }
+
                 model.UpdatedOn = DateTime.Now;
+                model.UpdatedBy = int.Parse(_userId);
                 model.IsDeleted = false;
                 await _dbRoles.UpdateAsync(model);
 

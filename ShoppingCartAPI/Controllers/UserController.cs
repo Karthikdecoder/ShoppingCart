@@ -36,7 +36,7 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                IEnumerable<User> userList = await _userRepo.GetAllAsync(includeProperties: "RoleMaster,Registration");
+                IEnumerable<User> userList = await _userRepo.GetAllAsync(u => (!u.IsDeleted), includeProperties: "RoleMaster,Registration");
                 _response.Result = _mapper.Map<List<User>>(userList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
@@ -123,6 +123,11 @@ namespace ShoppingCartAPI.Controllers
                 _userId = "0";
             }
 
+            model.CreatedOn = DateTime.Now;
+            model.CreatedBy = int.Parse(_userId);
+            model.UpdatedOn = DateTime.Now;
+            model.UpdatedBy = int.Parse(_userId);
+
             var user = await _userRepo.RegisterAsync(model, _userId);
 
             if (user == null)
@@ -207,6 +212,9 @@ namespace ShoppingCartAPI.Controllers
                 {
                     _userId = "0";
                 }
+
+                model.UpdatedOn = DateTime.Now;
+                model.UpdatedBy = int.Parse(_userId);
 
                 await _userRepo.UpdateUserAsync(model, _userId);
 

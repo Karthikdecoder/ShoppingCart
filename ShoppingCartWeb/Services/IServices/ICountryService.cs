@@ -8,6 +8,6 @@ namespace ShoppingCartWeb.Services.IServices
 		Task<T> GetCountryAsync<T>(int countryId, string token);
 		Task<T> CreateCountryAsync<T>(CountryMasterDTO countryMasterDTO, string token);
 		Task<T> UpdateCountryAsync<T>(CountryMasterDTO countryMasterDTO, string token);
-		Task<T> DeleteCountryAsync<T>(int countryId, string token);
+		Task<T> RemoveCountryAsync<T>(int countryId, string token);
 	}
 }

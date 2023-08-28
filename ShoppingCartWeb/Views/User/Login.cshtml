@@ -1,5 +1,9 @@
 ﻿@model ShoppingCartWeb.Models.Dto.LoginRequestDTO
 
+@*<link rel="stylesheet" href="~/css/bootstrap.css" />
+<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/ShoppingCartWeb.styles.css" asp-append-version="true" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
 <form method="post">
     <div class="container border p-4">
@@ -27,6 +31,75 @@
 
 
 </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}*@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #394b39; /* Set your preferred background color */
+        }
+
+        .login-container {
+            background-color: #e0f7fa; /* Set card background color */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <title>Login Page</title>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="login-container">
+                    <div class="card-header">
+                        @*<h4>Login</h4>*@
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            <div class="container border p-4">
+                                <div class="row text-center">
+                                    <h1>Login</h1>
+                                </div>
+                                <div class="row text-center">
+                                    <div asp-validation-summary="All" class="text-danger"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6 offset-3 pb-2">
+                                        <input asp-for="UserName" type="text" class="form-control" placeholder="Username..." />
+                                    </div>
+
+                                    <div class="col-6 offset-3 pb-2">
+                                        <input asp-for="Password" type="text" class="form-control" placeholder="Password..." />
+
+                                    </div>
+                                    <div class="col-6 offset-3 pb-2">
+                                        <button type="submit" class="form-control btn-success" value="Submit">Login</button>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

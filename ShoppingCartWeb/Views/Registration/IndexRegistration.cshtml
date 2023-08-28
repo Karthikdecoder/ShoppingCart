@@ -1,6 +1,11 @@
 ﻿@model IEnumerable<ShoppingCartWeb.Models.Dto.RegistrationDTO>
+
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
 <br />
-<div class="container p-4 border">
+<div class="container p-4 border mt-4">
 	<div class="row pb-2">
 		<div class="col">
 			<h1 class="text-primary">Registered Members List</h1>
@@ -13,6 +18,9 @@
 	<table class="table">
 		<thead>
 			<tr>
+				<th>
+					Registration Id
+				</th>
 				<th>
 					First Name
 				</th>
@@ -53,6 +61,7 @@
 			@foreach (var item in Model)
 			{
 				<tr>
+					<td>@item.RegistrationId</td>
 					<td>@item.FirstName</td>
 					<td>@item.LastName</td>
 					<td>@item.CategoryMaster.CategoryName</td>
@@ -65,8 +74,8 @@
 					<td>@item.StateMaster.StateName</td>
 					<td>@item.CountryMaster.CountryName</td>
 					<td>
-						<a asp-controller="Registration" asp-action="UpdateRegistration" asp-route-registrationno="@item.RegistrationId" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
-						<a asp-controller="Registration" asp-action="RemoveRegistration" asp-route-registrationno="@item.RegistrationId" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
+						<a asp-controller="Registration" asp-action="UpdateRegistration" asp-route-registrationId="@item.RegistrationId" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
+						<a asp-controller="Registration" asp-action="RemoveRegistration" asp-route-registrationId="@item.RegistrationId" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
 					</td>
 				</tr>
 			}

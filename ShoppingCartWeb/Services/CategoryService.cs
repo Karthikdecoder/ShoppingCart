@@ -15,16 +15,7 @@ namespace ShoppingCartWeb.Services
 
             categoryURL = configuration.GetValue<string>("ServiceUrls:ShoppingCartAPI");
         }
-        public Task<T> CreateCategoryAsync<T>(CategoryMasterDTO categoryMasterDTO, string token)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<T> RemoveCategoryAsync<T>(int categoryId, string token)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public Task<T> GetAllCategoryAsync<T>(string token)
         {
             return SendAsync<T>(new APIRequest()
@@ -40,14 +31,40 @@ namespace ShoppingCartWeb.Services
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
-                Url = categoryURL + "/api/CategoryMaster/GetCategory?categoryId?=" + categoryId,
+                Url = categoryURL + "/api/CategoryMaster/GetCategory?categoryId=" + categoryId,
                 Token = token
             });
         }
 
+        public Task<T> CreateCategoryAsync<T>(CategoryMasterDTO categoryMasterDTO, string token)
+        {
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.POST,
+                Data = categoryMasterDTO,
+                Url = categoryURL + "/api/CategoryMaster/CreateCategory",
+                Token = token
+            });
+        }
         public Task<T> UpdateCategoryAsync<T>(CategoryMasterDTO categoryMasterDTO, string token)
         {
-            throw new NotImplementedException();
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.PUT,
+                Data = categoryMasterDTO,
+                Url = categoryURL + "/api/CategoryMaster/UpdateCategory",
+                Token = token
+            });
+        }
+
+        public Task<T> RemoveCategoryAsync<T>(int categoryId, string token)
+        {
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.DELETE,
+                Url = categoryURL + "/api/CategoryMaster/RemoveCategory?categoryId=" + categoryId,
+                Token = token
+            });
         }
     }
 }

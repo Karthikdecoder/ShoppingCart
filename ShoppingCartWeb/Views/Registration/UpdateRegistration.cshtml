@@ -1,13 +1,25 @@
 ﻿@model ShoppingCartWeb.Models.VM.UpdateRegistrationVM
 
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 <form asp-action="UpdateRegistration">
     <br />
     <div class="container border p-3">
         <h1 class="text-primary">Update Registration</h1>
         <hr />
+
         <input hidden asp-for="Registration.RegistrationId" />
         <div class="row">
-            <div asp-validation-summary="All" class="text-danger"></div>
+            @*<div asp-validation-summary="All" class="text-danger"></div>*@
+
+            @*<div class="col-2">
+            <label asp-for="Registration.RegistrationId" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+            <input asp-for="Registration.RegistrationId" class="form-control" />
+            <span asp-validation-for="Registration.RegistrationId" class="text-danger"></span>
+            </div>*@
 
             <div class="col-2">
                 <label asp-for="Registration.FirstName" class="control-label pt-2" style="font-size:20px;"></label>
@@ -25,13 +37,33 @@
                 <span asp-validation-for="Registration.LastName" class="text-danger"></span>
             </div>
 
-            <div class="col-2">
-                <label asp-for="Registration.Gender" class="control-label pt-2" style="font-size:20px;"></label>
+            @*<div class="col-2">
+            <label asp-for="Registration.Gender" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
             <div class="col-10 pb-3">
-                <input asp-for="Registration.Gender" class="form-control" />
+            <input asp-for="Registration.Gender" class="form-control" />
+            <span asp-validation-for="Registration.Gender" class="text-danger"></span>
+            </div>*@
+
+            <div class="col-2">
+                <label asp-for="Registration.Gender" class="control-label pt-2" style="font-size: 16px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" asp-for="Registration.Gender" value="Male" />
+                    <label class="form-check-label" for="Registration.Gender">Male</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" asp-for="Registration.Gender" value="Female" />
+                    <label class="form-check-label" for="Registration.Gender">Female</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" asp-for="Registration.Gender" value="Other" />
+                    <label class="form-check-label" for="Registration.Gender">Other</label>
+                </div>
                 <span asp-validation-for="Registration.Gender" class="text-danger"></span>
             </div>
+
 
             <div class="col-2">
                 <label asp-for="Registration.DateOfBirth" class="control-label pt-2" style="font-size:20px;"></label>
@@ -72,7 +104,7 @@
                 <input asp-for="Registration.PostalCode" class="form-control" />
                 <span asp-validation-for="Registration.PostalCode" class="text-danger"></span>
             </div>
-            
+
             <div class="col-2">
                 <label asp-for="Registration.CategoryId" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
@@ -80,7 +112,7 @@
                 <select asp-for="Registration.CategoryId" class="form-select" asp-items="@Model.CategoryList">
                     <option disabled selected>--Select Category--</option>
                 </select>
-                <span asp-validation-for="Registration.RegistrationId" class="text-danger"></span>
+                <span asp-validation-for="Registration.CategoryId" class="text-danger"></span>
             </div>
 
             <div class="col-2">
@@ -104,10 +136,10 @@
             </div>
 
             <div class="col-5 offset-2">
-                <a asp-action="IndexUser" asp-controller="User" class="btn-primary btn form-control ">Back to List</a>
+                <a asp-action="IndexRegistration" asp-controller="Registration" class="btn-primary btn form-control ">Back to List</a>
             </div>
             <div class="col-5">
-                <input type="submit" value="Register" class="btn btn-success form-control" />
+                <input type="submit" value="Update" class="btn btn-success form-control" />
             </div>
         </div>
     </div>

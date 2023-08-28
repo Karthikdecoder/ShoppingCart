@@ -95,10 +95,10 @@ namespace ShoppingCartWeb.Controllers
 
 			if (registrationResponse != null && registrationResponse.IsSuccess)
 			{
-				registerVM.registrationList = JsonConvert.DeserializeObject<List<StateMasterDTO>>(Convert.ToString(registrationResponse.Result)).Select(i => new SelectListItem
+				registerVM.registrationList = JsonConvert.DeserializeObject<List<RegistrationDTO>>(Convert.ToString(registrationResponse.Result)).Select(i => new SelectListItem
 				{
-					Text = i.StateName,
-					Value = i.StateId.ToString()
+					Text = i.FirstName + " " + i.LastName,
+					Value = i.RegistrationId.ToString()
 				});
 			}
 
@@ -106,10 +106,10 @@ namespace ShoppingCartWeb.Controllers
 
 			if (roleResponse != null && roleResponse.IsSuccess)
 			{
-				registerVM.roleList = JsonConvert.DeserializeObject<List<CountryMasterDTO>>(Convert.ToString(roleResponse.Result)).Select(i => new SelectListItem
+				registerVM.roleList = JsonConvert.DeserializeObject<List<RoleMasterDTO>>(Convert.ToString(roleResponse.Result)).Select(i => new SelectListItem
 				{
-					Text = i.CountryName,
-					Value = i.CountryId.ToString()
+					Text = i.RoleName,
+					Value = i.RoleId.ToString()
 				});
 			}
 
@@ -127,7 +127,7 @@ namespace ShoppingCartWeb.Controllers
 
             if (result != null && result.IsSuccess)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("IndexUser", "User");
             }
             return View();
         }
@@ -260,7 +260,7 @@ namespace ShoppingCartWeb.Controllers
         {
             await HttpContext.SignOutAsync();
             HttpContext.Session.SetString(SD.SessionToken, "");
-            return RedirectToAction("Login", "Auth");
+            return RedirectToAction("Login", "User");
         }
 
         public IActionResult AccessDenied()

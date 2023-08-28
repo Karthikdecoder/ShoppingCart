@@ -15,14 +15,14 @@ namespace ShoppingCartAPI.Controllers
         protected APIResponse _response;
         private readonly IMapper _mapper;
         private readonly IStateRepository _stateRepo;
-        private string _userID;
+        private string _userId;
 
         public StateMasterController(IStateRepository stateRepo, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _stateRepo = stateRepo;
             _mapper = mapper;
             _response = new();
-            _userID = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.SerialNumber);
+            _userId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
 
         [HttpGet]
@@ -83,123 +83,136 @@ namespace ShoppingCartAPI.Controllers
             return _response;
         }
 
-        //[HttpPost]
-        //[Route("CreateCategory")]
+        [HttpPost]
+        [Route("CreateState")]
+        //[Authorize(Roles = "admin")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<APIResponse>> CreateState([FromBody] StateMasterDTO stateMasterDTO)
+        {
+            try
+            {
+                if (await _stateRepo.GetAsync(u => u.StateName == stateMasterDTO.StateName && u.IsDeleted == false) != null)
+                {
+                    ModelState.AddModelError("ErrorMessages", "State already exists!");
+                    return BadRequest(ModelState);
+                }
+
+                if (stateMasterDTO == null)
+                {
+                    return BadRequest(stateMasterDTO);
+                }
+
+                StateMaster stateMaster = _mapper.Map<StateMaster>(stateMasterDTO);
+
+                if (_userId == null)
+                {
+                    _userId = "0";
+                }
+
+                stateMaster.CreatedOn = DateTime.Now;
+                stateMaster.CreatedBy = int.Parse(_userId);
+                stateMaster.UpdatedOn = DateTime.Now;
+                stateMaster.UpdatedBy = int.Parse(_userId);
+                stateMaster.IsDeleted = false;
+                await _stateRepo.CreateAsync(stateMaster);
+
+                _response.Result = _mapper.Map<StateMasterDTO>(stateMaster);
+                _response.StatusCode = HttpStatusCode.Created;
+
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
+
         ////[Authorize(Roles = "admin")]
-        //[ProducesResponseType(StatusCodes.Status201Created)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<APIResponse>> CreateCategory([FromBody] CategoryMasterDTO categoryMasterDTO)
-        //{
-        //    try
-        //    {
-        //        if (await _dbCategory.GetAsync(u => u.CategoryName == categoryMasterDTO.CategoryName && u.IsDeleted == false) != null)
-        //        {
-        //            ModelState.AddModelError("ErrorMessages", "Category already exists!");
-        //            return BadRequest(ModelState);
-        //        }
+        [HttpDelete]
+        [Route("RemoveState")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponse>> RemoveState(int StateId)
+        {
+            try
+            {
+                if (StateId == 0)
+                {
+                    _response.StatusCode = HttpStatusCode.BadRequest;
+                    return BadRequest(_response);
+                }
 
-        //        if (categoryMasterDTO == null)
-        //        {
-        //            return BadRequest(categoryMasterDTO);
-        //        }
+                var State = await _stateRepo.GetAsync(u => u.StateId == StateId && u.IsDeleted == false);
 
-        //        CategoryMaster categoryMaster = _mapper.Map<CategoryMaster>(categoryMasterDTO);
+                if (State == null)
+                {
+                    _response.StatusCode = HttpStatusCode.NotFound;
+                    return NotFound(_response);
+                }
 
-        //        categoryMaster.CreatedOn = DateTime.Now;
-        //        categoryMaster.UpdatedOn = DateTime.Now;
-        //        categoryMaster.IsDeleted = false;
-        //        await _dbCategory.CreateAsync(categoryMaster);
+                State.IsDeleted = true;
+                await _stateRepo.UpdateAsync(State);
 
-        //        _response.Result = _mapper.Map<CategoryMasterDTO>(categoryMaster);
-        //        _response.StatusCode = HttpStatusCode.Created;
+                _response.StatusCode = HttpStatusCode.NoContent;
+                _response.IsSuccess = true;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
 
-        //        return Ok();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _response.IsSuccess = false;
-        //        _response.ResponseMessage = new List<string>() { ex.ToString() };
-        //    }
-        //    return _response;
-        //}
+        [HttpPut]
+        [Route("UpdateState")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponse>> UpdateState([FromBody] StateMasterDTO StateMasterDTO)
+        {
+            try
+            {
+                if (StateMasterDTO == null)
+                {
+                    return BadRequest();
+                }
 
-        ////[Authorize(Roles = "admin")]
-        //[HttpDelete]
-        //[Route("RemoveCategory")]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //public async Task<ActionResult<APIResponse>> RemoveCategory(int categoryId)
-        //{
-        //    try
-        //    {
-        //        if (categoryId == 0)
-        //        {
-        //            _response.StatusCode = HttpStatusCode.BadRequest;
-        //            return BadRequest(_response);
-        //        }
+                int StateId = StateMasterDTO.StateId;
 
-        //        var category = await _dbCategory.GetAsync(u => u.CategoryId == categoryId && u.IsDeleted == false);
+                if (await _stateRepo.GetAsync(u => u.StateId == StateId) == null)
+                {
+                    ModelState.AddModelError("ErrorMessages", "State ID is Invalid!");
+                    return BadRequest(ModelState);
+                }
 
-        //        if (category == null)
-        //        {
-        //            _response.StatusCode = HttpStatusCode.NotFound;
-        //            return NotFound(_response);
-        //        }
+                StateMaster model = _mapper.Map<StateMaster>(StateMasterDTO);
 
-        //        category.IsDeleted = true;
-        //        await _dbCategory.UpdateAsync(category);
+                if (_userId == null)
+                {
+                    _userId = "0";
+                }
 
-        //        _response.StatusCode = HttpStatusCode.NoContent;
-        //        _response.IsSuccess = true;
-        //        return Ok(_response);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _response.IsSuccess = false;
-        //        _response.ResponseMessage = new List<string>() { ex.ToString() };
-        //    }
-        //    return _response;
-        //}
+                model.UpdatedOn = DateTime.Now;
+                model.UpdatedBy = int.Parse(_userId);
+                model.IsDeleted = false;
+                await _stateRepo.UpdateAsync(model);
 
-        //[HttpPut]
-        //[Route("UpdateCategory")]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //public async Task<ActionResult<APIResponse>> UpdateCategory([FromBody] CategoryMasterDTO categoryMasterDTO)
-        //{
-        //    try
-        //    {
-        //        if (categoryMasterDTO == null)
-        //        {
-        //            return BadRequest();
-        //        }
-
-        //        int categoryId = categoryMasterDTO.CategoryId;
-
-        //        if (await _dbCategory.GetAsync(u => u.CategoryId == categoryId) == null)
-        //        {
-        //            ModelState.AddModelError("ErrorMessages", "Category ID is Invalid!");
-        //            return BadRequest(ModelState);
-        //        }
-
-        //        CategoryMaster model = _mapper.Map<CategoryMaster>(categoryMasterDTO);
-
-        //        model.UpdatedOn = DateTime.Now;
-        //        model.IsDeleted = false;
-        //        await _dbCategory.UpdateAsync(model);
-
-        //        _response.StatusCode = HttpStatusCode.NoContent;
-        //        _response.IsSuccess = true;
-        //        return Ok(_response);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _response.IsSuccess = false;
-        //        _response.ResponseMessage = new List<string>() { ex.ToString() };
-        //    }
-        //    return _response;
-        //}
+                _response.StatusCode = HttpStatusCode.NoContent;
+                _response.IsSuccess = true;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
     }
 }

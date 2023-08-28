@@ -64,7 +64,7 @@ namespace ShoppingCartWeb.Services
             {
                 ApiType = SD.ApiType.PUT,
                 Data = userDTO,
-                Url = userURL + "/api/User/UpdateUser/" + userDTO.UserId, 
+                Url = userURL + "/api/User/UpdateUser", 
                 Token = token
             });
         }
@@ -74,7 +74,7 @@ namespace ShoppingCartWeb.Services
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.DELETE,
-                Url = userURL + "/api/User/RemoveUser/" + userId,
+                Url = userURL + "/api/User/RemoveUser?userId=" + userId,
                 Token = token
             });
         }

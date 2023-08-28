@@ -1,0 +1,46 @@
+﻿@model IEnumerable<ShoppingCartWeb.Models.Dto.CategoryMasterDTO>
+
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br />
+<div class="container p-4 border mt-4">
+	<div class="row pb-2">
+		<div class="col">
+			<h1 class="text-primary">Category List</h1>
+		</div>
+		<div class="col text-end pt-1">
+			<a asp-controller="CategoryMaster" asp-action="CreateCategoryMaster" class="btn btn-outline-primary"><i class="bi bi-plus-square-fill"></i> Create new Role </a>
+		</div>
+	</div>
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>
+					Category Id
+				</th>
+				<th>
+					Category Name
+				</th>
+
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var item in Model)
+			{
+				<tr>
+					<td>@item.CategoryId</td>
+					<td>@item.CategoryName</td>
+					<td>
+						<a asp-controller="CategoryMaster" asp-action="UpdateCategoryMaster" asp-route-categoryId="@item.CategoryId" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
+						<a asp-controller="CategoryMaster" asp-action="RemoveCategoryMaster" asp-route-categoryId="@item.CategoryId" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+
+</div>

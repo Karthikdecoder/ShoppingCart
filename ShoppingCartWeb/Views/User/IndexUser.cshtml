@@ -1,4 +1,9 @@
 ﻿@model IEnumerable<ShoppingCartWeb.Models.Dto.UserDTO>
+
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
 <br />
 <div class="container p-4 border">
 	<div class="row pb-2">
@@ -13,6 +18,9 @@
 	<table class="table">
 		<thead>
 			<tr>
+				<th>
+					User Id
+				</th>
 				<th>
 					Username
 				</th>
@@ -35,6 +43,7 @@
 			@foreach (var item in Model)
 			{
 				<tr>
+					<td>@item.UserId</td>
 					<td>@item.UserName</td>
 					<td>@item.Password</td>
 					<td>@item.Registration.FirstName</td>

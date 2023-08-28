@@ -15,14 +15,14 @@ namespace ShoppingCartAPI.Controllers
         protected APIResponse _response;
         private readonly IMapper _mapper;
         private readonly ICategoryRepository _dbCategory;
-        private string _userID;
+        private string _userId;
 
         public CategoryMasterController(ICategoryRepository _categoryRepository, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _dbCategory = _categoryRepository;
             _mapper = mapper;
             _response = new();
-            _userID = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.SerialNumber);
+            _userId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
 
         [HttpGet]
@@ -106,15 +106,22 @@ namespace ShoppingCartAPI.Controllers
 
                 CategoryMaster categoryMaster = _mapper.Map<CategoryMaster>(categoryMasterDTO);
 
+                if (_userId == null)
+                {
+                    _userId = "0";
+                }
+
                 categoryMaster.CreatedOn = DateTime.Now;
+                categoryMaster.CreatedBy = int.Parse(_userId);
                 categoryMaster.UpdatedOn = DateTime.Now;
+                categoryMaster.UpdatedBy = int.Parse(_userId);
                 categoryMaster.IsDeleted = false;
                 await _dbCategory.CreateAsync(categoryMaster);
 
                 _response.Result = _mapper.Map<CategoryMasterDTO>(categoryMaster);
                 _response.StatusCode = HttpStatusCode.Created;
 
-                return Ok();
+                return Ok(_response);
             }
             catch (Exception ex)
             {
@@ -186,7 +193,13 @@ namespace ShoppingCartAPI.Controllers
 
                 CategoryMaster model = _mapper.Map<CategoryMaster>(categoryMasterDTO);
 
+                if (_userId == null)
+                {
+                    _userId = "0";
+                }
+
                 model.UpdatedOn = DateTime.Now;
+                model.UpdatedBy = int.Parse(_userId);
                 model.IsDeleted = false;
                 await _dbCategory.UpdateAsync(model);
 

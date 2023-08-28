@@ -17,13 +17,24 @@ namespace ShoppingCartWeb.Services
 		}
 		public Task<T> CreateCountryAsync<T>(CountryMasterDTO countryMasterDTO, string token)
 		{
-			throw new NotImplementedException();
-		}
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.POST,
+                Data = countryMasterDTO,
+                Url = countryUrl + "/api/CountryMaster/CreateCountry",
+                Token = token
+            });
+        }
 
-		public Task<T> DeleteCountryAsync<T>(int countryId, string token)
+		public Task<T> RemoveCountryAsync<T>(int countryId, string token)
 		{
-			throw new NotImplementedException();
-		}
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.DELETE,
+                Url = countryUrl + "/api/CountryMaster/RemoveCountry?CountryId=" + countryId,
+                Token = token
+            });
+        }
 
 		public Task<T> GetAllCountryAsync<T>(string token)
 		{
@@ -47,7 +58,13 @@ namespace ShoppingCartWeb.Services
 
 		public Task<T> UpdateCountryAsync<T>(CountryMasterDTO countryMasterDTO, string token)
 		{
-			throw new NotImplementedException();
-		}
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.PUT,
+                Data = countryMasterDTO,
+                Url = countryUrl + "/api/CountryMaster/UpdateCountry",
+                Token = token
+            });
+        }
 	}
 }

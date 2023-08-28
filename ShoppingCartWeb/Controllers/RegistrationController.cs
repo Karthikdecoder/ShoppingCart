@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
@@ -11,7 +9,6 @@ using ShoppingCartWeb.Models.VM;
 using ShoppingCartWeb.Services.IServices;
 using ShoppingCartWeb.Utililty;
 using System.Data;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace ShoppingCartWeb.Controllers
@@ -100,7 +97,7 @@ namespace ShoppingCartWeb.Controllers
 
             if (result != null && result.IsSuccess)
             {
-                return RedirectToAction("Home", "Index");
+                return RedirectToAction("IndexRegistration", "Registration");
             }
             return View();
 
@@ -148,7 +145,9 @@ namespace ShoppingCartWeb.Controllers
 					Text = i.CountryName,
 					Value = i.CountryId.ToString()
 				});
-			}
+
+                return View(updateRegistrationVM);
+            }
 
 			return NotFound();
 		}
@@ -182,8 +181,8 @@ namespace ShoppingCartWeb.Controllers
 					{
 						Text = i.FirstName,
 						Value = i.RegistrationId.ToString()
-					}); ;
-			}
+					});
+            }
 
 			return View(model);
 		}
@@ -231,6 +230,7 @@ namespace ShoppingCartWeb.Controllers
                     Text = i.CountryName,
                     Value = i.CountryId.ToString()
                 });
+                return View(removeRegistrationVM);
             }
 
             return NotFound();
@@ -240,7 +240,7 @@ namespace ShoppingCartWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveRegistration(RemoveRegistrationVM removeRegistration)
         {
-            var response = await _registrationService.DeleteRegistrationAsync<APIResponse>(removeRegistration.Registration.RegistrationId, HttpContext.Session.GetString(SD.SessionToken));
+            var response = await _registrationService.RemoveRegistrationAsync<APIResponse>(removeRegistration.Registration.RegistrationId, HttpContext.Session.GetString(SD.SessionToken));
 
             if (response != null && response.IsSuccess)
             {

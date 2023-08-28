@@ -16,6 +16,25 @@ namespace ShoppingCartWeb.Services
 
             registrationUrl = configuration.GetValue<string>("ServiceUrls:ShoppingCartAPI");
         }
+        public Task<T> GetAllRegistrationAsync<T>(string token)
+        {
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.GET,
+                Url = registrationUrl + "/api/Registration/GetAllRegistration",
+                Token = token
+            });
+        }
+
+        public Task<T> GetRegistrationAsync<T>(int registrationId, string token)
+        {
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.GET,
+                Url = registrationUrl + "/api/Registration/GetRegistration?registrationId=" + registrationId,
+                Token = token
+            });
+        }
 
         public Task<T> CreateRegistrationAsync<T>(RegistrationDTO registrationDTO, string token)
         {
@@ -28,34 +47,25 @@ namespace ShoppingCartWeb.Services
             });
         }
 
-        public Task<T> DeleteRegistrationAsync<T>(int registrationId, string token)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<T> GetAllRegistrationAsync<T>(string token)
-        {
-			return SendAsync<T>(new APIRequest()
-			{
-				ApiType = SD.ApiType.GET,
-				Url = registrationUrl + "/api/Registration/GetAllRegistration",
-				Token = token
-			});
-		}
-
-        public Task<T> GetRegistrationAsync<T>(int registrationId, string token)
+        public Task<T> RemoveRegistrationAsync<T>(int registrationId, string token)
         {
             return SendAsync<T>(new APIRequest()
             {
-                ApiType = SD.ApiType.GET,
-                Url = registrationUrl + "/api/Registration/GetRegistration?registrationId=" + registrationId,
+                ApiType = SD.ApiType.DELETE,
+                Url = registrationUrl + "/api/Registration/RemoveRegistration?registrationId=" + registrationId,
                 Token = token
             });
         }
 
         public Task<T> UpdateRegistrationAsync<T>(RegistrationDTO registrationDTO, string token)
         {
-            throw new NotImplementedException();
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.PUT,
+                Data = registrationDTO, 
+                Url = registrationUrl + "/api/Registration/UpdateRegistration",
+                Token = token
+            });
         }
     }
 }

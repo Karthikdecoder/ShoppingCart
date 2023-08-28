@@ -15,15 +15,6 @@ namespace ShoppingCartWeb.Services
 
             roleUrl = configuration.GetValue<string>("ServiceUrls:ShoppingCartAPI");
         }
-        public Task<T> CreateRoleAsync<T>(RoleMasterDTO roleMasterDTO, string token)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<T> RemoveRoleAsync<T>(int roleId, string token)
-        {
-            throw new NotImplementedException();
-        }
 
         public Task<T> GetAllRoleAsync<T>(string token)
         {
@@ -45,9 +36,36 @@ namespace ShoppingCartWeb.Services
             });
         }
 
+        public Task<T> CreateRoleAsync<T>(RoleMasterDTO roleMasterDTO, string token)
+        {
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.POST,
+                Data = roleMasterDTO,
+                Url = roleUrl + "/api/RoleMaster/CreateRole",
+                Token = token
+            });
+        }
+
+        public Task<T> RemoveRoleAsync<T>(int roleId, string token)
+        {
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.DELETE,
+                Url = roleUrl + "/api/RoleMaster/RemoveRole?roleId=" + roleId,
+                Token = token
+            });
+        }
+
         public Task<T> UpdateRoleAsync<T>(RoleMasterDTO roleMasterDTO, string token)
         {
-            throw new NotImplementedException();
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.PUT,
+                Data = roleMasterDTO, 
+                Url = roleUrl + "/api/RoleMaster/UpdateRole",
+                Token = token
+            });
         }
     }
 }

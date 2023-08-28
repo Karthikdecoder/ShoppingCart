@@ -1,0 +1,87 @@
+﻿@using ShoppingCartWeb.Utililty;
+<!DOCTYPE html>
+<html lang="en">
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor httpAcc
+
+@if (httpAcc.HttpContext.Session.GetString(SD.SessionToken) != null &&
+     httpAcc.HttpContext.Session.GetString(SD.SessionToken).ToString().Length > 0)
+{
+    <!-- /.navbar -->
+    <!-- Main Sidebar Container -->
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        <!-- Brand Logo -->
+        <a href="../../index3.html" class="brand-link">
+
+            <span class="brand-text font-weight-light">Point Of Sale</span>
+        </a>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+
+            <!-- Sidebar Menu -->
+            <nav class="mt-2">
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                    <!-- Add icons to the links using the .nav-icon class
+                         with font-awesome or any other icon font library -->
+
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-controller="Registration" asp-action="IndexRegistration">Person Registration</a>
+                    </li>
+
+                </ul>
+
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                    <!-- Add icons to the links using the .nav-icon class
+                         with font-awesome or any other icon font library -->
+
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-controller="User" asp-action="IndexUser">User Registration</a>
+                    </li>
+
+                </ul>
+
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                    <!-- Add icons to the links using the .nav-icon class
+                         with font-awesome or any other icon font library -->
+
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-controller="RoleMaster" asp-action="IndexRoleMaster">Role Master</a>
+                    </li>
+
+                </ul>
+
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                    <!-- Add icons to the links using the .nav-icon class
+                         with font-awesome or any other icon font library -->
+
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-controller="CategoryMaster" asp-action="IndexCategoryMaster">Category Master</a>
+                    </li>
+
+                </ul>
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                    <!-- Add icons to the links using the .nav-icon class
+                         with font-awesome or any other icon font library -->
+
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-controller="StateMaster" asp-action="IndexStateMaster">State Master</a>
+                    </li>
+
+                </ul>
+
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                    <!-- Add icons to the links using the .nav-icon class
+                         with font-awesome or any other icon font library -->
+
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-controller="CountryMaster" asp-action="IndexCountryMaster">Country Master</a>
+                    </li>
+
+                </ul>
+            </nav>
+            <!-- /.sidebar-menu -->
+        </div>
+        <!-- /.sidebar -->
+    </aside>
+
+}

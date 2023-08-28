@@ -15,14 +15,14 @@ namespace ShoppingCartAPI.Controllers
         protected APIResponse _response;
         private readonly IMapper _mapper;
         private readonly ICountryRepository _countryRepo;
-        private string _userID;
+        private string _userId;
 
         public CountryMasterController(ICountryRepository countryRepo, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _countryRepo = countryRepo;
             _mapper = mapper;
             _response = new();
-            _userID = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.SerialNumber);
+            _userId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
 
         [HttpGet]
@@ -83,123 +83,136 @@ namespace ShoppingCartAPI.Controllers
             return _response;
         }
 
-        //[HttpPost]
-        //[Route("CreateCategory")]
+        [HttpPost]
+        [Route("CreateCountry")]
+        //[Authorize(Roles = "admin")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<APIResponse>> CreateCountry([FromBody] CountryMasterDTO countryMasterDTO)
+        {
+            try
+            {
+                if (await _countryRepo.GetAsync(u => u.CountryName == countryMasterDTO.CountryName && u.IsDeleted == false) != null)
+                {
+                    ModelState.AddModelError("ErrorMessages", "Country already exists!");
+                    return BadRequest(ModelState);
+                }
+
+                if (countryMasterDTO == null)
+                {
+                    return BadRequest(countryMasterDTO);
+                }
+
+                CountryMaster countryMaster = _mapper.Map<CountryMaster>(countryMasterDTO);
+
+                if (_userId == null)
+                {
+                    _userId = "0";
+                }
+
+                countryMaster.CreatedOn = DateTime.Now;
+                countryMaster.CreatedBy = int.Parse(_userId);
+                countryMaster.UpdatedOn = DateTime.Now;
+                countryMaster.UpdatedBy = int.Parse(_userId);
+                countryMaster.IsDeleted = false;
+                await _countryRepo.CreateAsync(countryMaster);
+
+                _response.Result = _mapper.Map<CountryMasterDTO>(countryMaster);
+                _response.StatusCode = HttpStatusCode.Created;
+
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
+
         ////[Authorize(Roles = "admin")]
-        //[ProducesResponseType(StatusCodes.Status201Created)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<APIResponse>> CreateCategory([FromBody] CategoryMasterDTO categoryMasterDTO)
-        //{
-        //    try
-        //    {
-        //        if (await _dbCategory.GetAsync(u => u.CategoryName == categoryMasterDTO.CategoryName && u.IsDeleted == false) != null)
-        //        {
-        //            ModelState.AddModelError("ErrorMessages", "Category already exists!");
-        //            return BadRequest(ModelState);
-        //        }
+        [HttpDelete]
+        [Route("RemoveCountry")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponse>> RemoveCountry(int CountryId)
+        {
+            try
+            {
+                if (CountryId == 0)
+                {
+                    _response.StatusCode = HttpStatusCode.BadRequest;
+                    return BadRequest(_response);
+                }
 
-        //        if (categoryMasterDTO == null)
-        //        {
-        //            return BadRequest(categoryMasterDTO);
-        //        }
+                var Country = await _countryRepo.GetAsync(u => u.CountryId == CountryId && u.IsDeleted == false);
 
-        //        CategoryMaster categoryMaster = _mapper.Map<CategoryMaster>(categoryMasterDTO);
+                if (Country == null)
+                {
+                    _response.StatusCode = HttpStatusCode.NotFound;
+                    return NotFound(_response);
+                }
 
-        //        categoryMaster.CreatedOn = DateTime.Now;
-        //        categoryMaster.UpdatedOn = DateTime.Now;
-        //        categoryMaster.IsDeleted = false;
-        //        await _dbCategory.CreateAsync(categoryMaster);
+                Country.IsDeleted = true;
+                await _countryRepo.UpdateAsync(Country);
 
-        //        _response.Result = _mapper.Map<CategoryMasterDTO>(categoryMaster);
-        //        _response.StatusCode = HttpStatusCode.Created;
+                _response.StatusCode = HttpStatusCode.NoContent;
+                _response.IsSuccess = true;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
 
-        //        return Ok();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _response.IsSuccess = false;
-        //        _response.ResponseMessage = new List<string>() { ex.ToString() };
-        //    }
-        //    return _response;
-        //}
+        [HttpPut]
+        [Route("UpdateCountry")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponse>> UpdateCountry([FromBody] CountryMasterDTO CountryMasterDTO)
+        {
+            try
+            {
+                if (CountryMasterDTO == null)
+                {
+                    return BadRequest();
+                }
 
-        ////[Authorize(Roles = "admin")]
-        //[HttpDelete]
-        //[Route("RemoveCategory")]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //public async Task<ActionResult<APIResponse>> RemoveCategory(int categoryId)
-        //{
-        //    try
-        //    {
-        //        if (categoryId == 0)
-        //        {
-        //            _response.StatusCode = HttpStatusCode.BadRequest;
-        //            return BadRequest(_response);
-        //        }
+                int CountryId = CountryMasterDTO.CountryId;
 
-        //        var category = await _dbCategory.GetAsync(u => u.CategoryId == categoryId && u.IsDeleted == false);
+                if (await _countryRepo.GetAsync(u => u.CountryId == CountryId) == null)
+                {
+                    ModelState.AddModelError("ErrorMessages", "Country ID is Invalid!");
+                    return BadRequest(ModelState);
+                }
 
-        //        if (category == null)
-        //        {
-        //            _response.StatusCode = HttpStatusCode.NotFound;
-        //            return NotFound(_response);
-        //        }
+                CountryMaster model = _mapper.Map<CountryMaster>(CountryMasterDTO);
 
-        //        category.IsDeleted = true;
-        //        await _dbCategory.UpdateAsync(category);
+                if (_userId == null)
+                {
+                    _userId = "0";
+                }
 
-        //        _response.StatusCode = HttpStatusCode.NoContent;
-        //        _response.IsSuccess = true;
-        //        return Ok(_response);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _response.IsSuccess = false;
-        //        _response.ResponseMessage = new List<string>() { ex.ToString() };
-        //    }
-        //    return _response;
-        //}
+                model.UpdatedOn = DateTime.Now;
+                model.UpdatedBy = int.Parse(_userId);
+                model.IsDeleted = false;
+                await _countryRepo.UpdateAsync(model);
 
-        //[HttpPut]
-        //[Route("UpdateCategory")]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //public async Task<ActionResult<APIResponse>> UpdateCategory([FromBody] CategoryMasterDTO categoryMasterDTO)
-        //{
-        //    try
-        //    {
-        //        if (categoryMasterDTO == null)
-        //        {
-        //            return BadRequest();
-        //        }
-
-        //        int categoryId = categoryMasterDTO.CategoryId;
-
-        //        if (await _dbCategory.GetAsync(u => u.CategoryId == categoryId) == null)
-        //        {
-        //            ModelState.AddModelError("ErrorMessages", "Category ID is Invalid!");
-        //            return BadRequest(ModelState);
-        //        }
-
-        //        CategoryMaster model = _mapper.Map<CategoryMaster>(categoryMasterDTO);
-
-        //        model.UpdatedOn = DateTime.Now;
-        //        model.IsDeleted = false;
-        //        await _dbCategory.UpdateAsync(model);
-
-        //        _response.StatusCode = HttpStatusCode.NoContent;
-        //        _response.IsSuccess = true;
-        //        return Ok(_response);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _response.IsSuccess = false;
-        //        _response.ResponseMessage = new List<string>() { ex.ToString() };
-        //    }
-        //    return _response;
-        //}
+                _response.StatusCode = HttpStatusCode.NoContent;
+                _response.IsSuccess = true;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
     }
 }

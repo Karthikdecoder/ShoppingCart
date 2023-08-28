@@ -37,7 +37,7 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                IEnumerable<Registration> registrationList = await _registrationRepo.GetAllAsync(includeProperties : "CategoryMaster,StateMaster,CountryMaster");
+                IEnumerable<Registration> registrationList = await _registrationRepo.GetAllAsync(u => (!u.IsDeleted), includeProperties : "CategoryMaster,StateMaster,CountryMaster");
                 _response.Result = _mapper.Map<List<RegistrationDTO>>(registrationList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
@@ -66,7 +66,7 @@ namespace ShoppingCartAPI.Controllers
                     return BadRequest(_response);
                 }
 
-                var registrationDetail = await _registrationRepo.GetAsync( u => u.IsDeleted == false);
+                var registrationDetail = await _registrationRepo.GetAsync( u => u.RegistrationId == registrationId && u.IsDeleted == false);
 
                 if (registrationDetail == null)
                 {
@@ -96,7 +96,7 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                if (await _registrationRepo.GetAsync(u => u.RegistrationId == registrationDTO.RegistrationId) != null)
+                if (await _registrationRepo.GetAsync(u => u.RegistrationId == registrationDTO.RegistrationId  && u.Email == registrationDTO.Email || u.RegistrationId == registrationDTO.RegistrationId || u.Email == registrationDTO.Email) != null)
                 {
                     ModelState.AddModelError("ErrorMessages", "Registering Person already exists!");
                     return BadRequest(ModelState);
@@ -124,7 +124,7 @@ namespace ShoppingCartAPI.Controllers
                 _response.Result = _mapper.Map<RegistrationDTO>(registrationDetail);
                 _response.StatusCode = HttpStatusCode.Created;
 
-                return CreatedAtRoute("GetRegistration", new { id = registrationDetail.RegistrationId }, _response);
+                return Ok(_response);
             }
             catch (Exception ex)
             {
@@ -190,6 +190,12 @@ namespace ShoppingCartAPI.Controllers
                     ModelState.AddModelError("ErrorMessages", "Registration Id is Invalid");
                     return BadRequest(ModelState);
                 }
+
+                //if (await _registrationRepo.GetAsync(u => u.Email == registrationDTO.Email) != null)
+                //{
+                //    ModelState.AddModelError("ErrorMessages", "Registering Person already exists!");
+                //    return BadRequest(ModelState);
+                //}
 
                 Registration registrationDetail = _mapper.Map<Registration>(registrationDTO);
 
