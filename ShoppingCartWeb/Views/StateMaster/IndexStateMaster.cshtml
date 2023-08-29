@@ -24,6 +24,9 @@
 				<th>
 					State Name
 				</th>
+				<th>
+					Country Name
+				</th>
 
 				<th></th>
 			</tr>
@@ -34,9 +37,10 @@
 				<tr>
 					<td>@item.StateId</td>
 					<td>@item.StateName</td>
+					<td>@item.CountryMaster.CountryName</td>
 					<td>
-						<a asp-controller="StateMaster" asp-action="UpdateStateMaster" asp-route-stateId="@item.StateId" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
-						<a asp-controller="StateMaster" asp-action="RemoveStateMaster" asp-route-stateId="@item.StateId" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
+						<a asp-controller="StateMaster" asp-action="UpdateStateMaster" asp-route-StateId="@item.StateId" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
+						<a asp-controller="StateMaster" asp-action="RemoveStateMaster" asp-route-StateId="@item.StateId" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
 					</td>
 				</tr>
 			}

@@ -16,13 +16,14 @@ namespace ShoppingCartWeb.Controllers
     public class StateMasterController : Controller
     {
         private readonly IUserService _userService;
+        private readonly ICountryService _countryService;
         private readonly IRegistrationService _registrationService;
         private readonly IRoleService _roleService;
         private readonly ICategoryService _categoryService;
         private readonly IStateService _stateService;
         private readonly IMapper _mapper;
         private string _Role;
-        public StateMasterController(IUserService userService, IHttpContextAccessor httpContextAccessor, IRoleService roleService, ICategoryService categoryService, IMapper mapper, IRegistrationService registrationService, IStateService stateService)
+        public StateMasterController(IUserService userService, IHttpContextAccessor httpContextAccessor, IRoleService roleService, ICategoryService categoryService, IMapper mapper, IRegistrationService registrationService, IStateService stateService, ICountryService countryService)
         {
             _userService = userService;
             _Role = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Role);
@@ -31,6 +32,7 @@ namespace ShoppingCartWeb.Controllers
             _mapper = mapper;
             _registrationService = registrationService;
             _stateService = stateService;
+            _countryService = countryService;
         }
 
         public async Task<IActionResult> IndexStateMaster()
@@ -70,13 +72,27 @@ namespace ShoppingCartWeb.Controllers
 
         public async Task<IActionResult> UpdateStateMaster(int StateId)
         {
-            var StateResponse = await _stateService.GetStateAsync<APIResponse>(StateId, HttpContext.Session.GetString(SD.SessionToken));
+            StateMasterCreateVM stateMasterCreateVM = new();
+            var stateMasterResponse = await _stateService.GetStateAsync<APIResponse>(StateId, HttpContext.Session.GetString(SD.SessionToken));
 
-            if (StateResponse != null && StateResponse.IsSuccess)
+            if (stateMasterResponse != null && stateMasterResponse.IsSuccess)
             {
-                StateMasterDTO model = JsonConvert.DeserializeObject<StateMasterDTO>(Convert.ToString(StateResponse.Result));
+                StateMasterDTO model = JsonConvert.DeserializeObject<StateMasterDTO>(Convert.ToString(stateMasterResponse.Result));
+                stateMasterCreateVM.State = _mapper.Map<StateMasterDTO>(model);
+            }
 
-                return View(model);
+            var countryResponse = await _countryService.GetAllCountryAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+
+            if (countryResponse != null && countryResponse.IsSuccess)
+            {
+                stateMasterCreateVM.CountryList = JsonConvert.DeserializeObject<List<CountryMasterDTO>>(Convert.ToString(countryResponse.Result)).Select(i => new SelectListItem
+                {
+                    Text = i.CountryName,
+                    Value = i.CountryId.ToString()
+
+                });
+
+                return View(stateMasterCreateVM);
             }
 
             return NotFound();
@@ -84,24 +100,22 @@ namespace ShoppingCartWeb.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateStateMaster(StateMasterDTO model)
+        public async Task<IActionResult> UpdateStateMaster(StateMasterCreateVM model)
         {
-            if (ModelState.IsValid)
-            {
-                var response = await _stateService.UpdateStateAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionToken));
+            var response = await _stateService.UpdateStateAsync<APIResponse>(model.State, HttpContext.Session.GetString(SD.SessionToken));
 
-                if (response != null && response.IsSuccess)
+            if (response != null && response.IsSuccess)
+            {
+                return RedirectToAction(nameof(IndexStateMaster));
+            }
+            else
+            {
+                if (response.ErrorMessages.Count > 0)
                 {
-                    return RedirectToAction(nameof(IndexStateMaster));
-                }
-                else
-                {
-                    if (response.ErrorMessages.Count > 0)
-                    {
-                        ModelState.AddModelError("ErrorMessages", response.ErrorMessages.FirstOrDefault());
-                    }
+                    ModelState.AddModelError("ErrorMessages", response.ErrorMessages.FirstOrDefault());
                 }
             }
+
             return View(model);
         }
 

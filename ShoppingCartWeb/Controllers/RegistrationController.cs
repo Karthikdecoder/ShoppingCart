@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
 using ShoppingCartWeb.Models;
 using ShoppingCartWeb.Models.Dto;
@@ -63,7 +64,18 @@ namespace ShoppingCartWeb.Controllers
                     }); 
             }
 
-			var stateResponse = await _stateService.GetAllStateAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+            var countryResponse = await _countryService.GetAllCountryAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+
+            if (countryResponse != null && countryResponse.IsSuccess)
+            {
+                createRegisterationVM.CountryList = JsonConvert.DeserializeObject<List<CountryMasterDTO>>(Convert.ToString(countryResponse.Result)).Select(i => new SelectListItem
+                {
+                    Text = i.CountryName,
+                    Value = i.CountryId.ToString()
+                });
+            }
+
+            var stateResponse = await _stateService.GetAllStateAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
 
 			if (stateResponse != null && stateResponse.IsSuccess)
 			{
@@ -74,18 +86,33 @@ namespace ShoppingCartWeb.Controllers
 				});
 			}
 
-            var countryResponse = await _countryService.GetAllCountryAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+            var countries = countryResponse.Result;
 
-			if (countryResponse != null && countryResponse.IsSuccess)
-			{
-				createRegisterationVM.CountryList = JsonConvert.DeserializeObject<List<CountryMasterDTO>>(Convert.ToString(countryResponse.Result)).Select(i => new SelectListItem
-				{
-					Text = i.CountryName,
-					Value = i.CountryId.ToString()
-				});
-			}
+            var states = new List<StateMasterDTO>();
 
-			return View(createRegisterationVM);
+            //countries.Add(new CountryMasterDTO()
+            //{
+            //    CountryId = 0,
+            //    CountryName = "--Select Country--"
+            //});
+
+            //states.Add(new StateMasterDTO()
+            //{
+            //    StateId = 0,
+            //    StateName = "--Select State"
+            //});
+
+            ViewBag.Countries = new SelectList(states, "CountryId", "CountryName");
+            ViewBag.States = new SelectList(states, "StateId", "StateName");
+
+            return View(createRegisterationVM);
+        }
+
+        public JsonResult GetStateByCountryId(int countryId)
+        {
+            var stateResponse = _stateService.GetAllStateByCountryIdAsync<APIResponse>(countryId, HttpContext.Session.GetString(SD.SessionToken));
+
+            return Json(stateResponse.Result);
         }
 
         [HttpPost]

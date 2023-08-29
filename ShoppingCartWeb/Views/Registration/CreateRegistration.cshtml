@@ -107,7 +107,7 @@
                 <span asp-validation-for="Registration.CategoryId" class="text-danger"></span>
             </div>
 
-            <div class="col-2">
+            @*<div class="col-2">
                 <label asp-for="Registration.StateId" class="control-label pt-2" style="font-size:16px;"></label>
             </div>
             <div class="col-10 pb-3">
@@ -125,6 +125,24 @@
                     <option disabled selected>--Select Country--</option>
                 </select>
                 <span asp-validation-for="Registration.CountryId" class="text-danger"></span>
+            </div>*@
+
+            <div class="col-2">
+                Country
+            </div>
+            <div class="col-10 pb-3">
+                <select asp-for="Registration.CountryId" class="form-select" id="CountryId" asp-items="@ViewBag.countries">
+                    <option disabled selected>--Select Country--</option>
+                </select>
+            </div>
+
+            <div class="col-2">
+                State
+            </div>
+            <div class="col-10 pb-3">
+                <select asp-for="Registration.StateId" class="form-select" id="StateId" asp-items="@ViewBag.countries">
+                    <option disabled selected>--Select State--</option>
+                </select>
             </div>
 
             <div class="col-5 offset-2">
@@ -140,4 +158,29 @@
 @section Scripts
     {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+            GetStateByCountryId();
+        })
+        $("#CountryId").change(function (){
+            GetStateByCountryId();
+        })
+        var GetStateByCountryId() = funtion({
+            $.ajax({
+                url : '@Url.Action("GetStateByCountryId", "RegistrationController")',
+                type : 'GET', 
+                data : {
+                    CountryId : $('#CountryId').val(),
+                }
+                success : function(data) {
+                    $(data).each(
+                        function(index, item) {
+                            $('#StateId').append('<option value = ' + item.StateId + '">' + item.StateName + '</option>')
+                        }
+                    );
+                }
+            })
+        })
+    </script>
 }

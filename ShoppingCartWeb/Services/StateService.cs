@@ -35,6 +35,15 @@ namespace ShoppingCartWeb.Services
             });
         }
 
+        public Task<T> GetAllStateByCountryIdAsync<T>(int countryId, string token)
+        {
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.GET,
+                Url = stateUrl + "/api/StateMaster/GetAllStateByCountryId?countryId=" + countryId,
+                Token = token
+            });
+        }
 
         public Task<T> CreateStateAsync<T>(StateMasterDTO stateMasterDTO, string token)
         {
@@ -59,8 +68,8 @@ namespace ShoppingCartWeb.Services
         }
 
 
-		public Task<T> UpdateStateAsync<T>(StateMasterDTO stateMasterDTO, string token)
-		{
+        public Task<T> UpdateStateAsync<T>(StateMasterDTO stateMasterDTO, string token)
+        {
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.PUT,
@@ -69,5 +78,5 @@ namespace ShoppingCartWeb.Services
                 Token = token
             });
         }
-	}
+    }
 }

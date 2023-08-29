@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ShoppingCartAPI.Models;
 using ShoppingCartAPI.Models.Dto;
 using ShoppingCartAPI.Repository.IRepository;
+using System.Collections.Generic;
 using System.Net;
 using System.Security.Claims;
 
@@ -33,7 +34,7 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                IEnumerable<StateMaster> stateList = await _stateRepo.GetAllAsync(u => u.IsDeleted == false);
+                IEnumerable<StateMaster> stateList = await _stateRepo.GetAllAsync(u => u.IsDeleted == false, includeProperties: "CountryMaster");
                 _response.Result = _mapper.Map<List<StateMasterDTO>>(stateList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
@@ -83,6 +84,42 @@ namespace ShoppingCartAPI.Controllers
             return _response;
         }
 
+        [HttpGet]
+        [Route("GetAllStateByCountryId")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<APIResponse>> GetAllStateByCountryId(int countryId)
+        {
+            try
+            {
+                if (countryId == 0)
+                {
+                    _response.StatusCode = HttpStatusCode.BadRequest;
+                    return BadRequest(_response);
+                }
+
+                IEnumerable<StateMaster> stateList = await _stateRepo.GetAllAsync(u => u.CountryId == countryId && u.IsDeleted == false);
+
+                if (stateList == null)
+                {
+                    _response.StatusCode = HttpStatusCode.NotFound;
+                    return NotFound(_response);
+                }
+
+                _response.Result = _mapper.Map<List<StateMaster>>(stateList);
+                _response.StatusCode = HttpStatusCode.OK;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+
+            return _response;
+        }
+
         [HttpPost]
         [Route("CreateState")]
         //[Authorize(Roles = "admin")]
@@ -111,6 +148,7 @@ namespace ShoppingCartAPI.Controllers
                     _userId = "0";
                 }
 
+                stateMaster.CountryMaster = null;
                 stateMaster.CreatedOn = DateTime.Now;
                 stateMaster.CreatedBy = int.Parse(_userId);
                 stateMaster.UpdatedOn = DateTime.Now;

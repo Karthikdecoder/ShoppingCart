@@ -1,4 +1,4 @@
-﻿@model ShoppingCartWeb.Models.Dto.StateMasterDTO
+﻿@model ShoppingCartWeb.Models.VM.StateMasterCreateVM
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -11,16 +11,25 @@
         <hr />
 
         <div class="row">
-            <div asp-validation-summary="All" class="text-danger"></div>
+            @*<div asp-validation-summary="All" class="text-danger"></div>*@
 
             <div class="col-2">
-                <label asp-for="StateName" class="control-label pt-2" style="font-size:16px;"></label>
+                <label asp-for="State.StateName" class="control-label pt-2" style="font-size:16px;"></label>
             </div>
             <div class="col-10 pb-3">
-                <input asp-for="StateName" class="form-control" />
-                <span asp-validation-for="StateName" class="text-danger"></span>
+                <input asp-for="State.StateName" class="form-control" />
+                <span asp-validation-for="State.StateName" class="text-danger"></span>
             </div>
 
+            <div class="col-2">
+                <label asp-for="State.CountryId" class="control-label pt-2" style="font-size:16px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <select asp-for="State.CountryId" class="form-select" asp-items="@Model.CountryList">
+                    <option disabled selected>--Select Country--</option>
+                </select>
+                <span asp-validation-for="State.CountryId" class="text-danger"></span>
+            </div>
 
             <div class="col-5 offset-2">
                 <a asp-action="IndexStateMaster" asp-controller="StateMaster" class="btn-primary btn form-control ">Back to List</a>

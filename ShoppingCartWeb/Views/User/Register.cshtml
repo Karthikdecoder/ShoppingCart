@@ -28,7 +28,7 @@
                 <span asp-validation-for="User.Password" class="text-danger"></span>
             </div>
 
-            <div class="col-2">
+            @*<div class="col-2">
                 <label asp-for="User.RegistrationId" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
             <div class="col-10 pb-3">
@@ -36,16 +36,11 @@
                     <option disabled selected>--Select Name--</option>
                 </select>
                 <span asp-validation-for="User.RegistrationId" class="text-danger"></span>
-            </div>
+            </div>*@
 
-            <div class="col-2">
-                <label asp-for="User.RoleId" class="control-label pt-2" style="font-size:20px;"></label>
-            </div>
             <div class="col-10 pb-3">
-                <select asp-for="User.RoleId" class="form-select" asp-items="@Model.roleList">
-                    <option disabled selected>--Select Role--</option>
-                </select>
-                <span asp-validation-for="User.RoleId" class="text-danger"></span>
+                <input asp-for="User.RegistrationId" id="registrationId" class="form-control autocomplete" asp-items="@Model.registrationList">
+                <span asp-validation-for="User.RegistrationId" class="text-danger"></span>
             </div>
 
 

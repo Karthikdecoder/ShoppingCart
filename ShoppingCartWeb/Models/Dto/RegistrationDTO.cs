@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace ShoppingCartWeb.Models.Dto
 {
@@ -20,6 +21,7 @@ namespace ShoppingCartWeb.Models.Dto
         public CategoryMasterDTO CategoryMaster { get; set; }
 
         [Required]
+        [ValidateNever]
         [ForeignKey("CategoryMaster")]
         public int CategoryId { get; set; }
 
@@ -51,12 +53,14 @@ namespace ShoppingCartWeb.Models.Dto
         public StateMasterDTO StateMaster { get; set; }
 
         [Required]
+        [ValidateNever]
         [ForeignKey("StateMaster")]
         public int StateId { get; set; }
 
         public CountryMasterDTO CountryMaster { get; set; }
 
         [Required]
+        [ValidateNever]
         [ForeignKey("CountryMaster")]
         public int CountryId { get; set; }
 

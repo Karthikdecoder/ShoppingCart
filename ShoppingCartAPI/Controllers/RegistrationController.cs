@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ShoppingCartAPI.Data;
 using ShoppingCartAPI.Models;
 using ShoppingCartAPI.Models.Dto;
 using ShoppingCartAPI.Repository;
@@ -86,6 +87,7 @@ namespace ShoppingCartAPI.Controllers
 
             return _response;
         }
+
 
         [HttpPost]
         [Route("CreateRegistration")]

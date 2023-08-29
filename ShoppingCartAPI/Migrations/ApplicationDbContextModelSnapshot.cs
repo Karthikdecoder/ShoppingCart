@@ -201,6 +201,9 @@ namespace ShoppingCartAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StateId"));
 
+                    b.Property<int>("CountryId")
+                        .HasColumnType("int");
+
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
@@ -221,6 +224,8 @@ namespace ShoppingCartAPI.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("StateId");
+
+                    b.HasIndex("CountryId");
 
                     b.ToTable("StateMaster");
                 });
@@ -296,6 +301,17 @@ namespace ShoppingCartAPI.Migrations
                     b.Navigation("CountryMaster");
 
                     b.Navigation("StateMaster");
+                });
+
+            modelBuilder.Entity("ShoppingCartAPI.Models.StateMaster", b =>
+                {
+                    b.HasOne("ShoppingCartAPI.Models.CountryMaster", "CountryMaster")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CountryMaster");
                 });
 
             modelBuilder.Entity("ShoppingCartAPI.Models.User", b =>

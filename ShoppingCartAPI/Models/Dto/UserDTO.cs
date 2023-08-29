@@ -17,17 +17,16 @@ namespace ShoppingCartAPI.Models.Dto
 		[DataType(DataType.Password)]
 		public string Password { get; set; }
 
-		public Registration Registration { get; set; }
+        [Required]
+        [ForeignKey("Registration")]
+        public int RegistrationId { get; set; }
+        public Registration Registration { get; set; }
 
-		[Required]
-		[ForeignKey("Registration")]
-		public int RegistrationId { get; set; }
+        [Required]
+        [ForeignKey("RoleMaster")]
+        public int RoleId { get; set; }
+        public RoleMaster RoleMaster { get; set; }
 
-		public RoleMaster RoleMaster { get; set; }
-
-		[Required]
-		[ForeignKey("RoleMaster")]
-		public int RoleId { get; set; }
 		public int CreatedBy { get; set; }
 		public DateTime CreatedOn { get; set; }
 		public int UpdatedBy { get; set; }

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace ShoppingCartWeb.Models.Dto
 {
@@ -20,12 +21,14 @@ namespace ShoppingCartWeb.Models.Dto
 		public RegistrationDTO Registration { get; set; }
 
 		[Required]
-		[ForeignKey("Registration")]
+        [ValidateNever]
+        [ForeignKey("Registration")]
 		public int RegistrationId { get; set; }
 
 		public RoleMasterDTO RoleMaster { get; set; }
 
 		[Required]
+		[ValidateNever]
 		[ForeignKey("RoleMaster")]
 		public int RoleId { get; set; }
 		public int CreatedBy { get; set; }

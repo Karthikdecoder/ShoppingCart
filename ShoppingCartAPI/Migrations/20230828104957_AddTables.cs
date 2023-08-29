@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ShoppingCartAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class AddTables1 : Migration
+    public partial class AddTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -72,6 +72,7 @@ namespace ShoppingCartAPI.Migrations
                     StateId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     StateName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CountryId = table.Column<int>(type: "int", nullable: true),
                     CreatedBy = table.Column<int>(type: "int", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<int>(type: "int", nullable: true),
@@ -81,6 +82,12 @@ namespace ShoppingCartAPI.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_StateMaster", x => x.StateId);
+                    table.ForeignKey(
+                        name: "FK_StateMaster_CountryMaster_CountryId",
+                        column: x => x.CountryId,
+                        principalTable: "CountryMaster",
+                        principalColumn: "CountryId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -125,8 +132,7 @@ namespace ShoppingCartAPI.Migrations
                         name: "FK_Registration_StateMaster_StateId",
                         column: x => x.StateId,
                         principalTable: "StateMaster",
-                        principalColumn: "StateId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "StateId");
                 });
 
             migrationBuilder.CreateTable(
@@ -178,6 +184,11 @@ namespace ShoppingCartAPI.Migrations
                 column: "StateId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_StateMaster_CountryId",
+                table: "StateMaster",
+                column: "CountryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_User_RegistrationId",
                 table: "User",
                 column: "RegistrationId");
@@ -204,10 +215,10 @@ namespace ShoppingCartAPI.Migrations
                 name: "CategoryMaster");
 
             migrationBuilder.DropTable(
-                name: "CountryMaster");
+                name: "StateMaster");
 
             migrationBuilder.DropTable(
-                name: "StateMaster");
+                name: "CountryMaster");
         }
     }
 }

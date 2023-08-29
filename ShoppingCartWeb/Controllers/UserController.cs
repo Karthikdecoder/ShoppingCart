@@ -51,13 +51,13 @@ namespace ShoppingCartWeb.Controllers
             if (response != null && response.IsSuccess)
             {
                 LoginResponseDTO model = JsonConvert.DeserializeObject<LoginResponseDTO>(Convert.ToString(response.Result));
-                
+
                 var handler = new JwtSecurityTokenHandler();
                 var jwt = handler.ReadJwtToken(model.Token);
 
                 var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
                 identity.AddClaim(new Claim(ClaimTypes.Name, jwt.Claims.FirstOrDefault(u => u.Type == "unique_name").Value));
-                identity.AddClaim(new Claim(ClaimTypes.Role, jwt.Claims.FirstOrDefault(u => u.Type == "role").Value)); 
+                identity.AddClaim(new Claim(ClaimTypes.Role, jwt.Claims.FirstOrDefault(u => u.Type == "role").Value));
                 var principal = new ClaimsPrincipal(identity);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
@@ -91,29 +91,30 @@ namespace ShoppingCartWeb.Controllers
         {
             RegisterVM registerVM = new();
 
-			var registrationResponse = await _registrationService.GetAllRegistrationAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+            var registrationResponse = await _registrationService.GetAllRegistrationAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
 
-			if (registrationResponse != null && registrationResponse.IsSuccess)
-			{
-				registerVM.registrationList = JsonConvert.DeserializeObject<List<RegistrationDTO>>(Convert.ToString(registrationResponse.Result)).Select(i => new SelectListItem
-				{
-					Text = i.FirstName + " " + i.LastName,
-					Value = i.RegistrationId.ToString()
-				});
-			}
+            if (registrationResponse != null && registrationResponse.IsSuccess)
+            {
+                registerVM.registrationList = JsonConvert.DeserializeObject<List<RegistrationDTO>>(Convert.ToString(registrationResponse.Result)).Select(i => new SelectListItem
+                {
+                    Text = i.FirstName + " " + i.LastName,
+                    Value = i.RegistrationId.ToString()
+                });
+            }
 
-			var roleResponse = await _roleService.GetAllRoleAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
 
-			if (roleResponse != null && roleResponse.IsSuccess)
-			{
-				registerVM.roleList = JsonConvert.DeserializeObject<List<RoleMasterDTO>>(Convert.ToString(roleResponse.Result)).Select(i => new SelectListItem
-				{
-					Text = i.RoleName,
-					Value = i.RoleId.ToString()
-				});
-			}
+            var roleResponse = await _roleService.GetAllRoleAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
 
-			return View(registerVM);
+            if (roleResponse != null && roleResponse.IsSuccess)
+            {
+                registerVM.roleList = JsonConvert.DeserializeObject<List<RoleMasterDTO>>(Convert.ToString(roleResponse.Result)).Select(i => new SelectListItem
+                {
+                    Text = i.RoleName,
+                    Value = i.RoleId.ToString()
+                });
+            }
+
+            return Json(registerVM);
         }
 
 

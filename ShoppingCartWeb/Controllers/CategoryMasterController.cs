@@ -84,22 +84,20 @@ namespace ShoppingCartWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateCategoryMaster(CategoryMasterDTO model)
         {
-            if (ModelState.IsValid)
-            {
-                var response = await _categoryService.UpdateCategoryAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionToken));
+            var response = await _categoryService.UpdateCategoryAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionToken));
 
-                if (response != null && response.IsSuccess)
+            if (response != null && response.IsSuccess)
+            {
+                return RedirectToAction(nameof(IndexCategoryMaster));
+            }
+            else
+            {
+                if (response.ErrorMessages.Count > 0)
                 {
-                    return RedirectToAction(nameof(IndexCategoryMaster));
-                }
-                else
-                {
-                    if (response.ErrorMessages.Count > 0)
-                    {
-                        ModelState.AddModelError("ErrorMessages", response.ErrorMessages.FirstOrDefault());
-                    }
+                    ModelState.AddModelError("ErrorMessages", response.ErrorMessages.FirstOrDefault());
                 }
             }
+
             return View(model);
         }
 
