@@ -1,85 +1,101 @@
 ﻿@model IEnumerable<ShoppingCartWeb.Models.Dto.RegistrationDTO>
 
 @{
-	Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <br />
-<div class="container p-4 border mt-4">
-	<div class="row pb-2">
-		<div class="col">
-			<h1 class="text-primary">Registered Members List</h1>
-		</div>
-		<div class="col text-end pt-1">
-			<a asp-controller="Registration" asp-action="CreateRegistration" class="btn btn-outline-primary"><i class="bi bi-plus-square-fill"></i> Register new member </a>
-		</div>
-	</div>
+<div class="row">
+    <div class="col">
+        <h1 class="text-dark">Registered Members</h1>
+    </div>
+    <div class="col-2 text-start pt-1 justify-content-start">
+        <a asp-controller="Registration" asp-action="CreateRegistration" class="btn btn-primary btn-sm ms-2">
+            <div class="d-flex align-items-center">
+                <span class="d-inline-block align-middle me-1" style="font-size: 24px;">Create</span>
+                <!-- Increase the font-size value as needed -->
+                <i class="bi bi-plus-square-fill ml-2" style="font-size: 21px;"></i>
+                <!-- Increase the font-size value as needed -->
+            </div>
+        </a>
+    </div>
 
-	<table class="table">
-		<thead>
-			<tr>
-				<th>
-					Registration Id
-				</th>
-				<th>
-					First Name
-				</th>
-				<th>
-					Last Name
-				</th>
-				<th>
-					Category Name
-				</th>
-				<th>
-					Gender
-				</th>
-				<th>
-					Date Of Birth
-				</th>
-				<th>
-					Email
-				</th>
-				<th>
-					Contact Number
-				</th>
-				<th>
-					Address
-				</th>
-				<th>
-					Postal Code
-				</th>
-				<th>
-					State
-				</th>
-				<th>
-					Country
-				</th>
-				<th></th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (var item in Model)
-			{
-				<tr>
-					<td>@item.RegistrationId</td>
-					<td>@item.FirstName</td>
-					<td>@item.LastName</td>
-					<td>@item.CategoryMaster.CategoryName</td>
-					<td>@item.Gender</td>
-					<td>@item.DateOfBirth</td>
-					<td>@item.Email</td>
-					<td>@item.ContactNo</td>
-					<td>@item.Address</td>
-					<td>@item.PostalCode</td>
-					<td>@item.StateMaster.StateName</td>
-					<td>@item.CountryMaster.CountryName</td>
-					<td>
-						<a asp-controller="Registration" asp-action="UpdateRegistration" asp-route-registrationId="@item.RegistrationId" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
-						<a asp-controller="Registration" asp-action="RemoveRegistration" asp-route-registrationId="@item.RegistrationId" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
-					</td>
-				</tr>
-			}
-		</tbody>
-	</table>
+</div>
+
+<div class="container p-4 border mt-4">
+
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+
+                    <th>
+                        First Name
+                    </th>
+                    <th>
+                        Last Name
+                    </th>
+                    <th>
+                        Category
+                    </th>
+                    <th>
+                        Gender
+                    </th>
+                    <th>
+                        Date Of Birth
+                    </th>
+                    <th>
+                        Email
+                    </th>
+                    <th>
+                        Contact Number
+                    </th>
+                    <th>
+                        Address
+                    </th>
+                    <th>
+                        Postal Code
+                    </th>
+                    <th>
+                        State
+                    </th>
+                    <th>
+                        Country
+                    </th>
+                    <th>
+
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        @*<td>@item.RegistrationId</td>*@
+                        <td>@item.FirstName</td>
+                        <td>@item.LastName</td>
+                        <td>@item.CategoryMaster.CategoryName</td>
+                        <td>@item.Gender</td>
+                        <td style="white-space: nowrap;"> @item.DateOfBirth.ToString("dd-MM-yyyy")</td>
+                        <td>@item.Email</td>
+                        <td>@item.ContactNo</td>
+                        <td class="m-2">@item.Address</td>
+                        <td>@item.PostalCode</td>
+                        <td>@item.StateMaster.StateName</td>
+                        <td>@item.CountryMaster.CountryName</td>
+                        <td style="white-space: nowrap;">
+
+                            <div class="btn-group" role="group">
+                                <a asp-controller="Registration" asp-action="UpdateRegistration" asp-route-registrationId="@item.RegistrationId" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
+                                <a asp-controller="Registration" asp-action="RemoveRegistration" asp-route-registrationId="@item.RegistrationId" class="btn btn-danger ml-2"><i class="bi bi-trash-fill"></i></a>
+                            </div>
+
+
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 
 </div>

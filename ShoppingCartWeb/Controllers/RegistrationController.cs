@@ -75,44 +75,23 @@ namespace ShoppingCartWeb.Controllers
                 });
             }
 
-            var stateResponse = await _stateService.GetAllStateAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
-
-			if (stateResponse != null && stateResponse.IsSuccess)
-			{
-				createRegisterationVM.StateList = JsonConvert.DeserializeObject<List<StateMasterDTO>>(Convert.ToString(stateResponse.Result)).Select(i => new SelectListItem
-				{
-					Text = i.StateName,
-					Value = i.StateId.ToString()
-				});
-			}
-
-            var countries = countryResponse.Result;
-
-            var states = new List<StateMasterDTO>();
-
-            //countries.Add(new CountryMasterDTO()
-            //{
-            //    CountryId = 0,
-            //    CountryName = "--Select Country--"
-            //});
-
-            //states.Add(new StateMasterDTO()
-            //{
-            //    StateId = 0,
-            //    StateName = "--Select State"
-            //});
-
-            ViewBag.Countries = new SelectList(states, "CountryId", "CountryName");
-            ViewBag.States = new SelectList(states, "StateId", "StateName");
-
             return View(createRegisterationVM);
         }
 
-        public JsonResult GetStateByCountryId(int countryId)
+        public async Task<JsonResult> GetStateByCountryId(int countryId)
         {
-            var stateResponse = _stateService.GetAllStateByCountryIdAsync<APIResponse>(countryId, HttpContext.Session.GetString(SD.SessionToken));
+            CreateRegistrationVM createRegisterationVM = new();
 
-            return Json(stateResponse.Result);
+            var stateList = new List<StateMasterDTO>();
+            var stateResponse = await _stateService.GetAllStateByCountryIdAsync<APIResponse>(countryId, HttpContext.Session.GetString(SD.SessionToken));
+
+            if (stateResponse != null && stateResponse.IsSuccess) 
+            {
+                stateList = JsonConvert.DeserializeObject<List<StateMasterDTO>>(Convert.ToString(stateResponse.Result));
+                
+            }
+
+            return Json(stateList);
         }
 
         [HttpPost]
@@ -133,6 +112,7 @@ namespace ShoppingCartWeb.Controllers
 		public async Task<IActionResult> UpdateRegistration(int registrationId)
 		{
 			UpdateRegistrationVM updateRegistrationVM = new();
+
 			var registrationResponse = await _registrationService.GetRegistrationAsync<APIResponse>(registrationId, HttpContext.Session.GetString(SD.SessionToken));
 
 			if (registrationResponse != null && registrationResponse.IsSuccess)
@@ -218,6 +198,7 @@ namespace ShoppingCartWeb.Controllers
 		public async Task<IActionResult> RemoveRegistration(int registrationId)
         {
             RemoveRegistrationVM removeRegistrationVM = new();
+
             var registrationResponse = await _registrationService.GetRegistrationAsync<APIResponse>(registrationId, HttpContext.Session.GetString(SD.SessionToken));
 
             if (registrationResponse != null && registrationResponse.IsSuccess)

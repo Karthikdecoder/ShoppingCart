@@ -3,33 +3,35 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<br />
 <form asp-action="UpdateCountryMaster">
-    <br />
+
     <div class="container border p-3">
-        <h1 class="text-primary">Update Country</h1>
+        <h1 class="text-dark">Edit Country</h1>
         <hr />
 
         <input hidden asp-for="CountryId" />
         <div class="row">
-            @*<div asp-validation-summary="All" class="text-danger"></div>*@
+            <div class="col-md-6">
+                <div class="row pb-3">
+                    <div class="col-2">
+                        <label asp-for="CountryName" class="control-label pt-2" style="font-size:20px;"> Country</label>
+                    </div>
+                    <div class="col-10 pb-3">
+                        <input asp-for="CountryName" class="form-control" />
+                        <span asp-validation-for="CountryName" class="text-danger"></span>
+                    </div>
 
-            <div class="col-2">
-                <label asp-for="CountryName" class="control-label pt-2" style="font-size:20px;"></label>
-            </div>
-            <div class="col-10 pb-3">
-                <input asp-for="CountryName" class="form-control" />
-                <span asp-validation-for="CountryName" class="text-danger"></span>
-            </div>
 
-
-            <div class="col-5 offset-2">
-                <a asp-action="IndexCountryMaster" asp-controller="CountryMaster" class="btn-primary btn form-control ">Back to List</a>
-            </div>
-            <div class="col-5">
-                <input type="submit" value="Update" class="btn btn-success form-control" />
+                    <div class="col-5 offset-2">
+                        <a asp-action="IndexCountryMaster" asp-controller="CountryMaster" class="btn-primary btn form-control ">Cancel</a>
+                    </div>
+                    <div class="col-5">
+                        <input type="submit" value="Save" class="btn btn-success form-control" />
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 </form>
 
 @section Scripts

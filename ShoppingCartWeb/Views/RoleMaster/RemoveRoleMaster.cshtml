@@ -3,34 +3,33 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
+<br />
 <form asp-action="RemoveRoleMaster">
-    <br />
     <div class="container border p-3">
-        <h1 class="text-primary">Remove Role</h1>
+        <h1 class="text-dark">Remove Role</h1>
         <hr />
         <input hidden asp-for="RoleId" />
         <div class="row">
 
             <div class="col-2">
-                <label asp-for="RoleId" class="control-label pt-2" style="font-size:20px;"></label>
+                <label asp-for="RoleId" class="control-label pt-2" style="font-size:20px;">Id</label>
             </div>
             <div class="col-10 pb-3">
                 <input asp-for="RoleId" disabled class="form-control" />
             </div>
 
             <div class="col-2">
-                <label asp-for="RoleName" class="control-label pt-2" style="font-size:20px;"></label>
+                <label asp-for="RoleName" class="control-label pt-2" style="font-size:20px;">Role</label>
             </div>
             <div class="col-10 pb-3">
                 <input asp-for="RoleName" disabled class="form-control" />
             </div>
 
             <div class="col-5 offset-2">
-                <a asp-action="IndexRoleMaster" asp-controller="RoleMaster" class="btn-primary btn form-control ">Back to List</a>
+                <a asp-action="IndexRoleMaster" asp-controller="RoleMaster" class="btn-primary btn form-control ">Cancel</a>
             </div>
             <div class="col-5">
-                <input type="submit" value="Delete" class="btn btn-success form-control" />
+                <input type="submit" value="Delete" class="btn btn-danger form-control" />
             </div>
         </div>
     </div>

@@ -39,6 +39,19 @@ namespace ShoppingCartAPI.Repository
 
         public async Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO)
         {
+            var userNameFromDb = _db.User.FirstOrDefault(u => u.UserName.ToLower() == loginRequestDTO.UserName.ToLower());
+
+            var PasswordFromDb = _db.User.FirstOrDefault(u => u.Password.ToLower() == loginRequestDTO.Password.ToLower());
+
+            if (userNameFromDb == null && PasswordFromDb == null || userNameFromDb == null || PasswordFromDb == null) 
+            {
+                return new LoginResponseDTO()
+                {
+                    Token = "",
+                    UserRegistration = null
+                };
+            }
+
             var userLoginFromDb = _db.User.FirstOrDefault(u => u.UserName.ToLower() == loginRequestDTO.UserName.ToLower() && u.Password.ToLower() == loginRequestDTO.Password.ToLower());
 
             string Role = string.Empty;

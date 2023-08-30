@@ -52,15 +52,29 @@ namespace ShoppingCartWeb.Controllers
         [HttpGet]
         public async Task<IActionResult> CreateStateMaster()
         {
-            return View();
+			StateMasterCreateVM stateMasterCreateVM = new StateMasterCreateVM();
+
+			var countryResponse = await _countryService.GetAllCountryAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+
+			if (countryResponse != null && countryResponse.IsSuccess)
+			{
+				stateMasterCreateVM.CountryList = JsonConvert.DeserializeObject<List<CountryMasterDTO>>(Convert.ToString(countryResponse.Result)).Select(i => new SelectListItem
+				{
+					Text = i.CountryName,
+					Value = i.CountryId.ToString()
+				});
+
+				return View(stateMasterCreateVM);
+			}
+			return NotFound();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateStateMaster(StateMasterDTO StateMasterDTO)
+        public async Task<IActionResult> CreateStateMaster(StateMasterCreateVM stateMasterCreateVM)
         {
 
-            APIResponse result = await _stateService.CreateStateAsync<APIResponse>(StateMasterDTO, HttpContext.Session.GetString(SD.SessionToken));
+            APIResponse result = await _stateService.CreateStateAsync<APIResponse>(stateMasterCreateVM.State, HttpContext.Session.GetString(SD.SessionToken));
 
             if (result != null && result.IsSuccess)
             {

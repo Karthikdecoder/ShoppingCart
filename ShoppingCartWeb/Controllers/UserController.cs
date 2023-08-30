@@ -67,8 +67,8 @@ namespace ShoppingCartWeb.Controllers
             }
             else
             {
-                ModelState.AddModelError("CustomError", response.ErrorMessages.FirstOrDefault());
-                return View(obj);
+                //ModelState.AddModelError("CustomError", response.ErrorMessages.FirstOrDefault());
+                return View("Username or Password is incorrect");
             }
         }
 
@@ -114,7 +114,7 @@ namespace ShoppingCartWeb.Controllers
                 });
             }
 
-            return Json(registerVM);
+            return View(registerVM);
         }
 
 

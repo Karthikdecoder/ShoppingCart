@@ -107,7 +107,7 @@ namespace ShoppingCartAPI.Controllers
                     return NotFound(_response);
                 }
 
-                _response.Result = _mapper.Map<List<StateMaster>>(stateList);
+                _response.Result = _mapper.Map<List<StateMasterDTO>>(stateList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
             }
