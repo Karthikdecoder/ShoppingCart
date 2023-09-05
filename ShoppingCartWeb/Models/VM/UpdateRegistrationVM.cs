@@ -12,7 +12,10 @@ namespace ShoppingCartWeb.Models.VM
 		}
 		public RegistrationDTO Registration { get; set; }
 
-		[ValidateNever]
+        [ValidateNever]
+        public int CurrentPage { get; set; }
+
+        [ValidateNever]
 		public IEnumerable<SelectListItem> CategoryList { get; set; }
 
 		[ValidateNever]

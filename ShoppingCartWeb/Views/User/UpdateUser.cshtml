@@ -6,14 +6,14 @@
 <br />
 <form asp-action="UpdateUser">
     <div class="container border p-3">
-        <h1 class="text-dark">Edit User</h1>
+        <h1 class="text-dark">User</h1>
         <hr />
         <input hidden asp-for="User.UserId" />
         <div class="row">
             <div class="col-md-6">
                 <div class="row pb-3">
                     <div class="col-md-3">
-                        <label asp-for="User.UserName" class="control-label pt-2" style="font-size:20px;">User Name</label>
+                        <label asp-for="User.UserName" class="control-label pt-2" style="font-size:14px;">User Name</label>
                     </div>
                     <div class="col-md-9 pb-4">
                         <input asp-for="User.UserName" class="form-control" />
@@ -21,7 +21,7 @@
                     </div>
 
                     <div class="col-md-3">
-                        <label asp-for="User.Password" class="control-label pt-2" style="font-size:20px;">Password</label>
+                        <label asp-for="User.Password" class="control-label pt-2" style="font-size:14px;">Password</label>
                     </div>
                     <div class="col-md-9 pb-4">
                         <input asp-for="User.Password" placeholder="@Model.User.Password" class="form-control" />
@@ -30,7 +30,7 @@
 
 
                     <div class="col-md-3">
-                        <label asp-for="User.RegistrationId" class="control-label pt-2" style="font-size:20px;">Registration Name</label>
+                        <label asp-for="User.RegistrationId" class="control-label pt-2" style="font-size:14px;">Registration Name</label>
                     </div>
                     <div class="col-md-9 pb-4">
                         <select asp-for="User.RegistrationId" class="form-control" asp-items="@Model.registrationList">
@@ -41,7 +41,7 @@
 
 
                     <div class="col-md-3">
-                        <label asp-for="User.RoleId" class="control-label pt-2" style="font-size:20px;">Role</label>
+                        <label asp-for="User.RoleId" class="control-label pt-2" style="font-size:14px;">Role</label>
                     </div>
                     <div class="col-md-9 pb-4">
                         <select asp-for="User.RoleId" class="form-control" asp-items="@Model.roleList">

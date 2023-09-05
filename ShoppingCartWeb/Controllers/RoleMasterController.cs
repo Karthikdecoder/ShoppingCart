@@ -107,7 +107,7 @@ namespace ShoppingCartWeb.Controllers
                 }
 
                 TempData["error"] = response.ResponseMessage[0].ToString();
-                return RedirectToAction(nameof(IndexRoleMaster));
+                return View(roleMasterDTO);
             }
             return View(roleMasterDTO);
         }

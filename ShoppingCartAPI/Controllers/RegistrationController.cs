@@ -52,27 +52,27 @@ namespace ShoppingCartAPI.Controllers
             return _response;
         }
 
-        [HttpGet]
-        [Route("GetAllDeletedRegistration")]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<APIResponse>> GetAllDeletedRegistration()
-        {
-            try
-            {
-                IEnumerable<Registration> registrationList = await _registrationRepo.GetAllAsync(u => (u.IsDeleted), includeProperties: "CategoryMaster,StateMaster,CountryMaster");
-                _response.Result = _mapper.Map<List<RegistrationDTO>>(registrationList);
-                _response.StatusCode = HttpStatusCode.OK;
-                return Ok(_response);
-            }
-            catch (Exception ex)
-            {
-                _response.IsSuccess = false;
-                _response.ResponseMessage = new List<string>() { ex.ToString() };
-            }
+        //[HttpGet]
+        //[Route("GetAllDeletedRegistration")]
+        //[ProducesResponseType(StatusCodes.Status403Forbidden)]
+        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        //public async Task<ActionResult<APIResponse>> GetAllDeletedRegistration()
+        //{
+        //    try
+        //    {
+        //        IEnumerable<Registration> registrationList = await _registrationRepo.GetAllAsync(u => (u.IsDeleted), includeProperties: "CategoryMaster,StateMaster,CountryMaster");
+        //        _response.Result = _mapper.Map<List<RegistrationDTO>>(registrationList);
+        //        _response.StatusCode = HttpStatusCode.OK;
+        //        return Ok(_response);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _response.IsSuccess = false;
+        //        _response.ResponseMessage = new List<string>() { ex.ToString() };
+        //    }
 
-            return _response;
-        }
+        //    return _response;
+        //}
 
         [HttpGet]
         [Route("GetRegistration")]

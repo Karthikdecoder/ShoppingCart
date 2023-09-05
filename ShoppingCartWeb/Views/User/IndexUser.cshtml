@@ -5,21 +5,32 @@
 }
 <br />
 <div class="row pb-2">
+
     <div class="col">
+        <style>
+            .text-dark {
+                font-size: 24px; /* You can adjust the size to your preference, e.g., 24px, 36px, etc. */
+                /* You can also use other units like em, rem, or % if you prefer. */
+            }
+        </style>
+
         <h1 class="text-dark">Users</h1>
     </div>
-    <div class="col-2 text-start pt-1 justify-content-start">
+    <div class="col-2 d-flex justify-content-end align-items-start">
         <a asp-controller="User" asp-action="Register" class="btn btn-primary btn-sm ms-2">
             <div class="d-flex align-items-center">
 
-                <span class="d-inline-block align-middle" style="font-size: 24px;"><i class="bi bi-plus-square-fill"></i>  Create </span>
+                <span class="d-inline-block align-middle" style="font-size: 17px;"><i class="bi bi-plus-square-fill"></i>  Create </span>
 
             </div>
         </a>
     </div>
 </div>
 
-<div class="container p-4 border">
+
+<br />
+
+<div>
 
     <div class="table-responsive">
         <table class="table table-bordered">
@@ -50,8 +61,14 @@
                         <td style="white-space: nowrap;">@item.RoleMaster.RoleName</td>
                         <td>
                             <div class="btn-group" role="group">
-                                <a asp-controller="User" asp-action="UpdateUser" asp-route-userId="@item.UserId" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
-                                <a href="#" class="btn btn-danger ml-2" data-toggle="modal" data-target="#deleteModal_@item.UserId"><i class="bi bi-trash-fill"></i>  </a>
+
+                                <a asp-controller="User" asp-action="UpdateUser" asp-route-userId="@item.UserId" class="btn btn-sm ml-1">
+                                    <span id="boot-icon" class="bi bi-pencil-square" style="font-size: 17px; color: rgb(0, 128, 55); -webkit-text-stroke-width: 0.6px; opacity: 0.9;"></span>
+                                </a>
+
+                                <a href="#" class="btn btn-sm ml-1" data-toggle="modal" data-target="#deleteModal_@item.UserId">
+                                    <span id="boot-icon" class="bi bi-trash-fill" style="font-size: 17px; color: rgb(255, 0, 0); -webkit-text-stroke-width: 0px; opacity: 0.9;"></span>
+                                </a>
                             </div>
                         </td>
                     </tr>

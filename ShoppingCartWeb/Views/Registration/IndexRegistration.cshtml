@@ -7,23 +7,32 @@
 <br />
 <div class="row">
     <div class="col">
+        <style>
+            .text-dark {
+                font-size: 24px; /* You can adjust the size to your preference, e.g., 24px, 36px, etc. */
+                /* You can also use other units like em, rem, or % if you prefer. */
+            }
+        </style>
+
         <h1 class="text-dark">Registered Members</h1>
     </div>
-    <div class="col-2 text-start pt-1 justify-content-start">
+    <div class="col-2 d-flex justify-content-end align-items-start">
         <a asp-controller="Registration" asp-action="CreateRegistration" class="btn btn-primary btn-sm ms-2">
             <div class="d-flex align-items-center">
                 @*<i class="bi bi-plus-square-fill me-3 ml-2" style="font-size: 21px;"></i>*@
                 <!-- Increase the font-size value as needed -->
-                <span class="d-inline-block align-middle" style="font-size: 24px;"><i class="bi bi-plus-square-fill"></i>  Create </span>
+                <span class="d-inline-block align-middle" style="font-size: 17px;"><i class="bi bi-plus-square-fill"></i>  Create </span>
                 <!-- Increase the font-size value as needed -->
             </div>
         </a>
 
     </div>
-    
+
 </div>
 
-<div class="container p-4 border mt-4">
+<br />
+
+<div>
 
     <div class="table-responsive">
         <table class="table table-bordered">
@@ -31,10 +40,12 @@
                 <tr>
 
                     <th>
-                        FirstName
+                        <a href="/Registration/IndexRegistration?orderBy=@Model.FirstNameSortOrder" class="text-dark" style="font-size:medium;">FirstName</a>
                     </th>
+
+
                     <th>
-                        LastName
+                        <a href="/Registration/IndexRegistration?orderBy=@Model.LastNameSortOrder" class="text-dark" style="font-size:medium;">LastName</a>
                     </th>
                     <th>
                         Category
@@ -77,19 +88,24 @@
                             <td>@item.Email</td>
                             <td>@item.ContactNo</td>
                             <td>@item.CountryMaster.CountryName</td>
-                            <td>@item.StateMaster.StateName</td>
+                            <td style="white-space: nowrap;">@item.StateMaster.StateName</td>
                             <td>
 
 
                                 <div class="btn-group" role="group">
 
 
-                                    <a asp-controller="Registration" data-category-id="@item.RegistrationId" data-toggle="modal" data-target="#registrationModal_@item.RegistrationId" asp-action="ViewRegistration" asp-route-registrationId="@item.RegistrationId" class="btn btn-warning"><i class="bi bi-view-list"></i></a>
+                                    <a asp-controller="Registration" data-category-id="@item.RegistrationId" data-toggle="modal" data-target="#registrationModal_@item.RegistrationId" asp-action="ViewRegistration" asp-route-registrationId="@item.RegistrationId" class="btn  btn-sm ml-1">
+                                        <span id="boot-icon" class="bi bi-eye" style="font-size: 16px; color: rgb(128, 0, 128); -webkit-text-stroke-width: 0.5px;"></span>
+                                    </a>
 
-                                    <a asp-controller="Registration" asp-action="UpdateRegistration" asp-route-registrationId="@item.RegistrationId" class="btn btn-success ml-2"><i class="bi bi-pencil-square"></i></a>
+                                    <a asp-controller="Registration" asp-action="UpdateRegistration" asp-route-registrationId="@item.RegistrationId" asp-route-currentPageNo="@Model.CurrentPage" class="btn btn-sm ml-1">
+                                        <span id="boot-icon" class="bi bi-pencil-square" style="font-size: 17px; color: rgb(0, 128, 55); -webkit-text-stroke-width: 0.6px; opacity: 0.9;"></span>
+                                    </a>
 
-
-                                    <a href="#" class="btn btn-danger ml-2" data-toggle="modal" data-target="#deleteModal_@item.RegistrationId"><i class="bi bi-trash-fill"></i>  </a>
+                                    <a href="#" class="btn btn-sm ml-1" data-toggle="modal" data-target="#deleteModal_@item.RegistrationId">
+                                        <span id="boot-icon" class="bi bi-trash-fill" style="font-size: 17px; color: rgb(255, 0, 0); -webkit-text-stroke-width: 0px; opacity: 0.9;"></span>
+                                    </a>
 
                                 </div>
                             </td>
@@ -114,7 +130,8 @@
 
                                 <div class="btn-group" role="group">
 
-                                    <a href="#" class="btn btn-primary ml-2" data-toggle="modal" data-target="#enableModal_@item.RegistrationId"> Active </a>
+                                    <a href="#" class="btn btn-primary btn-sm ml-2" data-toggle="modal" data-target="#enableModal_@item.RegistrationId"> Active </a>
+
                                 </div>
                             </td>
                         </tr>
@@ -135,7 +152,7 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                    <a asp-controller="Registration" asp-action="RemoveRegistration" asp-route-registrationId="@item.RegistrationId" class="btn btn-danger">Delete</a>
+                                    <a asp-controller="Registration" asp-action="RemoveRegistration" asp-route-registrationId="@item.RegistrationId" asp-route-currentPageNo="@Model.CurrentPage" class="btn btn-danger">Delete</a>
                                 </div>
                             </div>
                         </div>
@@ -156,7 +173,7 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                                    <a asp-controller="Registration" asp-action="EnableRegistration" asp-route-registrationId="@item.RegistrationId" class="btn btn-success">Yes</a>
+                                    <a asp-controller="Registration" asp-action="EnableRegistration" asp-route-registrationId="@item.RegistrationId" asp-route-currentPageNo="@Model.CurrentPage" class="btn btn-success">Yes</a>
                                 </div>
                             </div>
                         </div>
@@ -201,7 +218,7 @@
         </table>
     </div>
 
-    <nav aria-label="Page navigation example">
+    <nav aria-label="Page navigation example" class="justify-content-end">
         <ul class="pagination">
             @if (Model.CurrentPage > 1)
             {

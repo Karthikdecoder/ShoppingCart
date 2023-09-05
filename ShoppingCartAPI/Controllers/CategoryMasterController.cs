@@ -35,7 +35,7 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                IEnumerable<CategoryMaster> roleList = await _dbCategory.GetAllAsync(u => u.IsDeleted == false);
+                IEnumerable<CategoryMaster> roleList = await _dbCategory.GetAllAsync();
                 _response.Result = _mapper.Map<List<CategoryMasterDTO>>(roleList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
@@ -64,15 +64,15 @@ namespace ShoppingCartAPI.Controllers
                     return BadRequest(_response);
                 }
 
-                var role = await _dbCategory.GetAsync(u => u.CategoryId == categoryId && u.IsDeleted == false);
+                var categoryMaster = await _dbCategory.GetAsync(u => u.CategoryId == categoryId && u.IsDeleted == false);
 
-                if (role == null)
+                if (categoryMaster == null)
                 {
                     _response.StatusCode = HttpStatusCode.NotFound;
                     return NotFound(_response);
                 }
 
-                _response.Result = _mapper.Map<CategoryMasterDTO>(role);
+                _response.Result = _mapper.Map<CategoryMasterDTO>(categoryMaster);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
             }
@@ -209,6 +209,51 @@ namespace ShoppingCartAPI.Controllers
 
                 model.UpdatedOn = DateTime.Now;
                 model.UpdatedBy = int.Parse(_userId);
+                model.IsDeleted = false;
+                await _dbCategory.UpdateAsync(model);
+
+                _response.StatusCode = HttpStatusCode.NoContent;
+                _response.IsSuccess = true;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
+
+        [HttpPut]
+        [Authorize(Roles = "Admin")]
+        [Route("EnableCategory")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponse>> EnableCategory(int categoryId)
+        {
+            try
+            {
+                if (categoryId == 0)
+                {
+                    _response.StatusCode = HttpStatusCode.BadRequest;
+                    return BadRequest(_response);
+                }
+
+                var categoryMasterDTO = await _dbCategory.GetAsync(u => u.CategoryId == categoryId && u.IsDeleted == true);
+
+                if (categoryMasterDTO == null)
+                {
+                    _response.StatusCode = HttpStatusCode.NotFound;
+                    return NotFound(_response);
+                }
+
+                CategoryMaster model = _mapper.Map<CategoryMaster>(categoryMasterDTO);
+
+                if (_userId == null)
+                {
+                    _userId = "0";
+                }
+
                 model.IsDeleted = false;
                 await _dbCategory.UpdateAsync(model);
 

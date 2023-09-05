@@ -109,7 +109,7 @@ namespace ShoppingCartWeb.Controllers
 				}
 
                 TempData["error"] = response.ResponseMessage[0].ToString();
-                return RedirectToAction(nameof(IndexCountryMaster));
+                return View(countryMasterDTO);
             }
 			return View(countryMasterDTO);
 		}

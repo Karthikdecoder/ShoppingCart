@@ -6,7 +6,7 @@
 <br />
 <form asp-action="UpdateRoleMaster">
     <div class="container border p-3">
-        <h1 class="text-dark">Edit Role</h1>
+        <h1 class="text-dark">Role</h1>
         <hr />
 
         <input hidden asp-for="RoleId" />
@@ -14,7 +14,7 @@
             <div class="col-md-6">
                 <div class="row pb-3">
                     <div class="col-2">
-                        <label asp-for="RoleName" class="control-label pt-2" style="font-size:20px;">Role</label>
+                        <label asp-for="RoleName" class="control-label pt-2" style="font-size:17px;">Role</label>
                     </div>
                     <div class="col-md-7 pb-4">
                         <input asp-for="RoleName" class="form-control" />
@@ -22,10 +22,10 @@
                     </div>
 
 
-                    <div class="col-3 offset-3">
+                    <div class="col-2 offset-5">
                         <a asp-action="IndexRoleMaster" asp-controller="RoleMaster" class="btn-primary btn form-control ">Cancel</a>
                     </div>
-                    <div class="col-3">
+                    <div class="col-2">
                         <input type="submit" value="Update" class="btn btn-success form-control" />
                     </div>
                 </div>

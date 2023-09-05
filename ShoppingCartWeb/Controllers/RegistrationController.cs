@@ -40,7 +40,7 @@ namespace ShoppingCartWeb.Controllers
         {
             RegistrationVM registrationVM = new();
 
-            List<RegistrationDTO> registrationDTOList = new();
+            IEnumerable<RegistrationDTO> registrationDTOList = new List<RegistrationDTO>(); 
 
             var response = await _registrationService.GetAllRegistrationAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
 
@@ -49,33 +49,23 @@ namespace ShoppingCartWeb.Controllers
                 registrationDTOList = JsonConvert.DeserializeObject<List<RegistrationDTO>>(Convert.ToString(response.Result));
             }
 
-            int totalRecords = registrationDTOList.Count();
+            registrationVM.FirstNameSortOrder = string.IsNullOrEmpty(orderBy) ? "firstName_desc" : "";
+            registrationVM.LastNameSortOrder = orderBy == "lastName" ? "lastName_desc" : "lastName";
 
-            int pageSize = 5;
-
-            int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
-
-            registrationDTOList = registrationDTOList.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
-
-            registrationVM.Registration = registrationDTOList;
-            registrationVM.CurrentPage = currentPage;
-            registrationVM.PageSize = pageSize;
-            registrationVM.TotalPages = totalPages;
-
-            return View(registrationVM);
-        }
-
-        public async Task<IActionResult> GetAllDeletedRegistration(string orderBy = "", int currentPage = 1)
-        {
-            RegistrationVM registrationVM = new();
-
-            List<RegistrationDTO> registrationDTOList = new();
-
-            var response = await _registrationService.GetAllDeletedRegistrationAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
-
-            if (response != null && response.IsSuccess)
+            switch (orderBy)
             {
-                registrationDTOList = JsonConvert.DeserializeObject<List<RegistrationDTO>>(Convert.ToString(response.Result));
+                case "firstName_desc":
+                    registrationDTOList = registrationDTOList.OrderByDescending(u => u.FirstName);
+                    break;
+                case "lastName_desc":
+                    registrationDTOList = registrationDTOList.OrderByDescending(u => u.LastName);
+                    break;
+                case "lastName":
+                    registrationDTOList = registrationDTOList.OrderBy(u => u.LastName);
+                    break;
+                default:
+                    registrationDTOList = registrationDTOList.OrderBy(u => u.FirstName);
+                    break;
             }
 
             int totalRecords = registrationDTOList.Count();
@@ -86,10 +76,11 @@ namespace ShoppingCartWeb.Controllers
 
             registrationDTOList = registrationDTOList.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
 
-            registrationVM.Registration = registrationDTOList;
+            registrationVM.Registration = (List<RegistrationDTO>) registrationDTOList;
             registrationVM.CurrentPage = currentPage;
             registrationVM.PageSize = pageSize;
             registrationVM.TotalPages = totalPages;
+            
 
             return View(registrationVM);
         }
@@ -181,9 +172,11 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateRegistration(int registrationId)
+        public async Task<IActionResult> UpdateRegistration(int registrationId, int currentPageNo)
         {
             UpdateRegistrationVM updateRegistrationVM = new();
+
+            updateRegistrationVM.CurrentPage = currentPageNo;
 
             var registrationResponse = await _registrationService.GetRegistrationAsync<APIResponse>(registrationId, HttpContext.Session.GetString(SD.SessionToken));
 
@@ -235,7 +228,6 @@ namespace ShoppingCartWeb.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateRegistration(UpdateRegistrationVM updateRegistrationVM)
         {
             if (ModelState.IsValid)
@@ -245,18 +237,18 @@ namespace ShoppingCartWeb.Controllers
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Updated successfully";
-                    return RedirectToAction(nameof(IndexRegistration));
+                    return RedirectToAction("IndexRegistration", new { currentPage = updateRegistrationVM.CurrentPage });
                 }
 
                 TempData["error"] = response.ResponseMessage[0].ToString();
-                return RedirectToAction(nameof(IndexRegistration));
+                return RedirectToAction("UpdateRegistration", new { registrationId = updateRegistrationVM.Registration.RegistrationId });
             }
 
             return View(updateRegistrationVM);
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> EnableRegistration(int registrationId)
+        public async Task<IActionResult> EnableRegistration(int registrationId, int currentPageNo)
         {
             if (ModelState.IsValid)
             {
@@ -265,7 +257,7 @@ namespace ShoppingCartWeb.Controllers
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Enabled successfully";
-                    return RedirectToAction(nameof(IndexRegistration));
+                    return RedirectToAction("IndexRegistration", new { currentPage = currentPageNo });
                 }
 
                 TempData["error"] = response.ResponseMessage[0].ToString();
@@ -327,14 +319,14 @@ namespace ShoppingCartWeb.Controllers
 
 
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> RemoveRegistration(int registrationId)
+        public async Task<IActionResult> RemoveRegistration(int registrationId, int currentPageNo)
         {
             var response = await _registrationService.RemoveRegistrationAsync<APIResponse>(registrationId, HttpContext.Session.GetString(SD.SessionToken));
 
             if (response != null && response.IsSuccess)
             {
                 TempData["success"] = "Deleted successfully";
-                return RedirectToAction(nameof(IndexRegistration));
+                return RedirectToAction("IndexRegistration", new { currentPage = currentPageNo });
             }
 
             TempData["success"] = "Error encountered";

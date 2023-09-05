@@ -140,29 +140,13 @@ namespace ShoppingCartWeb.Controllers
                 }
 
                 TempData["error"] = response.ResponseMessage[0].ToString();
-                return RedirectToAction(nameof(IndexStateMaster));
+                return RedirectToAction("UpdateStateMaster", new { StateId = stateMasterCreateVM.State.StateId });
             }
+
             return View(stateMasterCreateVM);
         }
 
 
-        //public async Task<IActionResult> RemoveStateMaster(int StateId)
-        //{
-        //    var StateMasterResponse = await _stateService.GetStateAsync<APIResponse>(StateId, HttpContext.Session.GetString(SD.SessionToken));
-
-        //    if (StateMasterResponse != null && StateMasterResponse.IsSuccess)
-        //    {
-        //        StateMasterDTO model = JsonConvert.DeserializeObject<StateMasterDTO>(Convert.ToString(StateMasterResponse.Result));
-
-        //        return View(model);
-        //    }
-
-
-        //    return NotFound();
-        //}
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RemoveStateMaster(int stateId)
         {

@@ -66,5 +66,15 @@ namespace ShoppingCartWeb.Services
                 Token = token
             });
         }
+
+        public Task<T> EnableCategoryAsync<T>(int categoryId, string token)
+        {
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.PUT,
+                Url = categoryURL + "/api/CategoryMaster/EnableCategory?categoryId=" + categoryId,
+                Token = token
+            });
+        }
     }
 }

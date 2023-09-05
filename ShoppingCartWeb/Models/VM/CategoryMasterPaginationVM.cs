@@ -2,11 +2,9 @@
 
 namespace ShoppingCartWeb.Models.VM
 {
-    public class RegistrationVM
+    public class CategoryMasterPaginationVM
     {
-        public List<RegistrationDTO> Registration { get; set; }
-        public string FirstNameSortOrder { get; set; } 
-        public string LastNameSortOrder { get; set; } 
+        public List<CategoryMasterDTO> CategoryMasterDTO { get; set; }
         public int PageSize { get; set; }
         public int CurrentPage { get; set; }
         public int TotalPages { get; set; }

@@ -32,8 +32,10 @@ namespace ShoppingCartWeb.Controllers
             _registrationService = registrationService;
         }
 
-        public async Task<IActionResult> IndexCategoryMaster()
+        public async Task<IActionResult> IndexCategoryMaster(string orderBy = "", int currentPage = 1)
         {
+            CategoryMasterPaginationVM categoryMasterPaginationVM = new();
+
             List<CategoryMasterDTO> list = new();
 
             var response = await _categoryService.GetAllCategoryAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
@@ -43,7 +45,20 @@ namespace ShoppingCartWeb.Controllers
                 list = JsonConvert.DeserializeObject<List<CategoryMasterDTO>>(Convert.ToString(response.Result));
             }
 
-            return View(list);
+            int totalRecords = list.Count();
+
+            int pageSize = 5;
+
+            int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+            list = list.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+
+            categoryMasterPaginationVM.CategoryMasterDTO = list;
+            categoryMasterPaginationVM.CurrentPage = currentPage;
+            categoryMasterPaginationVM.PageSize = pageSize;
+            categoryMasterPaginationVM.TotalPages = totalPages;
+
+            return View(categoryMasterPaginationVM);
         }
 
         public async Task<IActionResult> ViewCategoryMaster(int categoryId)
@@ -121,27 +136,31 @@ namespace ShoppingCartWeb.Controllers
                 }
 
                 TempData["error"] = response.ResponseMessage[0].ToString();
-                return RedirectToAction(nameof(IndexCategoryMaster));
+                return View(categoryMasterDTO);
             }
 
             return View(categoryMasterDTO);
         }
 
-        //[Authorize(Roles = "Admin")]
-        //public async Task<IActionResult> RemoveCategoryMaster(int categoryId)
-        //{
-        //    var CategoryMasterResponse = await _categoryService.GetCategoryAsync<APIResponse>(categoryId, HttpContext.Session.GetString(SD.SessionToken));
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EnableCategory(int categoryId, int currentPageNo)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _categoryService.EnableCategoryAsync<APIResponse>(categoryId, HttpContext.Session.GetString(SD.SessionToken));
 
-        //    if (CategoryMasterResponse != null && CategoryMasterResponse.IsSuccess)
-        //    {
-        //        CategoryMasterDTO model = JsonConvert.DeserializeObject<CategoryMasterDTO>(Convert.ToString(CategoryMasterResponse.Result));
+                if (response != null && response.IsSuccess)
+                {
+                    TempData["success"] = "Enabled successfully";
+                    return RedirectToAction("IndexCategoryMaster", new { currentPage = currentPageNo });
+                }
 
-        //        return View(model);
-        //    }
+                TempData["error"] = response.ResponseMessage[0].ToString();
+                return RedirectToAction(nameof(IndexCategoryMaster));
+            }
 
-
-        //    return NotFound();
-        //}
+            return View();
+        }
 
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RemoveCategoryMaster(int categoryId)

@@ -214,7 +214,7 @@ namespace ShoppingCartWeb.Controllers
                 }
 
                 TempData["error"] = response.ResponseMessage[0].ToString();
-                return RedirectToAction(nameof(IndexUser));
+                return RedirectToAction("UpdateUser", new { userId = updateUserVM.User.UserId });
             }
             return View(updateUserVM);
         }
