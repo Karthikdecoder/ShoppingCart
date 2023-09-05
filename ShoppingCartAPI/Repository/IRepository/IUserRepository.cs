@@ -13,6 +13,6 @@ namespace ShoppingCartAPI.Repository.IRepository
         Task<User> RegisterAsync(UserDTO User, string userId);
         Task RemoveAsync(User User);
         Task SaveAsync();
-        bool IsUniqueUser(string Email);
+        bool IsUniqueUser(UserDTO userDTO);
     }
 }

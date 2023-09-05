@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using ShoppingCartWeb.Models;
 using ShoppingCartWeb.Models.Dto;
@@ -67,8 +68,9 @@ namespace ShoppingCartWeb.Controllers
             }
             else
             {
+                ModelState.AddModelError("", "Username or password is incorrect");
                 //ModelState.AddModelError("CustomError", response.ErrorMessages.FirstOrDefault());
-                return View("Username or Password is incorrect");
+                return View();
             }
         }
 
@@ -87,6 +89,7 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Register()
         {
             RegisterVM registerVM = new();
@@ -97,11 +100,10 @@ namespace ShoppingCartWeb.Controllers
             {
                 registerVM.registrationList = JsonConvert.DeserializeObject<List<RegistrationDTO>>(Convert.ToString(registrationResponse.Result)).Select(i => new SelectListItem
                 {
-                    Text = i.FirstName + " " + i.LastName,
+                    Text = i.FirstName,
                     Value = i.RegistrationId.ToString()
                 });
             }
-
 
             var roleResponse = await _roleService.GetAllRoleAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
 
@@ -117,22 +119,47 @@ namespace ShoppingCartWeb.Controllers
             return View(registerVM);
         }
 
-
-        //[Authorize(Roles = "Admin")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterVM obj)
+        public async Task<JsonResult> GetRegistrationName(string Prefix)
         {
 
-            APIResponse result = await _userService.RegisterAsync<APIResponse>(obj.User, HttpContext.Session.GetString(SD.SessionToken));
+            RegisterVM registerVM = new();
 
-            if (result != null && result.IsSuccess)
+            var nameList = new List<RegistrationDTO>();
+
+            var nameResponse = await _userService.GetRegistrationNameServiceAsync<APIResponse>(Prefix, HttpContext.Session.GetString(SD.SessionToken));
+
+            if (nameResponse != null)
             {
-                return RedirectToAction("IndexUser", "User");
+                nameList = JsonConvert.DeserializeObject<List<RegistrationDTO>>(Convert.ToString(nameResponse.Result));
+            }
+
+            return Json(nameList);
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterVM registerVM)
+        {
+            if (ModelState.IsValid)
+            {
+                APIResponse result = await _userService.RegisterAsync<APIResponse>(registerVM.User, HttpContext.Session.GetString(SD.SessionToken));
+
+                if (result != null && result.IsSuccess)
+                {
+                    TempData["success"] = "Registered successfully";
+                    return RedirectToAction("IndexUser", "User");
+                }
+
+                TempData["error"] = result.ResponseMessage[0].ToString();
+                return RedirectToAction("Register", "User");
+                //return View(registerVM);
             }
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateUser(int userId)
         {
             UpdateUserVM updateUserVM = new();
@@ -172,6 +199,7 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateUser(UpdateUserVM updateUserVM)
         {
@@ -181,80 +209,68 @@ namespace ShoppingCartWeb.Controllers
 
                 if (response != null && response.IsSuccess)
                 {
+                    TempData["success"] = "Updated successfully";
                     return RedirectToAction(nameof(IndexUser));
                 }
-                else
-                {
-                    if (response.ErrorMessages.Count > 0)
-                    {
-                        ModelState.AddModelError("ErrorMessages", response.ErrorMessages.FirstOrDefault());
-                    }
-                }
-            }
 
-            var userUpdateResponse = await _userService.GetAllUserAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
-            if (userUpdateResponse != null && userUpdateResponse.IsSuccess)
-            {
-                updateUserVM.User = (UserDTO)JsonConvert.DeserializeObject<List<UserDTO>>
-                    (Convert.ToString(userUpdateResponse.Result)).Select(i => new SelectListItem
-                    {
-                        Text = i.UserName,
-                        Value = i.UserId.ToString()
-                    }); ;
+                TempData["error"] = response.ResponseMessage[0].ToString();
+                return RedirectToAction(nameof(IndexUser));
             }
-
             return View(updateUserVM);
         }
 
-        public async Task<IActionResult> RemoveUser(int userID)
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> RemoveUser(int userID)
+        //{
+        //    RemoveUserVM removeUserVM = new();
+        //    var response = await _userService.GetUserAsync<APIResponse>(userID, HttpContext.Session.GetString(SD.SessionToken));
+
+        //    if (response != null && response.IsSuccess)
+        //    {
+        //        UserDTO model = JsonConvert.DeserializeObject<UserDTO>(Convert.ToString(response.Result));
+        //        removeUserVM.User = model;
+        //    }
+
+        //    response = await _registrationService.GetAllRegistrationAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+
+        //    if (response != null && response.IsSuccess)
+        //    {
+        //        removeUserVM.registrationList = JsonConvert.DeserializeObject<List<RegistrationDTO>>(Convert.ToString(response.Result)).Select(i => new SelectListItem
+        //        {
+        //            Text = i.FirstName,
+        //            Value = i.RegistrationId.ToString()
+        //        });
+        //        return View(removeUserVM);
+        //    }
+
+        //    response = await _roleService.GetAllRoleAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+
+        //    if (response != null && response.IsSuccess)
+        //    {
+        //        removeUserVM.roleList = JsonConvert.DeserializeObject<List<RoleMasterDTO>>(Convert.ToString(response.Result)).Select(i => new SelectListItem
+        //        {
+        //            Text = i.RoleName,
+        //            Value = i.RoleId.ToString()
+        //        });
+        //        return View(removeUserVM);
+        //    }
+
+        //    return NotFound();
+        //}
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RemoveUser(int userId)
         {
-            RemoveUserVM removeUserVM = new();
-            var response = await _userService.GetUserAsync<APIResponse>(userID, HttpContext.Session.GetString(SD.SessionToken));
+            var response = await _userService.RemoveUserAsync<APIResponse>(userId, HttpContext.Session.GetString(SD.SessionToken));
 
             if (response != null && response.IsSuccess)
             {
-                UserDTO model = JsonConvert.DeserializeObject<UserDTO>(Convert.ToString(response.Result));
-                removeUserVM.User = model;
-            }
-
-            response = await _registrationService.GetAllRegistrationAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
-
-            if (response != null && response.IsSuccess)
-            {
-                removeUserVM.registrationList = JsonConvert.DeserializeObject<List<RegistrationDTO>>(Convert.ToString(response.Result)).Select(i => new SelectListItem
-                {
-                    Text = i.FirstName,
-                    Value = i.RegistrationId.ToString()
-                });
-                return View(removeUserVM);
-            }
-
-            response = await _roleService.GetAllRoleAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
-
-            if (response != null && response.IsSuccess)
-            {
-                removeUserVM.roleList = JsonConvert.DeserializeObject<List<RoleMasterDTO>>(Convert.ToString(response.Result)).Select(i => new SelectListItem
-                {
-                    Text = i.RoleName,
-                    Value = i.RoleId.ToString()
-                });
-                return View(removeUserVM);
-            }
-
-            return NotFound();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RemoveUser(RemoveUserVM model)
-        {
-            var response = await _userService.RemoveUserAsync<APIResponse>(model.User.UserId, HttpContext.Session.GetString(SD.SessionToken));
-
-            if (response != null && response.IsSuccess)
-            {
+                TempData["success"] = "Deleted successfully";
                 return RedirectToAction(nameof(IndexUser));
             }
-            return View(model);
+
+            TempData["success"] = "Error encountered";
+            return View();
         }
 
         public async Task<IActionResult> Logout()
@@ -266,7 +282,7 @@ namespace ShoppingCartWeb.Controllers
 
         public IActionResult AccessDenied()
         {
-            return View();
+            return RedirectToAction("Login", "User");
         }
     }
 

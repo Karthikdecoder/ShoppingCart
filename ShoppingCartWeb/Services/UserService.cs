@@ -17,6 +17,16 @@ namespace ShoppingCartWeb.Services
             userURL = configuration.GetValue<string>("ServiceUrls:ShoppingCartAPI");
         }
 
+        public Task<T> GetRegistrationNameServiceAsync<T>(string name, string token)
+        {
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.GET,
+                Url = userURL + "/api/User/GetRegistrationName?prefix=" + name,
+                Token = token
+            });
+        }
+
         public Task<T> LoginAsync<T>(LoginRequestDTO obj)
         {
             return SendAsync<T>(new APIRequest()
@@ -68,7 +78,7 @@ namespace ShoppingCartWeb.Services
                 Token = token
             });
         }
-
+        
         public Task<T> RemoveUserAsync<T>(int userId, string token)
         {
             return SendAsync<T>(new APIRequest()

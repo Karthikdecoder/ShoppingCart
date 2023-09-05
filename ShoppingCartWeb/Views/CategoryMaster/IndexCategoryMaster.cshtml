@@ -12,10 +12,9 @@
     <div class="col-2 text-start pt-1 justify-content-start">
         <a asp-controller="CategoryMaster" asp-action="CreateCategoryMaster" class="btn btn-primary btn-sm ms-2">
             <div class="d-flex align-items-center">
-                <span class="d-inline-block align-middle me-1" style="font-size: 24px;">Create</span>
-                <!-- Increase the font-size value as needed -->
-                <i class="bi bi-plus-square-fill ml-2" style="font-size: 21px;"></i>
-                <!-- Increase the font-size value as needed -->
+
+                <span class="d-inline-block align-middle" style="font-size: 24px;"><i class="bi bi-plus-square-fill"></i>  Create </span>
+
             </div>
         </a>
     </div>
@@ -30,9 +29,6 @@
             <thead>
                 <tr>
                     <th>
-                        Category Id
-                    </th>
-                    <th>
                         Category Name
                     </th>
 
@@ -43,18 +39,67 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td style="white-space: nowrap;">@item.CategoryId</td>
-                        <td>@item.CategoryName</td>
+                        <td style="white-space: nowrap;">@item.CategoryName</td>
                         <td>
 
                             <div class="btn-group" role="group">
-                                <a asp-controller="CategoryMaster" asp-action="UpdateCategoryMaster" asp-route-categoryId="@item.CategoryId" class="btn btn-success"><i class="bi bi-pencil-square"></i>  </a>
-                                <br />
-                                <a asp-controller="CategoryMaster" asp-action="RemoveCategoryMaster" asp-route-categoryId="@item.CategoryId" class="btn btn-danger ml-2"><i class="bi bi-trash-fill"></i>  </a>
+@*
+                                <a asp-controller="CategoryMaster" data-category-id="@item.CategoryId" data-toggle="modal" data-target="#categoryModal_@item.CategoryId" asp-action="ViewCategoryMaster" asp-route-categoryId="@item.CategoryId" class="btn btn-warning"><i class="bi bi-view-list"></i></a>
+
+*@
+                                <a asp-controller="CategoryMaster" asp-action="UpdateCategoryMaster" asp-route-categoryId="@item.CategoryId" class="btn btn-success ml-2"><i class="bi bi-pencil-square"></i></a>
+
+
+                                <a href="#" class="btn btn-danger ml-2" data-toggle="modal" data-target="#deleteModal_@item.CategoryId"><i class="bi bi-trash-fill"></i>  </a>
                             </div>
                         </td>
                     </tr>
+
+
+                    <!-- Delete Confirmation Modal for each item -->
+                    <div class="modal fade" id="deleteModal_@item.CategoryId" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete this item?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    <a asp-controller="CategoryMaster" asp-action="RemoveCategoryMaster" asp-route-categoryId="@item.CategoryId" class="btn btn-danger">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 }
+
+               @* @foreach (var item in Model)
+                {
+                    <div class="modal fade" id="categoryModal_@item.CategoryId" tabindex="-1" role="dialog" aria-labelledby="categoryModalLabel_@item.CategoryId">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="categoryModalLabel_@item.CategoryId">Category Details</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong>Category:</strong> @item.CategoryName</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }*@
+
             </tbody>
         </table>
 

@@ -38,7 +38,29 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                IEnumerable<Registration> registrationList = await _registrationRepo.GetAllAsync(u => (!u.IsDeleted), includeProperties : "CategoryMaster,StateMaster,CountryMaster");
+                IEnumerable<Registration> registrationList = await _registrationRepo.GetAllAsync(includeProperties : "CategoryMaster,StateMaster,CountryMaster");
+                _response.Result = _mapper.Map<List<RegistrationDTO>>(registrationList);
+                _response.StatusCode = HttpStatusCode.OK;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+
+            return _response;
+        }
+
+        [HttpGet]
+        [Route("GetAllDeletedRegistration")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<APIResponse>> GetAllDeletedRegistration()
+        {
+            try
+            {
+                IEnumerable<Registration> registrationList = await _registrationRepo.GetAllAsync(u => (u.IsDeleted), includeProperties: "CategoryMaster,StateMaster,CountryMaster");
                 _response.Result = _mapper.Map<List<RegistrationDTO>>(registrationList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
@@ -90,6 +112,7 @@ namespace ShoppingCartAPI.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [Route("CreateRegistration")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -98,10 +121,10 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                if (await _registrationRepo.GetAsync(u => u.RegistrationId == registrationDTO.RegistrationId  && u.Email == registrationDTO.Email || u.RegistrationId == registrationDTO.RegistrationId || u.Email == registrationDTO.Email) != null)
+                if (await _registrationRepo.GetAsync(u => u.Email == registrationDTO.Email || u.ContactNo == registrationDTO.ContactNo) != null)
                 {
-                    ModelState.AddModelError("ErrorMessages", "Registering Person already exists!");
-                    return BadRequest(ModelState);
+                    _response.ResponseMessage = new List<string>() { "Already Exists" };
+                    return BadRequest(_response);
                 }
 
                 if (registrationDTO == null)
@@ -137,6 +160,7 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
         [Route("RemoveRegistration")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -175,6 +199,7 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         [Route("UpdateRegistration")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -193,11 +218,14 @@ namespace ShoppingCartAPI.Controllers
                     return BadRequest(ModelState);
                 }
 
-                //if (await _registrationRepo.GetAsync(u => u.Email == registrationDTO.Email) != null)
-                //{
-                //    ModelState.AddModelError("ErrorMessages", "Registering Person already exists!");
-                //    return BadRequest(ModelState);
-                //}
+                var existingRegistration = await _registrationRepo.GetAsync(u => (u.Email == registrationDTO.Email || u.ContactNo == registrationDTO.ContactNo) && u.RegistrationId != registrationDTO.RegistrationId);
+
+                if (existingRegistration != null)
+                {
+                    _response.ResponseMessage = new List<string>() { "Already Exists" };
+                    return BadRequest(_response);
+                }
+
 
                 Registration registrationDetail = _mapper.Map<Registration>(registrationDTO);
 
@@ -222,7 +250,52 @@ namespace ShoppingCartAPI.Controllers
             }
             return _response;
         }
-        
+
+        [HttpPut]
+        [Authorize(Roles = "Admin")]
+        [Route("EnableRegistration")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponse>> EnableRegistration(int registrationId)
+        {
+            try
+            {
+                if (registrationId == 0)
+                {
+                    _response.StatusCode = HttpStatusCode.BadRequest;
+                    return BadRequest(_response);
+                }
+
+                var registrationDTO = await _registrationRepo.GetAsync(u => u.RegistrationId == registrationId && u.IsDeleted == true);
+
+                if (registrationDTO == null)
+                {
+                    _response.StatusCode = HttpStatusCode.NotFound;
+                    return NotFound(_response);
+                }
+
+                Registration registrationDetail = _mapper.Map<Registration>(registrationDTO);
+
+                if (_userId == null)
+                {
+                    _userId = "0";
+                }
+
+                registrationDetail.IsDeleted = false;
+                await _registrationRepo.UpdateAsync(registrationDetail);
+
+                _response.StatusCode = HttpStatusCode.NoContent;
+                _response.IsSuccess = true;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+
+            return _response;
+        }
     }
 }
 

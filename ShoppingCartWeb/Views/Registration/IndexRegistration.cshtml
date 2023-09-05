@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ShoppingCartWeb.Models.Dto.RegistrationDTO>
+﻿@model ShoppingCartWeb.Models.VM.RegistrationVM
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -12,14 +12,15 @@
     <div class="col-2 text-start pt-1 justify-content-start">
         <a asp-controller="Registration" asp-action="CreateRegistration" class="btn btn-primary btn-sm ms-2">
             <div class="d-flex align-items-center">
-                <span class="d-inline-block align-middle me-1" style="font-size: 24px;">Create</span>
+                @*<i class="bi bi-plus-square-fill me-3 ml-2" style="font-size: 21px;"></i>*@
                 <!-- Increase the font-size value as needed -->
-                <i class="bi bi-plus-square-fill ml-2" style="font-size: 21px;"></i>
+                <span class="d-inline-block align-middle" style="font-size: 24px;"><i class="bi bi-plus-square-fill"></i>  Create </span>
                 <!-- Increase the font-size value as needed -->
             </div>
         </a>
-    </div>
 
+    </div>
+    
 </div>
 
 <div class="container p-4 border mt-4">
@@ -30,10 +31,10 @@
                 <tr>
 
                     <th>
-                        First Name
+                        FirstName
                     </th>
                     <th>
-                        Last Name
+                        LastName
                     </th>
                     <th>
                         Category
@@ -42,60 +43,196 @@
                         Gender
                     </th>
                     <th>
-                        Date Of Birth
+                        DateOfBirth
                     </th>
                     <th>
                         Email
                     </th>
                     <th>
-                        Contact Number
-                    </th>
-                    <th>
-                        Address
-                    </th>
-                    <th>
-                        Postal Code
-                    </th>
-                    <th>
-                        State
+                        ContactNumber
                     </th>
                     <th>
                         Country
                     </th>
                     <th>
-
+                        State
+                    </th>
+                    <th>
+                        Action
                     </th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model)
+                @foreach (var item in Model.Registration)
                 {
-                    <tr>
-                        @*<td>@item.RegistrationId</td>*@
-                        <td>@item.FirstName</td>
-                        <td>@item.LastName</td>
-                        <td>@item.CategoryMaster.CategoryName</td>
-                        <td>@item.Gender</td>
-                        <td style="white-space: nowrap;"> @item.DateOfBirth.ToString("dd-MM-yyyy")</td>
-                        <td>@item.Email</td>
-                        <td>@item.ContactNo</td>
-                        <td class="m-2">@item.Address</td>
-                        <td>@item.PostalCode</td>
-                        <td>@item.StateMaster.StateName</td>
-                        <td>@item.CountryMaster.CountryName</td>
-                        <td style="white-space: nowrap;">
+                    if (@item.IsDeleted == false)
+                    {
+                        <tr>
+                            @*<td>@item.RegistrationId</td>*@
+                            <td>@item.FirstName</td>
+                            <td>@item.LastName</td>
+                            <td>@item.CategoryMaster.CategoryName</td>
+                            <td>@item.Gender</td>
+                            <td style="white-space: nowrap;"> @item.DateOfBirth.ToString("dd-MM-yyyy")</td>
+                            <td>@item.Email</td>
+                            <td>@item.ContactNo</td>
+                            <td>@item.CountryMaster.CountryName</td>
+                            <td>@item.StateMaster.StateName</td>
+                            <td>
 
-                            <div class="btn-group" role="group">
-                                <a asp-controller="Registration" asp-action="UpdateRegistration" asp-route-registrationId="@item.RegistrationId" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
-                                <a asp-controller="Registration" asp-action="RemoveRegistration" asp-route-registrationId="@item.RegistrationId" class="btn btn-danger ml-2"><i class="bi bi-trash-fill"></i></a>
+
+                                <div class="btn-group" role="group">
+
+
+                                    <a asp-controller="Registration" data-category-id="@item.RegistrationId" data-toggle="modal" data-target="#registrationModal_@item.RegistrationId" asp-action="ViewRegistration" asp-route-registrationId="@item.RegistrationId" class="btn btn-warning"><i class="bi bi-view-list"></i></a>
+
+                                    <a asp-controller="Registration" asp-action="UpdateRegistration" asp-route-registrationId="@item.RegistrationId" class="btn btn-success ml-2"><i class="bi bi-pencil-square"></i></a>
+
+
+                                    <a href="#" class="btn btn-danger ml-2" data-toggle="modal" data-target="#deleteModal_@item.RegistrationId"><i class="bi bi-trash-fill"></i>  </a>
+
+                                </div>
+                            </td>
+                        </tr>
+
+                    }
+                    else
+                    {
+                        <tr>
+                            @*<td>@item.RegistrationId</td>*@
+                            <td>@item.FirstName</td>
+                            <td>@item.LastName</td>
+                            <td>@item.CategoryMaster.CategoryName</td>
+                            <td>@item.Gender</td>
+                            <td style="white-space: nowrap;"> @item.DateOfBirth.ToString("dd-MM-yyyy")</td>
+                            <td>@item.Email</td>
+                            <td>@item.ContactNo</td>
+                            <td>@item.CountryMaster.CountryName</td>
+                            <td>@item.StateMaster.StateName</td>
+                            <td>
+
+
+                                <div class="btn-group" role="group">
+
+                                    <a href="#" class="btn btn-primary ml-2" data-toggle="modal" data-target="#enableModal_@item.RegistrationId"> Active </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+
+                    <!-- Delete Confirmation Modal for each item -->
+                    <div class="modal fade" id="deleteModal_@item.RegistrationId" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete this item?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    <a asp-controller="Registration" asp-action="RemoveRegistration" asp-route-registrationId="@item.RegistrationId" class="btn btn-danger">Delete</a>
+                                </div>
                             </div>
+                        </div>
+                    </div>
 
-
-                        </td>
-                    </tr>
+                    <!-- Enable Confirmation Modal for each item -->
+                    <div class="modal fade" id="enableModal_@item.RegistrationId" tabindex="-1" role="dialog" aria-labelledby="enableModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="enableModalLabel">Confirm Enable</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to Enable this item?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                    <a asp-controller="Registration" asp-action="EnableRegistration" asp-route-registrationId="@item.RegistrationId" class="btn btn-success">Yes</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 }
+
+
+                @foreach (var item in Model.Registration)
+                {
+                    <div class="modal fade" id="registrationModal_@item.RegistrationId" tabindex="-1" role="dialog" aria-labelledby="registrationModalLabel_@item.RegistrationId">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="registrationModalLabel_@item.RegistrationId">Registration Details</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong>FirstName:</strong> @item.FirstName</p>
+                                    <p><strong>LastName:</strong> @item.LastName</p>
+                                    <p><strong>CategoryName:</strong> @item.CategoryMaster.CategoryName</p>
+                                    <p><strong>Gender:</strong> @item.Gender</p>
+                                    <p><strong>DateOfBirth:</strong> @item.DateOfBirth.ToString("dd-MM-yyyy")</p>
+                                    <p><strong>Email:</strong> @item.Email</p>
+                                    <p><strong>ContactNo:</strong> @item.ContactNo</p>
+                                    <p><strong>Address:</strong> @item.Address</p>
+                                    <p><strong>PostalCode:</strong> @item.PostalCode</p>
+                                    <p><strong>StateName:</strong> @item.StateMaster.StateName</p>
+                                    <p><strong>CountryName:</strong> @item.CountryMaster.CountryName</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+
             </tbody>
         </table>
     </div>
+
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            @if (Model.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="/Registration/IndexRegistration?orderBy=@Model.OrderBy&currentPage=@(Model.CurrentPage-1)" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            }
+
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                if (i == Model.CurrentPage)
+                {
+                    <li class="page-item"><a class="page-link active" href="/Registration/IndexRegistration?orderBy=@Model.OrderBy&currentPage=@i"> @i</a></li>
+
+                }
+                else
+                {
+                    <li class="page-item"><a class="page-link" href="/Registration/IndexRegistration?orderBy=@Model.OrderBy&currentPage=@i"> @i</a></li>
+                }
+            }
+            @if (Model.CurrentPage < Model.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="/Registration/IndexRegistration?orderBy=@Model.OrderBy&currentPage=@Model.CurrentPage+1" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
 
 </div>

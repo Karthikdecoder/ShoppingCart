@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ShoppingCartAPI.Data;
 using ShoppingCartAPI.Models;
 using ShoppingCartAPI.Models.Dto;
 using ShoppingCartAPI.Repository;
@@ -19,12 +20,27 @@ namespace ShoppingCartAPI.Controllers
         private readonly IMapper _mapper;
         protected APIResponse _response;
         private string _userId;
-        public UserController(IUserRepository userRepo, IHttpContextAccessor httpContextAccessor, IMapper mapper)
+        private readonly ApplicationDbContext _db;
+        public UserController(IUserRepository userRepo, IHttpContextAccessor httpContextAccessor, IMapper mapper, ApplicationDbContext db)
         {
             _userRepo = userRepo;
             _mapper = mapper;
             _response = new();
             _userId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            _db = db;
+        }
+
+        [HttpGet]
+        [Route("GetRegistrationName")]
+        public async Task<ActionResult<APIResponse>> GetRegistrationName(string prefix)
+        {
+            var searchTerm = prefix.ToUpper();
+            var results = _db.Registration.ToList()
+                .Where(u => u.FirstName.ToUpper().StartsWith(searchTerm));
+
+            _response.Result = results;
+
+            return Ok(_response);
         }
 
 
@@ -106,15 +122,14 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromBody] UserDTO model)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Register([FromBody] UserDTO userDTO)
         {
-            bool ifUserNameUnique = _userRepo.IsUniqueUser(model.UserName);
+            bool ifUserNameUnique = _userRepo.IsUniqueUser(userDTO);
 
             if (!ifUserNameUnique)
             {
-                _response.StatusCode = HttpStatusCode.BadRequest;
-                _response.IsSuccess = false;
-                _response.ResponseMessage.Add("Username already exists");
+                _response.ResponseMessage = new List<string>() { "Already Exists" };
                 return BadRequest(_response);
             }
 
@@ -123,12 +138,12 @@ namespace ShoppingCartAPI.Controllers
                 _userId = "0";
             }
 
-            model.CreatedOn = DateTime.Now;
-            model.CreatedBy = int.Parse(_userId);
-            model.UpdatedOn = DateTime.Now;
-            model.UpdatedBy = int.Parse(_userId);
+            userDTO.CreatedOn = DateTime.Now;
+            userDTO.CreatedBy = int.Parse(_userId);
+            userDTO.UpdatedOn = DateTime.Now;
+            userDTO.UpdatedBy = int.Parse(_userId);
 
-            var user = await _userRepo.RegisterAsync(model, _userId);
+            var user = await _userRepo.RegisterAsync(userDTO, _userId);
 
             if (user == null)
             {
@@ -144,6 +159,7 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
         [Route("RemoveUser")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -188,6 +204,7 @@ namespace ShoppingCartAPI.Controllers
 
 
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         [Route("UpdateUser")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -204,6 +221,12 @@ namespace ShoppingCartAPI.Controllers
                 {
                     ModelState.AddModelError("ErrorMessages", "User ID is Invalid");
                     return BadRequest(ModelState);
+                }
+
+                if (await _userRepo.GetAsync(u => u.RegistrationId == userDTO.RegistrationId && u.UserId != userDTO.UserId && u.IsDeleted == false) != null)
+                {
+                    _response.ResponseMessage = new List<string>() { "Already Exists" };
+                    return BadRequest(_response);
                 }
 
                 User model = _mapper.Map<User>(userDTO);

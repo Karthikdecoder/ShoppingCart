@@ -2,8 +2,9 @@
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    
+    //@(ViewContext.RouteData.Values["Controller"].ToString() == "StateMaster" && ViewContext.RouteData.Values["Action"].ToString() == "IndexStateMaster" ? "active" : "")
 }
+
 
 <br />
 <div class="row pb-2">
@@ -14,23 +15,20 @@
     <div class="col-2 text-start pt-1 justify-content-start">
         <a asp-controller="StateMaster" asp-action="CreateStateMaster" class="btn btn-primary btn-sm ms-2">
             <div class="d-flex align-items-center">
-                <span class="d-inline-block align-middle me-1" style="font-size: 24px;">Create</span>
-                <!-- Increase the font-size value as needed -->
-                <i class="bi bi-plus-square-fill ml-2" style="font-size: 21px;"></i>
-                <!-- Increase the font-size value as needed -->
+
+                <span class="d-inline-block align-middle" style="font-size: 24px;"><i class="bi bi-plus-square-fill"></i>  Create </span>
+
             </div>
         </a>
     </div>
 </div>
+
 <div class="container p-4 border mt-4">
 
     <div class="table-responsive">
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>
-                        State Id
-                    </th>
                     <th>
                         State Name
                     </th>
@@ -44,19 +42,79 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td>@item.StateId</td>
                         <td>@item.StateName</td>
                         <td style="white-space: nowrap;"> @item.CountryMaster.CountryName</td>
+
                         <td>
+
                             <div class="btn-group" role="group">
                                 <a asp-controller="StateMaster" asp-action="UpdateStateMaster" asp-route-stateId="@item.StateId" class="btn btn-success button-spacing"><i class="bi bi-pencil-square"></i></a>
-                                <a asp-controller="StateMaster" asp-action="RemoveStateMaster" asp-route-stateId="@item.StateId" class="btn btn-danger ml-2"><i class="bi bi-trash-fill"></i></a>
+                                <a href="#" class="btn btn-danger ml-2" data-toggle="modal" data-target="#deleteModal_@item.StateId"><i class="bi bi-trash-fill"></i>  </a>
                             </div>
                         </td>
                     </tr>
+                    <!-- Delete Confirmation Modal for each item -->
+                    <div class="modal fade" id="deleteModal_@item.StateId" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete this item?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    <a asp-controller="StateMaster" asp-action="RemoveStateMaster" asp-route-stateId="@item.StateId" class="btn btn-danger">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 }
             </tbody>
         </table>
 
+
+        <script>
+            $(document).ready(function () {
+                $("#deleteConfirmationModal").on("click", function (e) {
+                    e.preventDefault();
+                    var stateId = $(this).data("stateId");
+                    Swal.fire({
+                        title: 'Confirm Deletion',
+                        text: 'Are you sure you want to delete this user?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Delete',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            alert(registerstateId); 
+                            .ajax({
+                                type: "POST",
+                                url: '@Url.Action("RemoveStateMaster", "StateMaster")',
+                                data: { stateId: $(this).data("stateId") },
+                                dataType: 'json',
+                                success: function (data) {
+                                    location.reload(true);
+                                },
+                                error: function () {
+                                    location.reload(true);
+                                }
+                            });
+                        }
+                    });
+                });
+            });
+        </script>
+
+
     </div>
 </div>
+
+

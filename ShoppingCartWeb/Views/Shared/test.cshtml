@@ -1,0 +1,183 @@
+﻿@*@model _CRUD_Bootstrap_Modal_Popup.Models.CustomerModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" />
+    <script type="text/javascript" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <script>
+        $(function () {
+            $('#example1').DataTable();
+        })
+        function GetDetails(id) {
+            $.ajax({
+                url: "/Home/EditCustomer/" + id,
+                typr: "GET",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (response) {
+                    $('#hfId').val(response.CustomerId);
+                    $('#txtUpdateName').val(response.Name);
+                    $('#ddlCountry').val(response.Country);
+                    $('#modal-Update').modal('show');
+                },
+                error: function (response) {
+                    alert(response.responseText);
+                }
+            });
+            return false;
+        }
+
+        function Delete(id) {
+            $.ajax({
+                url: "/Home/Delete/" + id,
+                typr: "GET",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (response) {
+                    $('#hfDeleteId').val(response.CustomerId);
+                    $('#txtDeleteName').val(response.Name);
+                    $('#modal-Delete').modal('show');
+                },
+                error: function (response) {
+                    alert(response.responseText);
+                }
+            });
+            return false;
+        }
+    </script>
+</head>
+<body>
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-header">
+                        <h3 class="box-title">Customer List</h3>
+                    </div>
+                    <div class="box-body">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>CustomerId</th>
+                                    <th>Name</th>
+                                    <th>Country</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Customers)
+                                {
+                                    <tr>
+                                        <td>@Html.DisplayFor(module => item.CustomerId)</td>
+                                        <td>@Html.DisplayFor(module => item.Name)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.Country)</td>
+                                        <td>
+                                            <a onclick="GetDetails(@item.CustomerId)"><i class="fa fa-edit"></i></a>
+                                            <a onclick="Delete(@item.CustomerId)"><i class="fa fa-trash-o"></i></a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="modal fade" id="modal-mrole">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header with-border">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h3 class="box-title"> New Customer</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="box box-primary">
+                        @using (Html.BeginForm("InsertCustomer", "Home", FormMethod.Post))
+                        {
+                            <div class="modal-body" style="height:200px">
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <label for="exampleInputEmail1">Customer Name :</label>
+                                        <input type="text" class="form-control" id="rolename" name="Name" placeholder="Customer Name" />
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Country</label>
+                                        <select class="form-control" name="Country">
+                                            <option value="0">Select Country</option>
+                                            <option value="United States">United States</option>
+                                            <option value="India">India</option>
+                                            <option value="France">France</option>
+                                            <option value="Russia">Russia</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="modal-Delete">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header with-border">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h3 class="box-title"> Delete Customer</h3>
+                </div>
+                <div class="modal-body" style="height:250px">
+                    <div class="box box-primary">
+                        @using (Html.BeginForm("DeleteCustomer", "Home", FormMethod.Post))
+                        {
+                            <div class="modal-body">
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <input type="hidden" id="hfDeleteId" name="CustomerId">
+                                        <label for="exampleInputEmail1">Customer Name :</label>
+                                        <input type="text" class="form-control" id="txtDeleteName" readonly="readonly" name="Name" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary" onclick="return confirm('Are sure wants to delete?');>Delete</button>
+                            <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#modal-mrole" style="margin-right:20px; ">
+        Add New Customer
+    </button>
+</body>
+</html>*@

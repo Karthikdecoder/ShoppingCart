@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShoppingCartAPI.Models;
 using ShoppingCartAPI.Models.Dto;
 using ShoppingCartAPI.Repository.IRepository;
+using System.Data;
 using System.Net;
 using System.Security.Claims;
 
@@ -84,8 +86,8 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [Route("CreateRole")]
-        //[Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -95,8 +97,10 @@ namespace ShoppingCartAPI.Controllers
             {
                 if (await _dbRoles.GetAsync(u => u.RoleName == roleMasterDTO.RoleName && u.IsDeleted == false) != null)
                 {
-                    ModelState.AddModelError("ErrorMessages", "Role already exists!");
-                    return BadRequest(ModelState);
+                    //ModelState.AddModelError("ErrorMessages", "Role already exists!");
+                    //return BadRequest(ModelState);
+                    _response.ResponseMessage = new List<string>() { "Already Exists" };
+                    return BadRequest(_response);
                 }
                 
                 if (roleMasterDTO == null)
@@ -131,8 +135,8 @@ namespace ShoppingCartAPI.Controllers
             return _response;
         }
 
-        //[Authorize(Roles = "admin")]
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
         [Route("RemoveRole")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -171,6 +175,7 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         [Route("UpdateRole")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -188,6 +193,13 @@ namespace ShoppingCartAPI.Controllers
                     ModelState.AddModelError("ErrorMessages", "Role ID is Invalid!");
                     return BadRequest(ModelState);
                 }
+
+                if (await _dbRoles.GetAsync(u => u.RoleName == roleMasterDTO.RoleName && u.RoleId != roleMasterDTO.RoleId && u.RoleId != roleMasterDTO.RoleId && u.IsDeleted == false) != null)
+                {
+                    _response.ResponseMessage = new List<string>() { "Already Exists" };
+                    return BadRequest(_response);
+                }
+
                 RoleMaster model = _mapper.Map<RoleMaster>(roleMasterDTO);
 
                 if (_userId == null)

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
@@ -45,27 +46,51 @@ namespace ShoppingCartWeb.Controllers
             return View(list);
         }
 
+        public async Task<IActionResult> ViewCategoryMaster(int categoryId)
+        {
+            CategoryMasterDTO categoryDetail = new();
+
+            var categoryResponse = await _categoryService.GetCategoryAsync<APIResponse>(categoryId, HttpContext.Session.GetString(SD.SessionToken));
+
+            if (categoryResponse != null && categoryResponse.IsSuccess)
+            {
+                CategoryMasterDTO model = JsonConvert.DeserializeObject<CategoryMasterDTO>(Convert.ToString(categoryResponse.Result));
+                categoryDetail = _mapper.Map<CategoryMasterDTO>(model);
+            }
+
+            return View(categoryDetail);
+        }
+
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateCategoryMaster()
         {
             return View();
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateCategoryMaster(CategoryMasterDTO categoryMasterDTO)
         {
-
-            APIResponse result = await _categoryService.CreateCategoryAsync<APIResponse>(categoryMasterDTO, HttpContext.Session.GetString(SD.SessionToken));
-
-            if (result != null && result.IsSuccess)
+            if (ModelState.IsValid)
             {
-                return RedirectToAction("IndexCategoryMaster", "CategoryMaster");
+                APIResponse response = await _categoryService.CreateCategoryAsync<APIResponse>(categoryMasterDTO, HttpContext.Session.GetString(SD.SessionToken));
+
+                if (response != null && response.IsSuccess)
+                {
+                    TempData["success"] = "Created successfully";
+                    return RedirectToAction("IndexCategoryMaster", "CategoryMaster");
+                }
+
+                TempData["error"] = response.ResponseMessage[0].ToString();
+                return View(categoryMasterDTO);
             }
             return View();
 
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateCategoryMaster(int categoryId)
         {
             var categoryResponse = await _categoryService.GetCategoryAsync<APIResponse>(categoryId, HttpContext.Session.GetString(SD.SessionToken));
@@ -81,53 +106,56 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateCategoryMaster(CategoryMasterDTO model)
+        public async Task<IActionResult> UpdateCategoryMaster(CategoryMasterDTO categoryMasterDTO)
         {
-            var response = await _categoryService.UpdateCategoryAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionToken));
-
-            if (response != null && response.IsSuccess)
+            if (ModelState.IsValid)
             {
+                var response = await _categoryService.UpdateCategoryAsync<APIResponse>(categoryMasterDTO, HttpContext.Session.GetString(SD.SessionToken));
+
+                if (response != null && response.IsSuccess)
+                {
+                    TempData["success"] = "Updated successfully";
+                    return RedirectToAction(nameof(IndexCategoryMaster));
+                }
+
+                TempData["error"] = response.ResponseMessage[0].ToString();
                 return RedirectToAction(nameof(IndexCategoryMaster));
             }
-            else
-            {
-                if (response.ErrorMessages.Count > 0)
-                {
-                    ModelState.AddModelError("ErrorMessages", response.ErrorMessages.FirstOrDefault());
-                }
-            }
 
-            return View(model);
+            return View(categoryMasterDTO);
         }
 
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> RemoveCategoryMaster(int categoryId)
+        //{
+        //    var CategoryMasterResponse = await _categoryService.GetCategoryAsync<APIResponse>(categoryId, HttpContext.Session.GetString(SD.SessionToken));
 
+        //    if (CategoryMasterResponse != null && CategoryMasterResponse.IsSuccess)
+        //    {
+        //        CategoryMasterDTO model = JsonConvert.DeserializeObject<CategoryMasterDTO>(Convert.ToString(CategoryMasterResponse.Result));
+
+        //        return View(model);
+        //    }
+
+
+        //    return NotFound();
+        //}
+
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RemoveCategoryMaster(int categoryId)
         {
-            var CategoryMasterResponse = await _categoryService.GetCategoryAsync<APIResponse>(categoryId, HttpContext.Session.GetString(SD.SessionToken));
-
-            if (CategoryMasterResponse != null && CategoryMasterResponse.IsSuccess)
-            {
-                CategoryMasterDTO model = JsonConvert.DeserializeObject<CategoryMasterDTO>(Convert.ToString(CategoryMasterResponse.Result));
-
-                return View(model);
-            }
-
-
-            return NotFound();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RemoveCategoryMaster(CategoryMasterDTO CategoryMasterDTO)
-        {
-            var response = await _categoryService.RemoveCategoryAsync<APIResponse>(CategoryMasterDTO.CategoryId, HttpContext.Session.GetString(SD.SessionToken));
+            var response = await _categoryService.RemoveCategoryAsync<APIResponse>(categoryId, HttpContext.Session.GetString(SD.SessionToken));
 
             if (response != null && response.IsSuccess)
             {
+                TempData["success"] = "Deleted successfully";
                 return RedirectToAction(nameof(IndexCategoryMaster));
             }
-            return View(CategoryMasterDTO);
+
+            TempData["success"] = "Error encountered";
+            return View();
         }
     }
 

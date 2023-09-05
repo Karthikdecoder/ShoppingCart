@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShoppingCartAPI.Models;
 using ShoppingCartAPI.Models.Dto;
 using ShoppingCartAPI.Repository.IRepository;
+using System.Data;
 using System.Net;
 using System.Security.Claims;
 
@@ -85,7 +87,7 @@ namespace ShoppingCartAPI.Controllers
 
         [HttpPost]
         [Route("CreateCountry")]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -95,8 +97,8 @@ namespace ShoppingCartAPI.Controllers
             {
                 if (await _countryRepo.GetAsync(u => u.CountryName == countryMasterDTO.CountryName && u.IsDeleted == false) != null)
                 {
-                    ModelState.AddModelError("ErrorMessages", "Country already exists!");
-                    return BadRequest(ModelState);
+                    _response.ResponseMessage = new List<string>() { "Already Exists" };
+                    return BadRequest(_response);
                 }
 
                 if (countryMasterDTO == null)
@@ -131,8 +133,8 @@ namespace ShoppingCartAPI.Controllers
             return _response;
         }
 
-        ////[Authorize(Roles = "admin")]
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
         [Route("RemoveCountry")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -155,6 +157,7 @@ namespace ShoppingCartAPI.Controllers
                     return NotFound(_response);
                 }
 
+                
                 Country.IsDeleted = true;
                 await _countryRepo.UpdateAsync(Country);
 
@@ -171,19 +174,20 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         [Route("UpdateCountry")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> UpdateCountry([FromBody] CountryMasterDTO CountryMasterDTO)
+        public async Task<ActionResult<APIResponse>> UpdateCountry([FromBody] CountryMasterDTO countryMasterDTO)
         {
             try
             {
-                if (CountryMasterDTO == null)
+                if (countryMasterDTO == null)
                 {
                     return BadRequest();
                 }
 
-                int CountryId = CountryMasterDTO.CountryId;
+                int CountryId = countryMasterDTO.CountryId;
 
                 if (await _countryRepo.GetAsync(u => u.CountryId == CountryId) == null)
                 {
@@ -191,7 +195,13 @@ namespace ShoppingCartAPI.Controllers
                     return BadRequest(ModelState);
                 }
 
-                CountryMaster model = _mapper.Map<CountryMaster>(CountryMasterDTO);
+                if (await _countryRepo.GetAsync(u => u.CountryName == countryMasterDTO.CountryName && u.CountryId != countryMasterDTO.CountryId && u.IsDeleted == false) != null)
+                {
+                    _response.ResponseMessage = new List<string>() { "Already Exists" };
+                    return BadRequest(_response);
+                }
+
+                CountryMaster model = _mapper.Map<CountryMaster>(countryMasterDTO);
 
                 if (_userId == null)
                 {

@@ -2,6 +2,7 @@
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    @(ViewContext.RouteData.Values["Controller"].ToString() == "StateMaster" && ViewContext.RouteData.Values["Action"].ToString() == "CreateStateMaster" ? "active" : "")
 }
 <br />
 <form asp-action="CreateStateMaster">
@@ -12,18 +13,18 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="row pb-3">
-                    <div class="col">
-                        <label asp-for="State.StateName" class="control-label pt-2" style="font-size:16px;">State</label>
+                    <div class="col-2">
+                        <label asp-for="State.StateName" class="control-label pt-2" style="font-size:20px;">State</label>
                     </div>
-                    <div class="col-10 pb-3">
+                    <div class="col-9 pb-3">
                         <input asp-for="State.StateName" class="form-control" />
                         <span asp-validation-for="State.StateName" class="text-danger"></span>
                     </div>
 
                     <div class="col-2">
-                        <label asp-for="State.CountryId" class="control-label pt-2" style="font-size:16px;">Country</label>
+                        <label asp-for="State.CountryId" class="control-label pt-2" style="font-size:20px;">Country</label>
                     </div>
-                    <div class="col-10 pb-3">
+                    <div class="col-9 pb-3">
                         <select asp-for="State.CountryId" class="form-control" asp-items="@Model.CountryList">
                             <option disabled selected>--Select Country--</option>
                         </select>
@@ -31,10 +32,10 @@
                     </div>
 
                     
-                    <div class="col-5 offset-2">
+                    <div class="col-3 offset-3">
                         <a asp-action="IndexStateMaster" asp-controller="StateMaster" class="btn-primary btn form-control ">Cancel</a>
                     </div>
-                    <div class="col-5">
+                    <div class="col-3">
                         <input type="submit" value="Save" class="btn btn-success form-control" />
                     </div>
                 </div>

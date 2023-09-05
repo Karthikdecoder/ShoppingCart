@@ -2,6 +2,7 @@
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+
 }
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -32,7 +33,7 @@
                 <div class="col-10 pb-3">
                     <label asp-for="Registration.Gender" class="control-label pt-2" style="font-size: 16px;">Gender</label>
                     
-                    <div class="form-check form-check-inline">
+                    <div class="form-check form-check-inline ml-2">
 
                         <input class="form-check-input" type="radio" asp-for="Registration.Gender" value="Male" />
 
@@ -57,7 +58,7 @@
 
                 <div class="col-10 pb-3">
                     <label asp-for="Registration.DateOfBirth" class="control-label pt-2" style="font-size:16px;">Date Of Birth</label>
-                    <input asp-for="Registration.DateOfBirth" class="form-control" />
+                    <input value="" asp-for="Registration.DateOfBirth" class="form-control" required/>
                     <span asp-validation-for="Registration.DateOfBirth" class="text-danger"></span>
                 </div>
 
@@ -93,33 +94,46 @@
 
                 <div class="col-10 pb-3">
                     <label asp-for="Registration.CountryId" class="control-label pt-2" style="font-size:16px;">Country</label>
-                    <select asp-for="Registration.CountryId" id="countryId" class="form-control" asp-items="@Model.CountryList">
+
+                    <select asp-for="Registration.CountryId" id="countryId" class="form-control" asp-items="@Model.CountryList" required>
                         <option value="">--Select Country--</option>
-                        <!-- Add country options here -->
                     </select>
+
                     <span asp-validation-for="Registration.CountryId" class="text-danger"></span>
                 </div>
 
                 <div class="col-2">
                 </div>
                 <div class="col-10 pb-3">
+
                     <label asp-for="Registration.StateId" class="control-label pt-2" style="font-size:16px;">State</label>
-                    <select asp-for="Registration.StateId" id="stateDropdown" class="form-control">
-                        <option>--Select State--</option>
+
+                    <select asp-for="Registration.StateId" id="stateDropdown" class="form-control" required>
+                        <option value="">--Select State--</option>
                     </select>
+
                     <span asp-validation-for="Registration.StateId" class="text-danger"></span>
                 </div>
             </div>
+            
+        </div>
+        <div class="row">
 
-            <div class="col-3 offset-6">
-                <a asp-action="IndexRegistration" asp-controller="Registration" class="btn-primary btn form-control ">Cancel</a>
-            </div>
-            <div class="col-3">
-                <input type="submit" value="Save" class="btn btn-success form-control" />
+            <div class="col-md-7"></div>
+            <div class="col-md-4">
+
+                <br />
+                <br />
+                <div class="row">
+                    <div class="col-4">
+                        <a asp-action="IndexRegistration" asp-controller="Registration" class="btn-primary btn form-control">Cancel</a>
+                    </div>
+                    <div class="col-4">
+                        <input type="submit" value="Save" class="btn btn-success form-control" />
+                    </div>
+                </div>
             </div>
         </div>
-
-
     </div>
 </form>
 

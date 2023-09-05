@@ -1,0 +1,59 @@
+﻿@model ShoppingCartWeb.Models.Dto.CategoryMasterDTO
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="modal fade" id="productModal" tabindex="-1" role="dialog" aria-labelledby="productModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productModalLabel">Product Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Name:</strong> @Model.CategoryName</p>
+                <!-- Add more details as needed -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*
+<br />
+<div class="row pb-2">
+    <div class="col">
+        <h1 class="text-dark">Categories</h1>
+    </div>
+    <div class="col-2 text-start pt-1 justify-content-start">
+    </div>
+</div>
+
+
+<div class="container p-4 border mt-4">
+
+
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        Category Name
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                    <tr>
+                        <td style="white-space: nowrap;"> @Model.CategoryName </td>
+                    </tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>*@

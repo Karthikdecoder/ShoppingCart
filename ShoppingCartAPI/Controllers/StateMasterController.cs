@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShoppingCartAPI.Models;
 using ShoppingCartAPI.Models.Dto;
 using ShoppingCartAPI.Repository.IRepository;
 using System.Collections.Generic;
+using System.Data;
 using System.Net;
 using System.Security.Claims;
 
@@ -121,8 +123,8 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [Route("CreateState")]
-        //[Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -130,10 +132,14 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                if (await _stateRepo.GetAsync(u => u.StateName == stateMasterDTO.StateName && u.IsDeleted == false) != null)
+
+                if (await _stateRepo.GetAsync(u => u.StateName == stateMasterDTO.StateName && u.CountryId == stateMasterDTO.CountryId && u.IsDeleted == false) != null)
                 {
-                    ModelState.AddModelError("ErrorMessages", "State already exists!");
-                    return BadRequest(ModelState);
+                    //ModelState.AddModelError("ResponseMessage", "State already Exists!");
+                    //return BadRequest(ModelState);
+
+                    _response.ResponseMessage = new List<string>() { "Already Exists" };
+                    return BadRequest(_response);
                 }
 
                 if (stateMasterDTO == null)
@@ -169,8 +175,8 @@ namespace ShoppingCartAPI.Controllers
             return _response;
         }
 
-        ////[Authorize(Roles = "admin")]
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
         [Route("RemoveState")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -209,19 +215,20 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         [Route("UpdateState")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> UpdateState([FromBody] StateMasterDTO StateMasterDTO)
+        public async Task<ActionResult<APIResponse>> UpdateState([FromBody] StateMasterDTO stateMasterDTO)
         {
             try
             {
-                if (StateMasterDTO == null)
+                if (stateMasterDTO == null)
                 {
                     return BadRequest();
                 }
 
-                int StateId = StateMasterDTO.StateId;
+                int StateId = stateMasterDTO.StateId;
 
                 if (await _stateRepo.GetAsync(u => u.StateId == StateId) == null)
                 {
@@ -229,7 +236,13 @@ namespace ShoppingCartAPI.Controllers
                     return BadRequest(ModelState);
                 }
 
-                StateMaster model = _mapper.Map<StateMaster>(StateMasterDTO);
+                if (await _stateRepo.GetAsync(u => u.StateName == stateMasterDTO.StateName && u.CountryId == stateMasterDTO.CountryId && u.StateId != stateMasterDTO.StateId && u.IsDeleted == false) != null)
+                {
+                    _response.ResponseMessage = new List<string>() { "Already Exists" };
+                    return BadRequest(_response);
+                }
+
+                StateMaster model = _mapper.Map<StateMaster>(stateMasterDTO);
 
                 if (_userId == null)
                 {

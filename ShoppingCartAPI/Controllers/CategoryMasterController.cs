@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShoppingCartAPI.Models;
 using ShoppingCartAPI.Models.Dto;
 using ShoppingCartAPI.Repository.IRepository;
+using System.Data;
 using System.Net;
 using System.Security.Claims;
 
@@ -85,7 +87,7 @@ namespace ShoppingCartAPI.Controllers
 
         [HttpPost]
         [Route("CreateCategory")]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -95,8 +97,8 @@ namespace ShoppingCartAPI.Controllers
             {
                 if (await _dbCategory.GetAsync(u => u.CategoryName == categoryMasterDTO.CategoryName && u.IsDeleted == false) != null)
                 {
-                    ModelState.AddModelError("ErrorMessages", "Category already exists!");
-                    return BadRequest(ModelState);
+                    _response.ResponseMessage = new List<string>() { "Already Exists" };
+                    return BadRequest(_response);
                 }
 
                 if (categoryMasterDTO == null)
@@ -131,8 +133,8 @@ namespace ShoppingCartAPI.Controllers
             return _response;
         }
 
-        //[Authorize(Roles = "admin")]
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
         [Route("RemoveCategory")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -171,6 +173,7 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         [Route("UpdateCategory")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -189,6 +192,12 @@ namespace ShoppingCartAPI.Controllers
                 {
                     ModelState.AddModelError("ErrorMessages", "Category ID is Invalid!");
                     return BadRequest(ModelState);
+                }
+
+                if (await _dbCategory.GetAsync(u => u.CategoryName == categoryMasterDTO.CategoryName && u.CategoryId != categoryMasterDTO.CategoryId && u.IsDeleted == false) != null)
+                {
+                    _response.ResponseMessage = new List<string>() { "Already Exists" };
+                    return BadRequest(_response);
                 }
 
                 CategoryMaster model = _mapper.Map<CategoryMaster>(categoryMasterDTO);

@@ -67,5 +67,25 @@ namespace ShoppingCartWeb.Services
                 Token = token
             });
         }
+
+        public Task<T> GetAllDeletedRegistrationAsync<T>(string token)
+        {
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.GET,
+                Url = registrationUrl + "/api/Registration/GetAllDeletedRegistration",
+                Token = token
+            });
+        }
+
+        public Task<T> EnableRegistrationAsync<T>(int registrationId, string token)
+        {
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.PUT,
+                Url = registrationUrl + "/api/Registration/EnableRegistration?registrationId=" + registrationId,
+                Token = token
+            });
+        }
     }
 }

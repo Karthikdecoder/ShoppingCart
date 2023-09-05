@@ -31,7 +31,7 @@ namespace ShoppingCartWeb.Models.Dto
 
         [Required(ErrorMessage = "Date of birth is required")]
         [DataType(DataType.Date, ErrorMessage = "Invalid Date Of Birth")]
-        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
+        //[DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime DateOfBirth { get; set; }
 
         [Required(ErrorMessage = "Email address is required")]

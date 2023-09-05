@@ -16,21 +16,22 @@
                     <div class="col-2">
                         <label asp-for="CategoryName" class="control-label pt-2" style="font-size:20px;">Category</label>
                     </div>
-                    <div class="col-10 pb-3">
+                    <div class="col-md-7 pb-4">
                         <input asp-for="CategoryName" class="form-control" />
                         <span asp-validation-for="CategoryName" class="text-danger"></span>
                     </div>
 
 
-                    <div class="col-5 offset-2">
+                    <div class="col-3 offset-3">
                         <a asp-action="IndexCategoryMaster" asp-controller="CategoryMaster" class="btn-primary btn form-control ">Cancel</a>
                     </div>
-                    <div class="col-5">
-                        <input type="submit" value="Save" class="btn btn-success form-control" />
+                    <div class="col-3">
+                        <input type="submit" value="Update" class="btn btn-success form-control" />
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 </form>
 
 @section Scripts

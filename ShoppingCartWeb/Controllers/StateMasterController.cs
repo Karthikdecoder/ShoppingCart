@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
@@ -50,40 +51,51 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateStateMaster()
         {
-			StateMasterCreateVM stateMasterCreateVM = new StateMasterCreateVM();
+            StateMasterCreateVM stateMasterCreateVM = new StateMasterCreateVM();
 
-			var countryResponse = await _countryService.GetAllCountryAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+            var countryResponse = await _countryService.GetAllCountryAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
 
-			if (countryResponse != null && countryResponse.IsSuccess)
-			{
-				stateMasterCreateVM.CountryList = JsonConvert.DeserializeObject<List<CountryMasterDTO>>(Convert.ToString(countryResponse.Result)).Select(i => new SelectListItem
-				{
-					Text = i.CountryName,
-					Value = i.CountryId.ToString()
-				});
+            if (countryResponse != null && countryResponse.IsSuccess)
+            {
+                stateMasterCreateVM.CountryList = JsonConvert.DeserializeObject<List<CountryMasterDTO>>(Convert.ToString(countryResponse.Result)).Select(i => new SelectListItem
+                {
+                    Text = i.CountryName,
+                    Value = i.CountryId.ToString()
+                });
 
-				return View(stateMasterCreateVM);
-			}
-			return NotFound();
+                return View(stateMasterCreateVM);
+            }
+            return NotFound();
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateStateMaster(StateMasterCreateVM stateMasterCreateVM)
         {
-
-            APIResponse result = await _stateService.CreateStateAsync<APIResponse>(stateMasterCreateVM.State, HttpContext.Session.GetString(SD.SessionToken));
-
-            if (result != null && result.IsSuccess)
+            if(ModelState.IsValid)
             {
-                return RedirectToAction("IndexStateMaster", "StateMaster");
+                APIResponse result = await _stateService.CreateStateAsync<APIResponse>(stateMasterCreateVM.State, HttpContext.Session.GetString(SD.SessionToken));
+
+                if (result != null && result.IsSuccess)
+                {
+                    TempData["success"] = "Created successfully";
+                    return RedirectToAction("IndexStateMaster", "StateMaster");
+                }
+
+                TempData["error"] = result.ResponseMessage[0].ToString();
+                return View(stateMasterCreateVM);
             }
-            return View();
+
+            TempData["error"] = "Error encountered";
+            return View(stateMasterCreateVM);
 
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateStateMaster(int StateId)
         {
             StateMasterCreateVM stateMasterCreateVM = new();
@@ -113,53 +125,56 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateStateMaster(StateMasterCreateVM model)
+        public async Task<IActionResult> UpdateStateMaster(StateMasterCreateVM stateMasterCreateVM)
         {
-            var response = await _stateService.UpdateStateAsync<APIResponse>(model.State, HttpContext.Session.GetString(SD.SessionToken));
+            if (ModelState.IsValid)
+            {
+                var response = await _stateService.UpdateStateAsync<APIResponse>(stateMasterCreateVM.State, HttpContext.Session.GetString(SD.SessionToken));
 
-            if (response != null && response.IsSuccess)
-            {
-                return RedirectToAction(nameof(IndexStateMaster));
-            }
-            else
-            {
-                if (response.ErrorMessages.Count > 0)
+                if (response != null && response.IsSuccess)
                 {
-                    ModelState.AddModelError("ErrorMessages", response.ErrorMessages.FirstOrDefault());
+                    TempData["success"] = "Updated successfully";
+                    return RedirectToAction(nameof(IndexStateMaster));
                 }
-            }
 
-            return View(model);
+                TempData["error"] = response.ResponseMessage[0].ToString();
+                return RedirectToAction(nameof(IndexStateMaster));
+            }
+            return View(stateMasterCreateVM);
         }
 
 
-        public async Task<IActionResult> RemoveStateMaster(int StateId)
+        //public async Task<IActionResult> RemoveStateMaster(int StateId)
+        //{
+        //    var StateMasterResponse = await _stateService.GetStateAsync<APIResponse>(StateId, HttpContext.Session.GetString(SD.SessionToken));
+
+        //    if (StateMasterResponse != null && StateMasterResponse.IsSuccess)
+        //    {
+        //        StateMasterDTO model = JsonConvert.DeserializeObject<StateMasterDTO>(Convert.ToString(StateMasterResponse.Result));
+
+        //        return View(model);
+        //    }
+
+
+        //    return NotFound();
+        //}
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RemoveStateMaster(int stateId)
         {
-            var StateMasterResponse = await _stateService.GetStateAsync<APIResponse>(StateId, HttpContext.Session.GetString(SD.SessionToken));
-
-            if (StateMasterResponse != null && StateMasterResponse.IsSuccess)
-            {
-                StateMasterDTO model = JsonConvert.DeserializeObject<StateMasterDTO>(Convert.ToString(StateMasterResponse.Result));
-
-                return View(model);
-            }
-
-
-            return NotFound();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RemoveStateMaster(StateMasterDTO StateMasterDTO)
-        {
-            var response = await _stateService.RemoveStateAsync<APIResponse>(StateMasterDTO.StateId, HttpContext.Session.GetString(SD.SessionToken));
+            var response = await _stateService.RemoveStateAsync<APIResponse>(stateId, HttpContext.Session.GetString(SD.SessionToken));
 
             if (response != null && response.IsSuccess)
             {
+                TempData["success"] = "Deleted successfully";
                 return RedirectToAction(nameof(IndexStateMaster));
             }
-            return View(StateMasterDTO);
+            TempData["success"] = "Error encountered";
+            return View();
         }
     }
 

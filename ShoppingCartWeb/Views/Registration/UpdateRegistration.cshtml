@@ -40,8 +40,6 @@
                         <input class="form-check-input" type="radio" asp-for="Registration.Gender" value="Female" />
                         <label class="form-check-label" for="Registration.Gender">Female</label>
                     </div>
-                    <br />
-                    <br />
                     <span asp-validation-for="Registration.Gender" class="text-danger"></span>
                 </div>
 
@@ -103,22 +101,33 @@
                 </div>
                 <div class="col-10 pb-3">
                     <label asp-for="Registration.StateId" class="control-label pt-2" style="font-size:16px;">State</label>
-                    <select asp-for="Registration.StateId" id="stateDropdown" class="form-control">
+                    <select asp-for="Registration.StateId" id="stateDropdown" class="form-control " asp-items="@Model.StateList">
                         <option>--Select State--</option>
                     </select>
                     <span asp-validation-for="Registration.StateId" class="text-danger"></span>
                 </div>
             </div>
+        </div>
 
-            <div class="col-3 offset-6">
-                <a asp-action="IndexRegistration" asp-controller="Registration" class="btn-primary btn form-control ">Cancel</a>
-            </div>
-            <div class="col-3">
-                <input type="submit" value="Save" class="btn btn-success form-control" />
+        <div class="row">
+
+            <div class="col-md-7"></div>
+            <div class="col-md-4">
+
+                <br />
+                <br />
+                <div class="row">
+                    <div class="col-4">
+                        <a asp-action="IndexRegistration" asp-controller="Registration" class="btn-primary btn form-control">Cancel</a>
+                    </div>
+                    <div class="col-4">
+                        <input type="submit" value="Update" class="btn btn-success form-control" />
+                    </div>
+                </div>
             </div>
         </div>
 
-        
+
     </div>
 </form>
 

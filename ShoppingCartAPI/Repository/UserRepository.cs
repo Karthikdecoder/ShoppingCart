@@ -27,9 +27,9 @@ namespace ShoppingCartAPI.Repository
             _mapper = mapper;
         }
 
-        public bool IsUniqueUser(string UserName)
+        public bool IsUniqueUser(UserDTO userDTO)
         {
-            var user = _db.User.FirstOrDefault(u => u.UserName == UserName);
+            var user = _db.User.FirstOrDefault(u => u.RegistrationId == userDTO.RegistrationId);
             if (user == null)
             {
                 return true;

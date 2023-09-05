@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
@@ -46,26 +47,36 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateRoleMaster()
         {
             return View();
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateRoleMaster(RoleMasterDTO roleMasterDTO)
         {
-
-            APIResponse result = await _roleService.CreateRoleAsync<APIResponse>(roleMasterDTO, HttpContext.Session.GetString(SD.SessionToken));
-
-            if (result != null && result.IsSuccess)
+            if (ModelState.IsValid)
             {
-                return RedirectToAction("IndexRoleMaster", "RoleMaster");
+                APIResponse result = await _roleService.CreateRoleAsync<APIResponse>(roleMasterDTO, HttpContext.Session.GetString(SD.SessionToken));
+
+                if (result != null && result.IsSuccess)
+                {
+                    TempData["success"] = "Created successfully";
+                    return RedirectToAction("IndexRoleMaster", "RoleMaster");
+                }
+
+                TempData["error"] = result.ResponseMessage[0].ToString();
+                return View(roleMasterDTO);
             }
+
             return View();
 
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateRoleMaster(int roleId)
         {
             var roleResponse = await _roleService.GetRoleAsync<APIResponse>(roleId, HttpContext.Session.GetString(SD.SessionToken));
@@ -81,55 +92,55 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateRoleMaster(RoleMasterDTO model)
+        public async Task<IActionResult> UpdateRoleMaster(RoleMasterDTO roleMasterDTO)
         {
             if (ModelState.IsValid)
             {
-                var response = await _roleService.UpdateRoleAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionToken));
+                var response = await _roleService.UpdateRoleAsync<APIResponse>(roleMasterDTO, HttpContext.Session.GetString(SD.SessionToken));
 
                 if (response != null && response.IsSuccess)
                 {
+                    TempData["success"] = "Updated successfully";
                     return RedirectToAction(nameof(IndexRoleMaster));
                 }
-                else
-                {
-                    if (response.ErrorMessages.Count > 0)
-                    {
-                        ModelState.AddModelError("ErrorMessages", response.ErrorMessages.FirstOrDefault());
-                    }
-                }
-            }
-            return View(model);
-        }
 
-
-        public async Task<IActionResult> RemoveRoleMaster(int roleId)
-        {
-            var roleMasterResponse = await _roleService.GetRoleAsync<APIResponse>(roleId, HttpContext.Session.GetString(SD.SessionToken));
-
-            if (roleMasterResponse != null && roleMasterResponse.IsSuccess)
-            {
-                RoleMasterDTO model = JsonConvert.DeserializeObject<RoleMasterDTO>(Convert.ToString(roleMasterResponse.Result));
-
-                return View(model);
-            }
-
-
-            return NotFound();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RemoveRoleMaster(RoleMasterDTO roleMasterDTO)
-        {
-            var response = await _roleService.RemoveRoleAsync<APIResponse>(roleMasterDTO.RoleId, HttpContext.Session.GetString(SD.SessionToken));
-
-            if (response != null && response.IsSuccess)
-            {
+                TempData["error"] = response.ResponseMessage[0].ToString();
                 return RedirectToAction(nameof(IndexRoleMaster));
             }
             return View(roleMasterDTO);
+        }
+
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> RemoveRoleMaster(int roleId)
+        //{
+        //    var roleMasterResponse = await _roleService.GetRoleAsync<APIResponse>(roleId, HttpContext.Session.GetString(SD.SessionToken));
+
+        //    if (roleMasterResponse != null && roleMasterResponse.IsSuccess)
+        //    {
+        //        RoleMasterDTO model = JsonConvert.DeserializeObject<RoleMasterDTO>(Convert.ToString(roleMasterResponse.Result));
+
+        //        return View(model);
+        //    }
+
+
+        //    return NotFound();
+        //}
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RemoveRoleMaster(int roleId)
+        {
+            var response = await _roleService.RemoveRoleAsync<APIResponse>(roleId, HttpContext.Session.GetString(SD.SessionToken));
+
+            if (response != null && response.IsSuccess)
+            {
+                TempData["success"] = "Deleted successfully";
+                return RedirectToAction(nameof(IndexRoleMaster));
+            }
+
+            TempData["success"] = "Error encountered";
+            return View();
         }
     }
 

@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ShoppingCartWeb.Models;
 using ShoppingCartWeb.Models.Dto;
+using ShoppingCartWeb.Models.VM;
 using ShoppingCartWeb.Services.IServices;
 using ShoppingCartWeb.Utililty;
+using System.Data;
 using System.Security.Claims;
 
 namespace ShoppingCartWeb.Controllers
@@ -19,6 +22,7 @@ namespace ShoppingCartWeb.Controllers
 		private readonly IStateService _stateService;
 		private readonly IMapper _mapper;
 		private string _Role;
+
 		public CountryMasterController(IUserService userService, IHttpContextAccessor httpContextAccessor, IRoleService roleService, ICategoryService categoryService, IMapper mapper, IRegistrationService registrationService, IStateService stateService, ICountryService countryService)
 		{
 			_userService = userService;
@@ -40,33 +44,42 @@ namespace ShoppingCartWeb.Controllers
 			if (response != null && response.IsSuccess)
 			{
 				list = JsonConvert.DeserializeObject<List<CountryMasterDTO>>(Convert.ToString(response.Result));
-			}
+            }
 
 			return View(list);
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> CreateCountryMaster()
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateCountryMaster()
 		{
 			return View();
 		}
 
 		[HttpPost]
-		[ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
 		public async Task<IActionResult> CreateCountryMaster(CountryMasterDTO CountryMasterDTO)
 		{
-
-			APIResponse result = await _countryService.CreateCountryAsync<APIResponse>(CountryMasterDTO, HttpContext.Session.GetString(SD.SessionToken));
-
-			if (result != null && result.IsSuccess)
+			if (ModelState.IsValid)
 			{
-				return RedirectToAction("IndexCountryMaster", "CountryMaster");
-			}
+				APIResponse result = await _countryService.CreateCountryAsync<APIResponse>(CountryMasterDTO, HttpContext.Session.GetString(SD.SessionToken));
+
+				if (result != null && result.IsSuccess)
+				{
+                    TempData["success"] = "Created successfully";
+                    return RedirectToAction("IndexCountryMaster", "CountryMaster");
+				}
+
+                TempData["error"] = result.ResponseMessage[0].ToString();
+                return View(CountryMasterDTO);
+            }
 			return View();
 
 		}
 
-		public async Task<IActionResult> UpdateCountryMaster(int CountryId)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateCountryMaster(int CountryId)
 		{
 			var CountryResponse = await _countryService.GetCountryAsync<APIResponse>(CountryId, HttpContext.Session.GetString(SD.SessionToken));
 
@@ -81,56 +94,54 @@ namespace ShoppingCartWeb.Controllers
 		}
 
 		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> UpdateCountryMaster(CountryMasterDTO model)
+        [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
+		public async Task<IActionResult> UpdateCountryMaster(CountryMasterDTO countryMasterDTO)
 		{
 			if (ModelState.IsValid)
 			{
-				var response = await _countryService.UpdateCountryAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionToken));
+				var response = await _countryService.UpdateCountryAsync<APIResponse>(countryMasterDTO, HttpContext.Session.GetString(SD.SessionToken));
 
 				if (response != null && response.IsSuccess)
 				{
-					return RedirectToAction(nameof(IndexCountryMaster));
+                    TempData["success"] = "Updated successfully";
+                    return RedirectToAction(nameof(IndexCountryMaster));
 				}
-				else
-				{
-					if (response.ErrorMessages.Count > 0)
-					{
-						ModelState.AddModelError("ErrorMessages", response.ErrorMessages.FirstOrDefault());
-					}
-				}
-			}
-			return View(model);
+
+                TempData["error"] = response.ResponseMessage[0].ToString();
+                return RedirectToAction(nameof(IndexCountryMaster));
+            }
+			return View(countryMasterDTO);
 		}
 
-
-		public async Task<IActionResult> RemoveCountryMaster(int CountryId)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RemoveCountryMaster(int CountryId)
 		{
-			var CountryMasterResponse = await _countryService.GetCountryAsync<APIResponse>(CountryId, HttpContext.Session.GetString(SD.SessionToken));
-
-			if (CountryMasterResponse != null && CountryMasterResponse.IsSuccess)
-			{
-				CountryMasterDTO model = JsonConvert.DeserializeObject<CountryMasterDTO>(Convert.ToString(CountryMasterResponse.Result));
-
-				return View(model);
-			}
-
-
-			return NotFound();
-		}
-
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> RemoveCountryMaster(CountryMasterDTO CountryMasterDTO)
-		{
-			var response = await _countryService.RemoveCountryAsync<APIResponse>(CountryMasterDTO.CountryId, HttpContext.Session.GetString(SD.SessionToken));
+            var response = await _countryService.RemoveCountryAsync<APIResponse>(CountryId, HttpContext.Session.GetString(SD.SessionToken));
 
 			if (response != null && response.IsSuccess)
 			{
-				return RedirectToAction(nameof(IndexCountryMaster));
+                TempData["success"] = "Deleted successfully";
+                return RedirectToAction(nameof(IndexCountryMaster));
 			}
-			return View(CountryMasterDTO);
-		}
+
+            TempData["success"] = "Error encountered";
+            return View();
+        }
+
+		//[HttpPost]
+		//[ValidateAntiForgeryToken]
+		//public async Task<IActionResult> RemoveCountryMaster(string CountryId)
+		//{
+		//	var response = await _countryService.RemoveCountryAsync<APIResponse>(CountryId, HttpContext.Session.GetString(SD.SessionToken));
+
+		//	if (response != null && response.IsSuccess)
+		//	{
+		//		return RedirectToAction(nameof(IndexCountryMaster));
+		//	}
+		//	return View();
+		//}
+
 	}
 
 }
