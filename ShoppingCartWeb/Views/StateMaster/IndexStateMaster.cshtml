@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ShoppingCartWeb.Models.Dto.StateMasterDTO>
+﻿@model ShoppingCartWeb.Models.VM.StateMasterPaginationVM
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -51,38 +51,78 @@
             </thead>
             <tbody>
 
-                @foreach (var item in Model)
+                @foreach (var item in Model.StateMasterDTO)
                 {
-                    <tr>
-                        <td>@item.StateName</td>
-                        <td style="white-space: nowrap;"> @item.CountryMaster.CountryName</td>
+                    if (@item.IsDeleted == false)
+                    {
+                        <tr>
+                            <td>@item.StateName</td>
+                            <td style="white-space: nowrap;"> @item.CountryMaster.CountryName</td>
 
-                        <td>
+                            <td>
 
-                            <div class="btn-group" role="group">
-                                <a asp-controller="StateMaster" asp-action="UpdateStateMaster" asp-route-stateId="@item.StateId" class=" button-spacing btn ml-1 text-success" style="font:bold">
-                                    <span id="boot-icon" class="bi bi-pencil-square" style="font-size: 17px; color: rgb(0, 128, 55); -webkit-text-stroke-width: 0.6px; opacity: 0.9;"></span>
-                                </a>
-                                <a href="#" class="btn ml-1 text-danger" style=" font:bold " data-toggle="modal" data-target="#deleteModal_@item.StateId"> <span id="boot-icon" class="bi bi-trash-fill" style="font-size: 17px; color: rgb(255, 0, 0); -webkit-text-stroke-width: 0px; opacity: 0.9;"></span> </a>
+                                <div class="btn-group" role="group">
+                                    <a asp-controller="StateMaster" asp-action="UpdateStateMaster" asp-route-stateId="@item.StateId" class=" button-spacing btn ml-1 text-success" style="font:bold">
+                                        <span id="boot-icon" class="bi bi-pencil-square" style="font-size: 17px; color: rgb(0, 128, 55); -webkit-text-stroke-width: 0.6px; opacity: 0.9;"></span>
+                                    </a>
+                                    <a href="#" class="btn ml-1 text-danger" style=" font:bold " data-toggle="modal" data-target="#deleteModal_@item.StateId"> <span id="boot-icon" class="bi bi-trash-fill" style="font-size: 17px; color: rgb(255, 0, 0); -webkit-text-stroke-width: 0px; opacity: 0.9;"></span> </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Delete Confirmation Modal for each item -->
+                        <div class="modal fade" id="deleteModal_@item.StateId" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this item?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                        <a asp-controller="StateMaster" asp-action="RemoveStateMaster" asp-route-stateId="@item.StateId" class="btn btn-danger">Delete</a>
+                                    </div>
+                                </div>
                             </div>
-                        </td>
-                    </tr>
-                    <!-- Delete Confirmation Modal for each item -->
-                    <div class="modal fade" id="deleteModal_@item.StateId" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                        </div>
+                    }
+
+                    else
+                    {
+                        <tr>
+                            <td style="white-space: nowrap;">@item.StateName</td>
+                            <td style="white-space: nowrap;"> @item.CountryMaster.CountryName</td>
+                            <td>
+
+                                <div class="btn-group" role="group">
+
+                                    <a href="#" class="btn btn-primary btn-sm ml-2" data-toggle="modal" data-target="#enableModal_@item.StateId"> Active </a>
+
+                                </div>
+                            </td>
+                        </tr>
+                    }
+
+                    <!-- Enable Confirmation Modal for each item -->
+                    <div class="modal fade" id="enableModal_@item.StateId" tabindex="-1" role="dialog" aria-labelledby="enableModalLabel" aria-hidden="true">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                                    <h5 class="modal-title" id="enableModalLabel">Confirm Enable</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    Are you sure you want to delete this item?
+                                    Are you sure you want to Enable this item?
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                    <a asp-controller="StateMaster" asp-action="RemoveStateMaster" asp-route-stateId="@item.StateId" class="btn btn-danger">Delete</a>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                    <a asp-controller="StateMaster" asp-action="EnableStateMaster" asp-route-stateId="@item.StateId" asp-route-currentPageNo="@Model.CurrentPage" class="btn btn-success">Yes</a>
                                 </div>
                             </div>
                         </div>
@@ -129,6 +169,41 @@
 
 
     </div>
+
+    <nav aria-label="Page navigation example" class="justify-content-end">
+        <ul class="pagination">
+            @if (Model.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="/StateMaster/IndexStateMaster?orderBy=@Model.OrderBy&currentPage=@(Model.CurrentPage-1)" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            }
+
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                if (i == Model.CurrentPage)
+                {
+                    <li class="page-item"><a class="page-link active" href="/StateMaster/IndexStateMaster?orderBy=@Model.OrderBy&currentPage=@i"> @i</a></li>
+
+                }
+                else
+                {
+                    <li class="page-item"><a class="page-link" href="/StateMaster/IndexStateMaster?orderBy=@Model.OrderBy&currentPage=@i"> @i</a></li>
+                }
+            }
+            @if (Model.CurrentPage < Model.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="/StateMaster/IndexStateMaster?orderBy=@Model.OrderBy&currentPage=@Model.CurrentPage+1" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+
 </div>
 
 

@@ -40,9 +40,9 @@
                 <tr>
 
                     <th>
-                        <a href="/Registration/IndexRegistration?orderBy=@Model.FirstNameSortOrder" class="text-dark" style="font-size:medium;">FirstName</a>
-                    </th>
+                        <a href="/Registration/IndexRegistration?orderBy=@Model.FirstNameSortOrder&@Model.OrderBy=@Model.FirstNameSortOrder" class="text-dark" style="font-size:medium;">FirstName</a>
 
+                    </th>
 
                     <th>
                         <a href="/Registration/IndexRegistration?orderBy=@Model.LastNameSortOrder" class="text-dark" style="font-size:medium;">LastName</a>
@@ -74,23 +74,27 @@
                 </tr>
             </thead>
             <tbody>
+
+
                 @foreach (var item in Model.Registration)
                 {
-                    if (@item.IsDeleted == false)
-                    {
-                        <tr>
-                            @*<td>@item.RegistrationId</td>*@
-                            <td>@item.FirstName</td>
-                            <td>@item.LastName</td>
-                            <td>@item.CategoryMaster.CategoryName</td>
-                            <td>@item.Gender</td>
-                            <td style="white-space: nowrap;"> @item.DateOfBirth.ToString("dd-MM-yyyy")</td>
-                            <td>@item.Email</td>
-                            <td>@item.ContactNo</td>
-                            <td>@item.CountryMaster.CountryName</td>
-                            <td style="white-space: nowrap;">@item.StateMaster.StateName</td>
-                            <td>
 
+
+
+                    <tr>
+                        <td>@item.FirstName</td>
+                        <td>@item.LastName</td>
+                        <td>@item.CategoryMaster.CategoryName</td>
+                        <td>@item.Gender</td>
+                        <td style="white-space: nowrap;"> @item.DateOfBirth.ToString("dd-MM-yyyy")</td>
+                        <td>@item.Email</td>
+                        <td>@item.ContactNo</td>
+                        <td>@item.CountryMaster.CountryName</td>
+                        <td style="white-space: nowrap;">@item.StateMaster.StateName</td>
+
+                        @if (item.IsDeleted == false)
+                        {
+                            <td>
 
                                 <div class="btn-group" role="group">
 
@@ -107,35 +111,24 @@
                                         <span id="boot-icon" class="bi bi-trash-fill" style="font-size: 17px; color: rgb(255, 0, 0); -webkit-text-stroke-width: 0px; opacity: 0.9;"></span>
                                     </a>
 
+
                                 </div>
                             </td>
-                        </tr>
+                        }
 
-                    }
-                    else
-                    {
-                        <tr>
-                            @*<td>@item.RegistrationId</td>*@
-                            <td>@item.FirstName</td>
-                            <td>@item.LastName</td>
-                            <td>@item.CategoryMaster.CategoryName</td>
-                            <td>@item.Gender</td>
-                            <td style="white-space: nowrap;"> @item.DateOfBirth.ToString("dd-MM-yyyy")</td>
-                            <td>@item.Email</td>
-                            <td>@item.ContactNo</td>
-                            <td>@item.CountryMaster.CountryName</td>
-                            <td>@item.StateMaster.StateName</td>
+                        else
+                        {
                             <td>
-
-
                                 <div class="btn-group" role="group">
 
                                     <a href="#" class="btn btn-primary btn-sm ml-2" data-toggle="modal" data-target="#enableModal_@item.RegistrationId"> Active </a>
 
                                 </div>
                             </td>
-                        </tr>
-                    }
+                        }
+
+                    </tr>
+
 
                     <!-- Delete Confirmation Modal for each item -->
                     <div class="modal fade" id="deleteModal_@item.RegistrationId" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -152,7 +145,7 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                    <a asp-controller="Registration" asp-action="RemoveRegistration" asp-route-registrationId="@item.RegistrationId" asp-route-currentPageNo="@Model.CurrentPage" class="btn btn-danger">Delete</a>
+                                    <a asp-controller="Registration" asp-action="RemoveRegistration" asp-route-registrationId="@item.RegistrationId" asp-route-currentPageNo="@Model.CurrentPage" asp-route-orderBys-="@Model.OrderBy" class="btn btn-danger">Delete</a>
                                 </div>
                             </div>
                         </div>

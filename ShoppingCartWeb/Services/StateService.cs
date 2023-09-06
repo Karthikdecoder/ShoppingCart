@@ -80,5 +80,15 @@ namespace ShoppingCartWeb.Services
                 Token = token
             });
         }
+
+        public Task<T> EnableStateAsync<T>(int stateId, string token)
+        {
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.PUT,
+                Url = stateUrl + "/api/StateMaster/EnableState?stateId=" + stateId,
+                Token = token
+            });
+        }
     }
 }

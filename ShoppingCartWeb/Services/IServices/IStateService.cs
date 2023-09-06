@@ -10,6 +10,7 @@ namespace ShoppingCartWeb.Services.IServices
         Task<T> GetStateAsync<T>(int stateId, string token);
 		Task<T> CreateStateAsync<T>(StateMasterDTO stateMasterDTO, string token);
 		Task<T> UpdateStateAsync<T>(StateMasterDTO stateMasterDTO, string token);
+		Task<T> EnableStateAsync<T>(int stateId, string token);
 		Task<T> RemoveStateAsync<T>(int stateId, string token);
 	}
 }

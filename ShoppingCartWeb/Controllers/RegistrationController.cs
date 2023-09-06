@@ -319,14 +319,14 @@ namespace ShoppingCartWeb.Controllers
 
 
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> RemoveRegistration(int registrationId, int currentPageNo)
+        public async Task<IActionResult> RemoveRegistration(int registrationId, int currentPageNo, string orderBys)
         {
             var response = await _registrationService.RemoveRegistrationAsync<APIResponse>(registrationId, HttpContext.Session.GetString(SD.SessionToken));
 
             if (response != null && response.IsSuccess)
             {
                 TempData["success"] = "Deleted successfully";
-                return RedirectToAction("IndexRegistration", new { currentPage = currentPageNo });
+                return RedirectToAction("IndexRegistration", new { orderBy = orderBys , currentPage = currentPageNo});
             }
 
             TempData["success"] = "Error encountered";

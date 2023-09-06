@@ -36,7 +36,7 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                IEnumerable<StateMaster> stateList = await _stateRepo.GetAllAsync(u => u.IsDeleted == false, includeProperties: "CountryMaster");
+                IEnumerable<StateMaster> stateList = await _stateRepo.GetAllAsync(includeProperties: "CountryMaster");
                 _response.Result = _mapper.Map<List<StateMasterDTO>>(stateList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
@@ -253,6 +253,52 @@ namespace ShoppingCartAPI.Controllers
                 model.UpdatedBy = int.Parse(_userId);
                 model.IsDeleted = false;
                 await _stateRepo.UpdateAsync(model);
+
+                _response.StatusCode = HttpStatusCode.NoContent;
+                _response.IsSuccess = true;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
+
+        [HttpPut]
+        [Authorize(Roles = "Admin")]
+        [Route("EnableState")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponse>> EnableState(int stateId)
+        {
+            try
+            {
+                if (stateId == 0)
+                {
+                    _response.StatusCode = HttpStatusCode.BadRequest;
+                    return BadRequest(_response);
+                }
+
+                var stateMasterDTO = await _stateRepo.GetAsync(u => u.StateId == stateId && u.IsDeleted == true);
+
+                if (stateMasterDTO == null)
+                {
+                    _response.StatusCode = HttpStatusCode.NotFound;
+                    return NotFound(_response);
+                }
+
+                StateMaster stateMaster = _mapper.Map<StateMaster>(stateMasterDTO);
+
+                if (_userId == null)
+                {
+                    _userId = "0";
+                }
+
+
+                stateMaster.IsDeleted = false;
+                await _stateRepo.UpdateAsync(stateMaster);
 
                 _response.StatusCode = HttpStatusCode.NoContent;
                 _response.IsSuccess = true;

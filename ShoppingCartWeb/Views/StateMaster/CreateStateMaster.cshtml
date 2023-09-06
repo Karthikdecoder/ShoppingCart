@@ -2,7 +2,8 @@
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    @(ViewContext.RouteData.Values["Controller"].ToString() == "StateMaster" && ViewContext.RouteData.Values["Action"].ToString() == "CreateStateMaster" ? "active" : "")
+    string currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    string currentAction = ViewContext.RouteData.Values["action"]?.ToString();
 }
 <br />
 <form asp-action="CreateStateMaster">

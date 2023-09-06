@@ -36,8 +36,10 @@ namespace ShoppingCartWeb.Controllers
             _countryService = countryService;
         }
 
-        public async Task<IActionResult> IndexStateMaster()
+        public async Task<IActionResult> IndexStateMaster(string orderBy = "", int currentPage = 1)
         {
+            StateMasterPaginationVM stateMasterPaginationVM = new StateMasterPaginationVM();   
+
             List<StateMasterDTO> list = new();
 
             var response = await _stateService.GetAllStateAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
@@ -47,7 +49,20 @@ namespace ShoppingCartWeb.Controllers
                 list = JsonConvert.DeserializeObject<List<StateMasterDTO>>(Convert.ToString(response.Result));
             }
 
-            return View(list);
+            int totalRecords = list.Count();
+
+            int pageSize = 5;
+
+            int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+            list = list.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+
+            stateMasterPaginationVM.StateMasterDTO = list;
+            stateMasterPaginationVM.CurrentPage = currentPage;
+            stateMasterPaginationVM.PageSize = pageSize;
+            stateMasterPaginationVM.TotalPages = totalPages;
+
+            return View(stateMasterPaginationVM);
         }
 
         [HttpGet]
@@ -146,6 +161,25 @@ namespace ShoppingCartWeb.Controllers
             return View(stateMasterCreateVM);
         }
 
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EnableStateMaster(int stateId, int currentPageNo)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _stateService.EnableStateAsync<APIResponse>(stateId, HttpContext.Session.GetString(SD.SessionToken));
+
+                if (response != null && response.IsSuccess)
+                {
+                    TempData["success"] = "Enabled successfully";
+                    return RedirectToAction("IndexStateMaster", new { currentPage = currentPageNo });
+                }
+
+                TempData["error"] = response.ResponseMessage[0].ToString();
+                return RedirectToAction(nameof(IndexStateMaster));
+            }
+
+            return View();
+        }
 
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RemoveStateMaster(int stateId)
