@@ -2,6 +2,8 @@
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+
 }
 <br />
 <div class="row pb-2">
@@ -13,11 +15,12 @@
                 /* You can also use other units like em, rem, or % if you prefer. */
             }
         </style>
+
         <h1 class="text-dark">Roles</h1>
     </div>
 
     <div class="col-2 d-flex justify-content-end align-items-start">
-        <a asp-controller="RoleMaster" asp-action="CreateRoleMaster" class="btn btn-primary btn-sm">
+        <a asp-controller="RoleMaster" asp-action="UpdateRoleMaster" class="btn btn-primary btn-sm">
             <div class="d-flex align-items-center">
                 <span class="d-inline-block align-middle" style="font-size: 17px;"><i class="bi bi-plus-square-fill"></i> Create</span>
             </div>
@@ -50,19 +53,54 @@
                 {
                     <tr>
                         <td>@item.RoleName</td>
-                        <td style="white-space: nowrap;">
-                            <div class="btn-group" role="group">
 
-                                <a asp-controller="RoleMaster" asp-action="UpdateRoleMaster" asp-route-roleId="@item.RoleId" class="btn btn-sm ml-2">
-                                    <span id="boot-icon" class="bi bi-pencil-square" style="font-size: 17px; color: rgb(0, 128, 55); -webkit-text-stroke-width: 0.6px; opacity: 0.9;"></span>
+                        @if (item.IsDeleted == false)
+                        {
+                            <td style="white-space: nowrap;">
+                                <div class="btn-group" role="group">
+
+                                    <a asp-controller="RoleMaster" asp-action="UpdateRoleMaster" asp-route-roleId="@item.RoleId" class="btn btn-sm ml-2">
+                                        <span id="boot-icon" class="bi bi-pencil-square" style="font-size: 17px; color: rgb(0, 128, 55); -webkit-text-stroke-width: 0.6px; opacity: 0.9;"></span>
                                     </a>
 
-                                <a href="#" class="btn btn-sm ml-2" data-toggle="modal" data-target="#deleteModal_@item.RoleId">
-                                    <span id="boot-icon" class="bi bi-trash-fill" style="font-size: 17px; color: rgb(255, 0, 0); -webkit-text-stroke-width: 0px; opacity: 0.9;"></span>
+                                    <a href="#" class="btn btn-sm ml-2" data-toggle="modal" data-target="#deleteModal_@item.RoleId">
+                                        <span id="boot-icon" class="bi bi-trash-fill" style="font-size: 17px; color: rgb(255, 0, 0); -webkit-text-stroke-width: 0px; opacity: 0.9;"></span>
                                     </a>
-                            </div>
-                        </td>
+                                </div>
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="#" class="btn btn-primary btn-sm ml-2" data-toggle="modal" data-target="#enableModal_@item.RoleId"> Active </a>
+                                </div>
+                            </td>
+                        }
                     </tr>
+
+                    <!-- Enable Confirmation Modal for each item -->
+                    <div class="modal fade" id="enableModal_@item.RoleId" tabindex="-1" role="dialog" aria-labelledby="enableModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="enableModalLabel">Confirm Enable</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to Enable this item?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                    <a asp-controller="RoleMaster" asp-action="EnableRole" asp-route-roleId="@item.RoleId" class="btn btn-success">Yes</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
                     <!-- Delete Confirmation Modal for each item -->
                     <div class="modal fade" id="deleteModal_@item.RoleId" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
                         <div class="modal-dialog" role="document">
@@ -89,3 +127,26 @@
 
     </div>
 </div>
+
+@section Scripts {
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Bootstrap Table CSS and JavaScript -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.18.3/bootstrap-table.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.18.3/bootstrap-table.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#table').bootstrapTable();
+        });
+
+    </script>
+    
+}

@@ -2,11 +2,9 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using ShoppingCartWeb.Models;
 using ShoppingCartWeb.Models.Dto;
-using ShoppingCartWeb.Models.VM;
 using ShoppingCartWeb.Services.IServices;
 using ShoppingCartWeb.Utililty;
 using System.Data;
@@ -79,6 +77,11 @@ namespace ShoppingCartWeb.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateRoleMaster(int roleId)
         {
+            if(roleId == 0)
+            {
+                return View();
+            }
+
             var roleResponse = await _roleService.GetRoleAsync<APIResponse>(roleId, HttpContext.Session.GetString(SD.SessionToken));
 
             if (roleResponse != null && roleResponse.IsSuccess)
@@ -110,6 +113,26 @@ namespace ShoppingCartWeb.Controllers
                 return View(roleMasterDTO);
             }
             return View(roleMasterDTO);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EnableRole(int roleId)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _roleService.EnableRoleAsync<APIResponse>(roleId, HttpContext.Session.GetString(SD.SessionToken));
+
+                if (response != null && response.IsSuccess)
+                {
+                    TempData["success"] = "Enabled successfully";
+                    return RedirectToAction("IndexRoleMaster");
+                }
+
+                TempData["error"] = response.ResponseMessage[0].ToString();
+                return RedirectToAction(nameof(IndexRoleMaster));
+            }
+
+            return View();
         }
 
         //[Authorize(Roles = "Admin")]

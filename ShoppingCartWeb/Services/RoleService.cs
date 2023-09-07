@@ -67,5 +67,15 @@ namespace ShoppingCartWeb.Services
                 Token = token
             });
         }
+
+        public Task<T> EnableRoleAsync<T>(int roleId, string token)
+        {
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.PUT,
+                Url = roleUrl + "/api/RoleMaster/EnableRole?roleId=" + roleId,
+                Token = token
+            });
+        }
     }
 }

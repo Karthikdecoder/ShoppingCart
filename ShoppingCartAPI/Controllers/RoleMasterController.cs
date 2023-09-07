@@ -35,7 +35,7 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                IEnumerable<RoleMaster> roleList = await _dbRoles.GetAllAsync(u => u.IsDeleted == false);
+                IEnumerable<RoleMaster> roleList = await _dbRoles.GetAllAsync();
                 _response.Result = _mapper.Map<List<RoleMasterDTO>>(roleList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
@@ -223,5 +223,53 @@ namespace ShoppingCartAPI.Controllers
             }
             return _response;
         }
+
+        [HttpPut]
+        [Authorize(Roles = "Admin")]
+        [Route("EnableRole")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponse>> EnableRole(int roleId)
+        {
+            try
+            {
+                if (roleId == 0)
+                {
+                    _response.StatusCode = HttpStatusCode.BadRequest;
+                    return BadRequest(_response);
+                }
+
+                var roleMasterDTO = await _dbRoles.GetAsync(u => u.RoleId == roleId && u.IsDeleted == true);
+
+                if (roleMasterDTO == null)
+                {
+                    _response.StatusCode = HttpStatusCode.NotFound;
+                    return NotFound(_response);
+                }
+
+                RoleMaster model = _mapper.Map<RoleMaster>(roleMasterDTO);
+
+                if (_userId == null)
+                {
+                    _userId = "0";
+                }
+
+                model.UpdatedOn = DateTime.Now;
+                model.UpdatedBy = int.Parse(_userId);
+                model.IsDeleted = false;
+                await _dbRoles.UpdateAsync(model);
+
+                _response.StatusCode = HttpStatusCode.NoContent;
+                _response.IsSuccess = true;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
     }
+
 }

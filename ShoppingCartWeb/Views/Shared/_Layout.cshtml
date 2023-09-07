@@ -21,6 +21,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js"></script>
 
 
+
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
@@ -46,7 +47,7 @@
 
             <ul class="navbar-nav ml-auto">
                 @*<li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>*@
                 <li class="nav-item d-none d-sm-inline-block">
 
@@ -78,47 +79,79 @@
                         <!-- Add icons to the links using the .nav-icon class
                              with font-awesome or any other icon font library -->
 
-                        <li class="nav-item @(currentController == "Registration" && (currentAction == "IndexRegistration" || currentAction == "IndexUser") ? "menu-open" : "")">
-                            <a href="#" class="nav-link @(currentController == "Registration" && (currentAction == "IndexRegistration" || currentAction == "IndexUser" || currentAction == "CreateRegistration") ? "active" : "")">
+                        <li class="nav-item @(currentController == "Registration" || currentController == "User" && (currentAction == "IndexRegistration" || currentAction == "IndexUser"|| currentAction == "CreateRegistration" || currentAction == "UpdateRegistration" || currentAction == "Register" || currentAction == "UpdateUser") ? "menu-open" : "")">
+
+                            <a href="#" class="nav-link @(currentController == "Registration" || currentController == "User" && (currentAction == "IndexRegistration" || currentAction == "IndexUser" || currentAction == "CreateRegistration" || currentAction == "UpdateRegistration" || currentAction == "Register" ||currentAction == "UpdateUser") ? "active" : "")">
+
                                 <i class="nav-icon fas fa-tree"></i>
+
                                 <p>
                                     Registrations
+
                                     <i class="fas fa-angle-left right"></i>
                                 </p>
                             </a>
+
                             <ul class="nav nav-treeview">
 
                                 <li class="nav-item">
-                                    <a class="nav-link @(currentController == "Registration" && (currentAction == "IndexRegistration" || currentAction=="CreateRegistration") ? "active" : "")" asp-controller="Registration" asp-action="IndexRegistration">General Registration</a>
+                                    <a class="nav-link @(currentController == "Registration" && (currentAction == "IndexRegistration" || currentAction=="CreateRegistration" || currentAction == "UpdateRegistration" ) ? "active" : "")" asp-controller="Registration" asp-action="IndexRegistration">
+
+                                        General Registration
+
+                                    </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link @(currentController == "User" && currentAction == "IndexUser" ? "active" : "")" asp-controller="User" asp-action="IndexUser">User Registration</a>
+                                    <a class="nav-link @(currentController == "User" && (currentAction == "IndexUser" || currentAction == "Register" || currentAction == "UpdateUser") ? "active" : "")" asp-controller="User" asp-action="IndexUser">
+
+                                        User Registration
+                                    </a>
+
                                 </li>
 
 
                             </ul>
                         </li>
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
+                        <li class="nav-item @(currentController == "RoleMaster" || currentController == "CategoryMaster" || currentController == "CountryMaster" || currentController == "StateMaster" &&
+
+                        (currentAction == "IndexRoleMaster" || currentAction == "CreateRoleMaster" || currentAction == "UpdateRoleMaster" ||
+                        currentAction == "IndexCategoryMaster" || currentAction == "CreateCategoryMaster" || currentAction == "UpdateCategoryMaster" ||
+                        currentAction == "IndexCountryMaster" || currentAction == "CreateCountryMaster" || currentAction == "UpdateCountryMaster" ||
+                        currentAction == "IndexStateMaster" || currentAction == "CreateStateMaster" || currentAction == "UpdateStateMaster")
+                        ? "menu-open" : "")">
+
+                            <a href="#" class="nav-link @(currentController == "RoleMaster" || currentController == "CategoryMaster" || currentController == "CountryMaster" || currentController == "StateMaster" &&
+
+                        (currentAction == "IndexRoleMaster" || currentAction == "CreateRoleMaster" || currentAction == "UpdateRoleMaster" ||
+                        currentAction == "IndexCategoryMaster" || currentAction == "CreateCategoryMaster" || currentAction == "UpdateCategoryMaster" ||
+                        currentAction == "IndexCountryMaster" || currentAction == "CreateCountryMaster" || currentAction == "UpdateCountryMaster" ||
+                        currentAction == "IndexStateMaster" || currentAction == "CreateStateMaster" || currentAction == "UpdateStateMaster") ? "active" : "")">
+
                                 <i class="nav-icon fas fa-tree"></i>
                                 <p>
                                     Masters
                                     <i class="fas fa-angle-left right"></i>
                                 </p>
                             </a>
+
                             <ul class="nav nav-treeview">
+
                                 <li class="nav-item">
-                                    <a class="nav-link @(currentController == "RoleMaster" && currentAction == "IndexRoleMaster" ? "active" : "")" asp-controller="RoleMaster" asp-action="IndexRoleMaster">Role Master</a>
+                                    <a class="nav-link @(currentController == "RoleMaster" && (currentAction == "IndexRoleMaster" || currentAction == "CreateRoleMaster" || currentAction == "UpdateRoleMaster") ? "active" : "")" asp-controller="RoleMaster" asp-action="IndexRoleMaster">
+                                        Role Master
+                                    </a>
+                                </li>
+
+
+                                <li class="nav-item">
+                                    <a class="nav-link @(currentController == "CategoryMaster" && (currentAction == "IndexCategoryMaster" || currentAction == "CreateCategoryMaster" || currentAction == "UpdateCategoryMaster") ? "active" : "")" asp-controller="CategoryMaster" asp-action="IndexCategoryMaster">Category Master</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link @(currentController == "CategoryMaster" && currentAction == "IndexCategoryMaster" ? "active" : "")" asp-controller="CategoryMaster" asp-action="IndexCategoryMaster">Category Master</a>
+                                    <a class="nav-link @(currentController == "CountryMaster" && (currentAction == "IndexCountryMaster" || currentAction == "CreateCountryMaster" || currentAction == "UpdateCountryMaster") ? "active" : "")" asp-controller="CountryMaster" asp-action="IndexCountryMaster">Country Master</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link @(currentController == "CountryMaster" && currentAction == "IndexCountryMaster" ? "active" : "")" asp-controller="CountryMaster" asp-action="IndexCountryMaster">Country Master</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link @(currentController == "StateMaster" && currentAction == "IndexStateMaster" ? "active" : "")" asp-controller="StateMaster" asp-action="IndexStateMaster">State Master</a>
+                                    <a class="nav-link @(currentController == "StateMaster" && (currentAction == "IndexStateMaster" || currentAction == "CreateStateMaster" || currentAction == "UpdateStateMaster") ? "active" : "")" asp-controller="StateMaster" asp-action="IndexStateMaster">State Master</a>
                                 </li>
                             </ul>
 
@@ -201,6 +234,13 @@
             });
         });
 
+        window.onload = function () {
+            window.history.pushState(null, "", location.href);
+            window.onpopstate = function () {
+                window.history.pushState(null, "", location.href);
+            };
+        };
+
 
     </script>
 
@@ -212,6 +252,7 @@
     <script src="~/AdminLTE/dist/js/adminlte.js"></script>
     <script src="~/AdminLTE/dist/js/pages/dashboard.js"></script>
     <script src="~/AdminLTE/dist/js/demo.js"></script>*@
+
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs4-4.6.0/jq-3.6.0/dt-1.13.1/b-2.3.3/fc-4.2.1/sc-2.0.7/sb-1.4.0/sp-2.1.0/sl-1.5.0/datatables.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js"></script>
 

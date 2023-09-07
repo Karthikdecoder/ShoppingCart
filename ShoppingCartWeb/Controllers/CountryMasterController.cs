@@ -115,6 +115,26 @@ namespace ShoppingCartWeb.Controllers
 		}
 
         [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EnableCountry(int countryId)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _countryService.EnableCountryAsync<APIResponse>(countryId, HttpContext.Session.GetString(SD.SessionToken));
+
+                if (response != null && response.IsSuccess)
+                {
+                    TempData["success"] = "Enabled successfully";
+                    return RedirectToAction("IndexCountryMaster");
+                }
+
+                TempData["error"] = response.ResponseMessage[0].ToString();
+                return RedirectToAction(nameof(IndexCountryMaster));
+            }
+
+            return View();
+        }
+
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RemoveCountryMaster(int CountryId)
 		{
             var response = await _countryService.RemoveCountryAsync<APIResponse>(CountryId, HttpContext.Session.GetString(SD.SessionToken));

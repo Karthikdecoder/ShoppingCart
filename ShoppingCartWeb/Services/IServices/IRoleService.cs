@@ -9,6 +9,7 @@ namespace ShoppingCartWeb.Services.IServices
         Task<T> GetRoleAsync<T>(int roleId, string token);
         Task<T> CreateRoleAsync<T>(RoleMasterDTO roleMasterDTO, string token);
         Task<T> UpdateRoleAsync<T>(RoleMasterDTO roleMasterDTO, string token);
+        Task<T> EnableRoleAsync<T>(int roleId, string token);
         Task<T> RemoveRoleAsync<T>(int roleId, string token);
     }
 }

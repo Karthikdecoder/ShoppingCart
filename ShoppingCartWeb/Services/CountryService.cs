@@ -66,5 +66,15 @@ namespace ShoppingCartWeb.Services
                 Token = token
             });
         }
-	}
+
+        public Task<T> EnableCountryAsync<T>(int countryId, string token)
+        {
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.PUT,
+                Url = countryUrl + "/api/CountryMaster/EnableCountry?countryId=" + countryId,
+                Token = token
+            });
+        }
+    }
 }

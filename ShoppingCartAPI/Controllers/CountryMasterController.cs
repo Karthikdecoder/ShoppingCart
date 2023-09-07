@@ -35,7 +35,7 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                IEnumerable<CountryMaster> countryList = await _countryRepo.GetAllAsync(u => u.IsDeleted == false);
+                IEnumerable<CountryMaster> countryList = await _countryRepo.GetAllAsync();
                 _response.Result = _mapper.Map<List<CountryMasterDTO>>(countryList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
@@ -199,6 +199,53 @@ namespace ShoppingCartAPI.Controllers
                 {
                     _response.ResponseMessage = new List<string>() { "Already Exists" };
                     return BadRequest(_response);
+                }
+
+                CountryMaster model = _mapper.Map<CountryMaster>(countryMasterDTO);
+
+                if (_userId == null)
+                {
+                    _userId = "0";
+                }
+
+                model.UpdatedOn = DateTime.Now;
+                model.UpdatedBy = int.Parse(_userId);
+                model.IsDeleted = false;
+                await _countryRepo.UpdateAsync(model);
+
+                _response.StatusCode = HttpStatusCode.NoContent;
+                _response.IsSuccess = true;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
+
+        [HttpPut]
+        [Authorize(Roles = "Admin")]
+        [Route("EnableCountry")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponse>> EnableCountry(int countryId)
+        {
+            try
+            {
+                if (countryId == 0)
+                {
+                    _response.StatusCode = HttpStatusCode.BadRequest;
+                    return BadRequest(_response);
+                }
+
+                var countryMasterDTO = await _countryRepo.GetAsync(u => u.CountryId == countryId && u.IsDeleted == true);
+
+                if (countryMasterDTO == null)
+                {
+                    _response.StatusCode = HttpStatusCode.NotFound;
+                    return NotFound(_response);
                 }
 
                 CountryMaster model = _mapper.Map<CountryMaster>(countryMasterDTO);

@@ -219,6 +219,26 @@ namespace ShoppingCartWeb.Controllers
             return View(updateUserVM);
         }
 
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EnableUser(int userId)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _userService.EnableUserAsync<APIResponse>(userId, HttpContext.Session.GetString(SD.SessionToken));
+
+                if (response != null && response.IsSuccess)
+                {
+                    TempData["success"] = "Enabled successfully";
+                    return RedirectToAction("IndexUser");
+                }
+
+                TempData["error"] = response.ResponseMessage[0].ToString();
+                return RedirectToAction(nameof(IndexUser));
+            }
+
+            return View();
+        }
+
         //[Authorize(Roles = "Admin")]
         //public async Task<IActionResult> RemoveUser(int userID)
         //{
@@ -277,6 +297,7 @@ namespace ShoppingCartWeb.Controllers
         {
             await HttpContext.SignOutAsync();
             HttpContext.Session.SetString(SD.SessionToken, "");
+            ViewBag.DisableBackButton = true;
             return RedirectToAction("Login", "User");
         }
 

@@ -143,6 +143,12 @@ namespace ShoppingCartAPI.Repository
             return user;
         }
 
+        public async Task<User> GetUserForEnableAsync(int userId)
+        {
+            var user = await _db.User.AsNoTracking().FirstOrDefaultAsync(u => u.UserId == userId && u.IsDeleted == true);
+            return user;
+        }
+
         public async Task<User> UpdateUserAsync(User User, string userId)
         {
             User.UpdatedBy = int.Parse(userId);

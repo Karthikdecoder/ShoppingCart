@@ -2,6 +2,7 @@
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+
 }
 
 <br />
@@ -13,9 +14,11 @@
                 /* You can also use other units like em, rem, or % if you prefer. */
             }
         </style>
-        
-            <h1 class="text-dark">Countries</h1>
+
+        <h1 class="text-dark">Countries</h1>
     </div>
+
+
 
     <div class="col-2 d-flex justify-content-end align-items-start">
         <a asp-controller="CountryMaster" asp-action="CreateCountryMaster" class="btn btn-primary btn-sm ms-2">
@@ -33,7 +36,11 @@
 <div>
 
     <div class="table-responsive">
-        <table class="table table-bordered">
+        <!-- Inside your main view (Index.cshtml) -->
+        <input type="hidden" id="currentPage" value="1" />
+
+
+        <table id="tableDemo" class="table table-bordered">
             <thead>
                 <tr>
                     <th>
@@ -49,22 +56,58 @@
 
                 @foreach (var item in Model)
                 {
+
                     <tr>
                         <td style="white-space: nowrap;">@item.CountryName</td>
-                        <td>
-                            <div class="btn-group" role="group">
+                        @if (item.IsDeleted == false)
+                        {
+                            <td>
+                                <div class="btn-group" role="group">
 
-                                <a asp-controller="CountryMaster" asp-action="UpdateCountryMaster" asp-route-countryId="@item.CountryId" class="btn btn-sm ml-1">
-                                    <span id="boot-icon" class="bi bi-pencil-square" style="font-size: 17px; color: rgb(0, 128, 55); -webkit-text-stroke-width: 0.6px; opacity: 0.9;"></span>
+                                    <a asp-controller="CountryMaster" asp-action="UpdateCountryMaster" asp-route-countryId="@item.CountryId" class="btn btn-sm ml-1 update-button"
+                                       data-country-id="@item.CountryId">
+                                        <span id="boot-icon" class="bi bi-pencil-square" style="font-size: 17px; color: rgb(0, 128, 55); -webkit-text-stroke-width: 0.6px; opacity: 0.9;"></span>
                                     </a>
 
-                                <a href="#" class="btn btn-sm ml-1" data-toggle="modal" data-target="#deleteModal_@item.CountryId">
-                                    <span id="boot-icon" class="bi bi-trash-fill" style="font-size: 17px; color: rgb(255, 0, 0); -webkit-text-stroke-width: 0px; opacity: 0.9;"></span>
+
+                                    <a href="#" class="btn btn-sm ml-1" data-toggle="modal" data-target="#deleteModal_@item.CountryId">
+                                        <span id="boot-icon" class="bi bi-trash-fill" style="font-size: 17px; color: rgb(255, 0, 0); -webkit-text-stroke-width: 0px; opacity: 0.9;"></span>
                                     </a>
 
-                            </div>
-                        </td>
+                                </div>
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="#" class="btn btn-primary btn-sm ml-2" data-toggle="modal" data-target="#enableModal_@item.CountryId"> Active </a>
+                                </div>
+                            </td>
+                        }
                     </tr>
+
+                    <!-- Enable Confirmation Modal for each item -->
+                    <div class="modal fade" id="enableModal_@item.CountryId" tabindex="-1" role="dialog" aria-labelledby="enableModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="enableModalLabel">Confirm Enable</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to Enable this item?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                    <a asp-controller="CountryMaster" asp-action="EnableCountry" asp-route-countryId="@item.CountryId" class="btn btn-success">Yes</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Delete Confirmation Modal for each item -->
                     <div class="modal fade" id="deleteModal_@item.CountryId" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
                         <div class="modal-dialog" role="document">
@@ -85,12 +128,64 @@
                             </div>
                         </div>
                     </div>
+
                 }
+
             </tbody>
         </table>
-
+        <div id="pagination"></div>
     </div>
 </div>
+
+
 @section Scripts {
+    <!-- Include the CSS for the pagination -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.4/simplePagination.css" integrity="sha512-emkhkASXU1wKqnSDVZiYpSKjYEPP8RRG2lgIxDFVI4f/twjijBnDItdaRh7j+VRKFs4YzrAcV17JeFqX+3NVig==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Add a custom CSS style to change the color of pagination numbers to blue -->
+    <style>
+        .light-theme .current {
+            background-color: blue;
+            color: white;
+            border: 1px solid blue;
+        }
+    </style>
+
+    <!-- Rest of your HTML and JavaScript code -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js" integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.4/jquery.simplePagination.js" integrity="sha512-D8ZYpkcpCShIdi/rxpVjyKIo4+cos46+lUaPOn2RXe8Wl5geuxwmFoP+0Aj6wiZghAphh4LNxnPDiW4B802rjQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        $(function () {
+            $('#pagination').pagination({
+                items: $('#tableDemo tr').length,
+                itemsOnPage: 5,
+                cssStyle: 'light-theme',
+                onPageClick: function (pageNumber) {
+                    debugger;
+                    var perpage = 5;
+                    var showfrom = perpage * (pageNumber - 1);
+                    var showTo = showfrom + perpage;
+                    $('#tableDemo tbody tr').hide().slice(showfrom, showTo).show();
+                }
+            });
+            $('#pagination').pagination('selectPage', 1);
+
+            $('.update-button').click(function () {
+                var countryId = $(this).data('country-id');
+                var currentPage = $('#pagination').pagination('getCurrentPage'); // Get the current page number
+                console.log(countryId);
+                console.log(currentPage);
+
+                // Construct the URL with the countryId and currentPage
+                var updateUrl = '@Url.Action("UpdateCountryMaster", "CountryMaster", new { countryId = "__countryId__", pageNumber = "__pageNumber__" })';
+                updateUrl = updateUrl.replace('__countryId__', countryId).replace('__pageNumber__', currentPage);
+
+                // Redirect to the update URL
+                window.location.href = updateUrl;
+            });
+        });
+    </script>
+
 
 }

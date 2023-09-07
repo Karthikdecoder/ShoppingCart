@@ -9,6 +9,7 @@ namespace ShoppingCartAPI.Repository.IRepository
         Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO);
         Task<List<User>> GetAllUserAsync();
         Task<User> GetUserAsync(int userId);
+        Task<User> GetUserForEnableAsync(int userId);
         Task<User> UpdateUserAsync(User User, string userId);
         Task<User> RegisterAsync(UserDTO User, string userId);
         Task RemoveAsync(User User);

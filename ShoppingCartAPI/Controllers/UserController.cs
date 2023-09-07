@@ -52,7 +52,7 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                IEnumerable<User> userList = await _userRepo.GetAllAsync(u => (!u.IsDeleted), includeProperties: "RoleMaster,Registration");
+                IEnumerable<User> userList = await _userRepo.GetAllAsync( includeProperties: "RoleMaster,Registration");
                 _response.Result = _mapper.Map<List<User>>(userList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
@@ -239,6 +239,51 @@ namespace ShoppingCartAPI.Controllers
                 model.UpdatedOn = DateTime.Now;
                 model.UpdatedBy = int.Parse(_userId);
 
+                await _userRepo.UpdateUserAsync(model, _userId);
+
+                _response.StatusCode = HttpStatusCode.NoContent;
+                _response.IsSuccess = true;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
+
+        [HttpPut]
+        [Authorize(Roles = "Admin")]
+        [Route("EnableUser")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponse>> EnableUser(int userId)
+        {
+            try
+            {
+                if (userId == 0)
+                {
+                    _response.StatusCode = HttpStatusCode.BadRequest;
+                    return BadRequest(_response);
+                }
+
+                var userDTO = await _userRepo.GetUserForEnableAsync(userId);
+
+                if (userDTO == null)
+                {
+                    _response.StatusCode = HttpStatusCode.NotFound;
+                    return NotFound(_response);
+                }
+
+                User model = _mapper.Map<User>(userDTO);
+
+                if (_userId == null)
+                {
+                    _userId = "0";
+                }
+
+                model.IsDeleted = false;
                 await _userRepo.UpdateUserAsync(model, _userId);
 
                 _response.StatusCode = HttpStatusCode.NoContent;
