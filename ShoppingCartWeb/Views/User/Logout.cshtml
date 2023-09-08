@@ -1,1 +1,21 @@
 ﻿
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    
+    <script>
+        window.onpageshow = function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        };
+    </script>
+
+    <script>
+        window.addEventListener('popstate', function () {
+            window.history.pushState(null, null, window.location.href);
+        });
+    </script>
+
+}

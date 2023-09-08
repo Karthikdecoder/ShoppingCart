@@ -19,6 +19,20 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="row pb-3">
+
+
+
+                    <div class="col-md-3">
+                        <label for="User.RegistrationId" class="control-label pt-2" style="font-size:14px;"> Registered Name </label>
+                    </div>
+                    <div class="col-md-9 pb-4">
+                        <input type="text" id="Name" class="form-control" />
+                        <input type="hidden" id="registrationId" asp-for="User.RegistrationId" />
+
+                    </div>
+
+
+
                     <div class="col-md-3">
                         <label asp-for="User.UserName" class="control-label pt-2" style="font-size:14px;">User Name</label>
                     </div>
@@ -36,18 +50,6 @@
                     </div>
 
 
-
-                    <div class="col-md-3">
-                        <label for="User.RegistrationId" class="control-label pt-2" style="font-size:14px;"> Registered Name </label>
-                    </div>
-                    <div class="col-md-9 pb-4">
-                        <input type="text" id="Name" class="form-control" />
-                        <input type="hidden" id="registrationId" asp-for="User.RegistrationId" />
-
-                    </div>
-
-
-
                     <div class="col-md-3">
                         <label asp-for="User.RoleId" class="control-label pt-2" style="font-size:14px;">Role</label>
                     </div>
@@ -62,19 +64,16 @@
 
                 <div class="row">
 
-                    <div class="col-md-5"></div>
-                    <div class="col-md-6">
-
-                        <div class="row">
-                            <div class="col-4">
-                                <a asp-action="IndexUser" asp-controller="User" class="btn-primary btn form-control ">Cancel</a>
-                            </div>
-                            <div class="col-4">
-                                <input type="submit" value="Save" class="btn btn-success form-control" />
-                            </div>
-                        </div>
+                    <div class="col-3 offset-6">
+                        <a asp-action="IndexUser" asp-controller="User" class="btn-primary btn form-control ">Cancel</a>
                     </div>
+                    <div class="col-3">
+                        <input type="submit" value="Save" class="btn btn-success form-control" />
+                    </div>
+
                 </div>
+
+
             </div>
         </div>
     </div>

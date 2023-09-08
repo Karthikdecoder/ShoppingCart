@@ -113,6 +113,7 @@
                     <select asp-for="Registration.StateId" id="stateDropdown" class="form-control " asp-items="@Model.StateList">
                         <option>--Select State--</option>
                     </select>
+                    
                     <span asp-validation-for="Registration.StateId" class="text-danger"></span>
                 </div>
             </div>
@@ -148,6 +149,7 @@
         $(document).ready(function () {
             $("#countryId").change(function () {
                 var countryId = $(this).val();
+
                 $("#stateDropdown").empty();
 
                 if (countryId !== "") {

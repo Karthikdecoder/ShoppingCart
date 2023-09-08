@@ -1,4 +1,4 @@
-﻿@model ShoppingCartWeb.Models.Dto.RoleMasterDTO
+﻿@model ShoppingCartWeb.Models.VM.UpdateRoleMasterVM
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -15,28 +15,30 @@
         <h1 class="text-dark">Roles</h1>
         <hr />
 
-        <input hidden asp-for="RoleId" />
-        <input hidden asp-for="CreatedBy" />
-        <input hidden asp-for="CreatedOn" />
+        <input hidden asp-for="RoleMasterDTO.RoleId" />
+        <input hidden asp-for="RoleMasterDTO.CreatedBy" />
+        <input hidden asp-for="RoleMasterDTO.CreatedOn" />
+        <input hidden asp-for="CurrentPage" />
 
         <div class="row">
             <div class="col-md-6">
                 <div class="row pb-3">
                     <div class="col-2">
-                        <label asp-for="RoleName" class="control-label pt-2" style="font-size:17px;">Role</label>
+                        <label asp-for="RoleMasterDTO.RoleName" class="control-label pt-2" style="font-size:17px;">Role</label>
                     </div>
                     <div class="col-md-7 pb-4">
-                        <input asp-for="RoleName" class="form-control" />
-                        <span asp-validation-for="RoleName" class="text-danger"></span>
+                        <input asp-for="RoleMasterDTO.RoleName" class="form-control" />
+                        <span asp-validation-for="RoleMasterDTO.RoleName" class="text-danger"></span>
                     </div>
 
 
                     <div class="col-2 offset-5">
-                        <a asp-action="IndexRoleMaster" asp-controller="RoleMaster" class="btn-primary btn form-control ">Cancel</a>
+                        <a asp-action="IndexRoleMaster" asp-controller="RoleMaster" class="btn-primary btn form-control " style="font-size: 14px;">Cancel</a>
                     </div>
                     <div class="col-2">
-                        <input type="submit" value="Update" class="btn btn-success form-control" />
+                        <input type="submit" value="Update" class="btn btn-success form-control" style="font-size: 13px;">
                     </div>
+
                 </div>
             </div>
         </div>

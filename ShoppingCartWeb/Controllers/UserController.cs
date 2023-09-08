@@ -64,18 +64,19 @@ namespace ShoppingCartWeb.Controllers
 
                 HttpContext.Session.SetString(SD.SessionToken, model.Token);
 
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("IndexRegistration", "Registration");
             }
             else
             {
-                ModelState.AddModelError("", "Username or password is incorrect");
-                //ModelState.AddModelError("CustomError", response.ErrorMessages.FirstOrDefault());
+                TempData["error"] = "Username or password is incorrect";
                 return View();
             }
         }
 
-        public async Task<IActionResult> IndexUser()
+        public async Task<IActionResult> IndexUser(string orderBy = "", int currentPage = 1)
         {
+            UserPaginationVM userPaginationVM = new UserPaginationVM();
+
             List<UserDTO> list = new();
 
             var response = await _userService.GetAllUserAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
@@ -85,7 +86,20 @@ namespace ShoppingCartWeb.Controllers
                 list = JsonConvert.DeserializeObject<List<UserDTO>>(Convert.ToString(response.Result));
             }
 
-            return View(list);
+            int totalRecords = list.Count();
+
+            int pageSize = 5;
+
+            int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+            list = list.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+
+            userPaginationVM.UserDTO = list;
+            userPaginationVM.CurrentPage = currentPage;
+            userPaginationVM.PageSize = pageSize;
+            userPaginationVM.TotalPages = totalPages;
+
+            return View(userPaginationVM);
         }
 
         [HttpGet]
@@ -239,45 +253,6 @@ namespace ShoppingCartWeb.Controllers
             return View();
         }
 
-        //[Authorize(Roles = "Admin")]
-        //public async Task<IActionResult> RemoveUser(int userID)
-        //{
-        //    RemoveUserVM removeUserVM = new();
-        //    var response = await _userService.GetUserAsync<APIResponse>(userID, HttpContext.Session.GetString(SD.SessionToken));
-
-        //    if (response != null && response.IsSuccess)
-        //    {
-        //        UserDTO model = JsonConvert.DeserializeObject<UserDTO>(Convert.ToString(response.Result));
-        //        removeUserVM.User = model;
-        //    }
-
-        //    response = await _registrationService.GetAllRegistrationAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
-
-        //    if (response != null && response.IsSuccess)
-        //    {
-        //        removeUserVM.registrationList = JsonConvert.DeserializeObject<List<RegistrationDTO>>(Convert.ToString(response.Result)).Select(i => new SelectListItem
-        //        {
-        //            Text = i.FirstName,
-        //            Value = i.RegistrationId.ToString()
-        //        });
-        //        return View(removeUserVM);
-        //    }
-
-        //    response = await _roleService.GetAllRoleAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
-
-        //    if (response != null && response.IsSuccess)
-        //    {
-        //        removeUserVM.roleList = JsonConvert.DeserializeObject<List<RoleMasterDTO>>(Convert.ToString(response.Result)).Select(i => new SelectListItem
-        //        {
-        //            Text = i.RoleName,
-        //            Value = i.RoleId.ToString()
-        //        });
-        //        return View(removeUserVM);
-        //    }
-
-        //    return NotFound();
-        //}
-
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RemoveUser(int userId)
         {
@@ -290,14 +265,16 @@ namespace ShoppingCartWeb.Controllers
             }
 
             TempData["success"] = "Error encountered";
-            return View();
+            return View(); 
         }
 
+        
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync();
             HttpContext.Session.SetString(SD.SessionToken, "");
-            ViewBag.DisableBackButton = true;
+
+            
             return RedirectToAction("Login", "User");
         }
 

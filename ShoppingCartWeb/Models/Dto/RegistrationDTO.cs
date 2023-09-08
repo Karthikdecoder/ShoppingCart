@@ -31,7 +31,7 @@ namespace ShoppingCartWeb.Models.Dto
 
         [Required(ErrorMessage = "Date of birth is required")]
         [DataType(DataType.Date, ErrorMessage = "Invalid Date Of Birth")]
-        //[DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
+        [Range(typeof(DateTime), "1900-01-01", "9999-12-31", ErrorMessage = "Date of birth should start from year 1900")]
         public DateTime DateOfBirth { get; set; }
 
         [Required(ErrorMessage = "Email address is required")]
@@ -47,8 +47,9 @@ namespace ShoppingCartWeb.Models.Dto
         public string Address { get; set; }
 
         [Required(ErrorMessage = "Postal Code is required")]
-        [RegularExpression(@"^\d{6}$", ErrorMessage = "Postal code must be a 6-digit number.")]
+        [RegularExpression(@"^(?!000000)\d{6}$", ErrorMessage = "Postal code must be a 6-digit number and should not be '000000'.")]
         public string PostalCode { get; set; }
+
 
         public StateMasterDTO StateMaster { get; set; }
 

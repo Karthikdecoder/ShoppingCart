@@ -35,9 +35,12 @@ namespace ShoppingCartWeb.Controllers
 			_countryService = countryService;
 		}
 
-		public async Task<IActionResult> IndexCountryMaster()
+		public async Task<IActionResult> IndexCountryMaster(string orderBy = "", int currentPage = 1)
 		{
-			List<CountryMasterDTO> list = new();
+            CountryPaginationVM countryPaginationVM = new CountryPaginationVM();
+
+
+            List<CountryMasterDTO> list = new();
 
 			var response = await _countryService.GetAllCountryAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
 
@@ -46,8 +49,21 @@ namespace ShoppingCartWeb.Controllers
 				list = JsonConvert.DeserializeObject<List<CountryMasterDTO>>(Convert.ToString(response.Result));
             }
 
-			return View(list);
-		}
+            int totalRecords = list.Count();
+
+            int pageSize = 5;
+
+            int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+            list = list.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+
+            countryPaginationVM.CountryMasterDTO = list;
+            countryPaginationVM.CurrentPage = currentPage;
+            countryPaginationVM.PageSize = pageSize;
+            countryPaginationVM.TotalPages = totalPages;
+
+            return View(countryPaginationVM);
+        }
 
 		[HttpGet]
         [Authorize(Roles = "Admin")]
@@ -135,9 +151,9 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> RemoveCountryMaster(int CountryId)
+        public async Task<IActionResult> RemoveCountryMaster(int countryId)
 		{
-            var response = await _countryService.RemoveCountryAsync<APIResponse>(CountryId, HttpContext.Session.GetString(SD.SessionToken));
+            var response = await _countryService.RemoveCountryAsync<APIResponse>(countryId, HttpContext.Session.GetString(SD.SessionToken));
 
 			if (response != null && response.IsSuccess)
 			{
@@ -148,19 +164,6 @@ namespace ShoppingCartWeb.Controllers
             TempData["success"] = "Error encountered";
             return View();
         }
-
-		//[HttpPost]
-		//[ValidateAntiForgeryToken]
-		//public async Task<IActionResult> RemoveCountryMaster(string CountryId)
-		//{
-		//	var response = await _countryService.RemoveCountryAsync<APIResponse>(CountryId, HttpContext.Session.GetString(SD.SessionToken));
-
-		//	if (response != null && response.IsSuccess)
-		//	{
-		//		return RedirectToAction(nameof(IndexCountryMaster));
-		//	}
-		//	return View();
-		//}
 
 	}
 

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ShoppingCartWeb.Models.Dto.UserDTO>
+﻿@model ShoppingCartWeb.Models.VM.UserPaginationVM
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -14,7 +14,7 @@
             }
         </style>
 
-        <h1 class="text-dark">Users</h1>
+        <h1 class="text-dark">Registered Users</h1>
     </div>
     <div class="col-2 d-flex justify-content-end align-items-start">
         <a asp-controller="User" asp-action="Register" class="btn btn-primary btn-sm ms-2">
@@ -33,7 +33,7 @@
 <div>
 
     <div class="table-responsive">
-        <table class="table table-bordered">
+        <table id="myTable" class="table table-bordered">
             <thead>
                 <tr>
                     <th>
@@ -52,7 +52,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model)
+                @foreach (var item in Model.UserDTO)
                 {
                     <tr>
                         <td>@item.Registration.FirstName @item.Registration.LastName</td>
@@ -68,8 +68,11 @@
                                         <span id="boot-icon" class="bi bi-pencil-square" style="font-size: 17px; color: rgb(0, 128, 55); -webkit-text-stroke-width: 0.6px; opacity: 0.9;"></span>
                                     </a>
 
-                                    <a href="#" class="btn btn-sm ml-1" data-toggle="modal" data-target="#deleteModal_@item.UserId">
-                                        <span id="boot-icon" class="bi bi-trash-fill" style="font-size: 17px; color: rgb(255, 0, 0); -webkit-text-stroke-width: 0px; opacity: 0.9;"></span>
+                                    <a href="#" class="btn ml-1 text-danger delete-button" style="font:bold" data-toggle="modal" data-target="#deleteModal" data-userId="@item.UserId">
+
+                                        <span id="boot-icon" class="bi bi-trash-fill"
+                                              style="font-size: 17px; color: rgb(255, 0, 0); -webkit-text-stroke-width: 0px; opacity: 0.9;">
+                                        </span>
                                     </a>
                                 </div>
                             </td>
@@ -78,57 +81,138 @@
                         {
                             <td>
                                 <div class="btn-group" role="group">
-                                    <a href="#" class="btn btn-primary btn-sm ml-2" data-toggle="modal" data-target="#enableModal_@item.UserId"> Active </a>
+                                    <a href="#" class="btn btn-primary btn-sm ml-2 enable-button" data-toggle="modal" data-target="#enableModal" data-userId="@item.UserId">
+                                        Active
+                                    </a>
                                 </div>
                             </td>
                         }
 
                     </tr>
 
-                    <!-- Delete Confirmation Modal for each item -->
-                    <div class="modal fade" id="deleteModal_@item.UserId" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    Are you sure you want to delete this item?
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                    <a asp-controller="User" asp-action="RemoveUser" asp-route-userId="@item.UserId" class="btn btn-danger">Delete</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Enable Confirmation Modal for each item -->
-                    <div class="modal fade" id="enableModal_@item.UserId" tabindex="-1" role="dialog" aria-labelledby="enableModalLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="enableModalLabel">Confirm Enable</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    Are you sure you want to Enable this item?
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                                    <a asp-controller="User" asp-action="EnableUser" asp-route-userId="@item.UserId" class="btn btn-success">Yes</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 }
+
+                <!-- Enable Confirmation Modal for each item -->
+                <div class="modal fade" id="enableModal" tabindex="-1" role="dialog" aria-labelledby="enableModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="enableModalLabel">Confirm Enable</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to Enable this item?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                <a id="enableModalButton" asp-controller="User" asp-action="EnableUser" asp-route-userId="" class="btn btn-success">Yes</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delete Confirmation Modal for each item -->
+                <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to delete this item?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <a id="deleteModalButton" asp-controller="User" asp-action="RemoveUser" asp-route-userId="" class="btn btn-danger">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
             </tbody>
         </table>
 
     </div>
+
+    <br />
+    <br />
+
+    <div>
+
+        <nav aria-label="Page navigation example" style="float: right;margin-top: -35px;margin-right: 2px;font-size: smaller;">
+            <ul class="pagination">
+                @if (Model.CurrentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="/User/IndexUser?orderBy=@Model.OrderBy&currentPage=@(Model.CurrentPage-1)" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                }
+
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    if (i == Model.CurrentPage)
+                    {
+                        <li class="page-item active"><a class="page-link active" href="/User/IndexUser?orderBy=@Model.OrderBy&currentPage=@i"> @i</a></li>
+
+                    }
+                    else
+                    {
+                        <li class="page-item"><a class="page-link" href="/User/IndexUser?orderBy=@Model.OrderBy&currentPage=@i"> @i</a></li>
+                    }
+                }
+                @if (Model.CurrentPage < Model.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="/User/IndexUser?orderBy=@Model.OrderBy&currentPage=@Model.CurrentPage+1" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+
+    </div>
+
 </div>
+
+<br />
+
+@section Scripts
+    {
+    <script>
+        $(document).ready(function () {
+            $('#myTable').DataTable(
+                {
+                    "paging": false
+                });
+        });
+    </script>
+
+
+    <script>
+        $(document).ready(function () {
+            $('.delete-button').click(function () {
+                var userId = $(this).data('userid');
+                console.log(userId);
+                $('#userIdToDelete').text(userId); // Set the StateId in the modal
+                $('#deleteModalButton').attr('href', '/User/RemoveUser?userId=' + userId); // Set the Delete button's URL
+            });
+        });
+
+        $(document).ready(function () {
+            $('.enable-button').click(function () {
+                var userId = $(this).data('userid');
+                $('#userIdToEnable').text(userId); // Set the StateId in the modal
+                $('#enableModalButton').attr('href', '/User/EnableUser?userId=' + userId); // Set the button's URL
+            });
+        });
+    </script>
+}

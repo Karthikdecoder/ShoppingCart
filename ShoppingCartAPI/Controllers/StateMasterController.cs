@@ -133,7 +133,7 @@ namespace ShoppingCartAPI.Controllers
             try
             {
 
-                if (await _stateRepo.GetAsync(u => u.StateName == stateMasterDTO.StateName && u.CountryId == stateMasterDTO.CountryId && u.IsDeleted == false) != null)
+                if (await _stateRepo.GetAsync(u => u.StateName == stateMasterDTO.StateName && u.CountryId == stateMasterDTO.CountryId ) != null)
                 {
                     //ModelState.AddModelError("ResponseMessage", "State already Exists!");
                     //return BadRequest(ModelState);
@@ -236,7 +236,7 @@ namespace ShoppingCartAPI.Controllers
                     return BadRequest(ModelState);
                 }
 
-                if (await _stateRepo.GetAsync(u => u.StateName == stateMasterDTO.StateName && u.CountryId == stateMasterDTO.CountryId && u.StateId != stateMasterDTO.StateId && u.IsDeleted == false) != null)
+                if (await _stateRepo.GetAsync(u => u.StateName == stateMasterDTO.StateName && u.CountryId == stateMasterDTO.CountryId && u.StateId != stateMasterDTO.StateId ) != null)
                 {
                     _response.ResponseMessage = new List<string>() { "Already Exists" };
                     return BadRequest(_response);

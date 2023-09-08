@@ -44,18 +44,14 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddHttpContextAccessor();
 
-//builder.Services.AddRazorPages(options =>
-//{
-//    options.Conventions.AddPageRoute("/Auth/Login", "");
-//});
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
               .AddCookie(options =>
               {
                   options.Cookie.HttpOnly = true;
                   options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-                  options.LoginPath = "/Auth/Login";
-                  options.AccessDeniedPath = "/Auth/AccessDenied";
+                  options.LoginPath = "/User/Login";
+                  options.AccessDeniedPath = "/User/AccessDenied";
                   options.SlidingExpiration = true;
               });
 
@@ -79,10 +75,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseSession();
-
-//app.MapControllerRoute(
-//    name: "default",
-//    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",

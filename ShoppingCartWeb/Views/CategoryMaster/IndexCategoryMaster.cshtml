@@ -2,9 +2,15 @@
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var currentPage = @Model.CurrentPage;
 }
 
 <br />
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css" />
+
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
+
 <div class="row pb-2">
 
     <div class="col">
@@ -35,7 +41,8 @@
 
 
     <div class="table-responsive">
-        <table class="table table-bordered">
+
+        <table id="myTable" class="table table-bordered" >
             <thead>
                 <tr>
                     <th>
@@ -63,12 +70,16 @@
 
                                 <div class="btn-group" role="group">
 
-                                    <a asp-controller="CategoryMaster" asp-action="UpdateCategoryMaster" asp-route-categoryId="@item.CategoryId" class="btn btn-sm ml-1">
+                                    
+                                    <a asp-controller="CategoryMaster" asp-action="UpdateCategoryMaster" asp-route-categoryId="@item.CategoryId" asp-route-currentPageNo="" class="btn btn-sm ml-1">
                                         <span id="boot-icon" class="bi bi-pencil-square" style="font-size: 17px; color: rgb(0, 128, 55); -webkit-text-stroke-width: 0.6px; opacity: 0.9;"></span>
                                     </a>
 
-                                    <a href="#" class="btn btn-sm ml-1" data-toggle="modal" data-target="#deleteModal_@item.CategoryId">
-                                        <span id="boot-icon" class="bi bi-trash-fill" style="font-size: 17px; color: rgb(255, 0, 0); -webkit-text-stroke-width: 0px; opacity: 0.9;"></span>
+                                    <a href="#" class="btn ml-1 text-danger delete-button" style="font:bold" data-toggle="modal" data-target="#deleteModal" data-categoryId="@item.CategoryId">
+
+                                        <span id="boot-icon" class="bi bi-trash-fill"
+                                              style="font-size: 17px; color: rgb(255, 0, 0); -webkit-text-stroke-width: 0px; opacity: 0.9;">
+                                        </span>
                                     </a>
 
                                 </div>
@@ -77,67 +88,72 @@
                         else
                         {
                             <td>
-                                <div class="btn-group" role="group">
-                                    <a href="#" class="btn btn-primary btn-sm ml-2" data-toggle="modal" data-target="#enableModal_@item.CategoryId"> Active </a>
-                                </div>
+                                <a href="#" class="btn btn-primary btn-sm ml-2 enable-button" data-toggle="modal" data-target="#enableModal" data-categoryId="@item.CategoryId">
+                                    Active
+                                </a>
                             </td>
                         }
 
                     </tr>
 
-
-                    <!-- Delete Confirmation Modal for each item -->
-                    <div class="modal fade" id="deleteModal_@item.CategoryId" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    Are you sure you want to delete this item?
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                    <a asp-controller="CategoryMaster" asp-action="RemoveCategoryMaster" asp-route-categoryId="@item.CategoryId" class="btn btn-danger">Delete</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Enable Confirmation Modal for each item -->
-                    <div class="modal fade" id="enableModal_@item.CategoryId" tabindex="-1" role="dialog" aria-labelledby="enableModalLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="enableModalLabel">Confirm Enable</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    Are you sure you want to Enable this item?
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                                    <a asp-controller="CategoryMaster" asp-action="EnableCategory" asp-route-categoryId="@item.CategoryId" asp-route-currentPageNo="@Model.CurrentPage" class="btn btn-success">Yes</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+                    
                 }
+
+                <!-- Enable Confirmation Modal for each item -->
+                <div class="modal fade" id="enableModal" tabindex="-1" role="dialog" aria-labelledby="enableModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="enableModalLabel">Confirm Enable</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to Enable this item?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                <a id="enableModalButton" asp-controller="CategoryMaster" asp-action="EnableCategory" asp-route-categoryId="" asp-route-currentPageNo="@Model.CurrentPage" class="btn btn-success">Yes</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Delete Confirmation Modal for each item -->
+                <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to delete this item?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <a id="deleteModalButton" asp-controller="CategoryMaster" asp-action="RemoveCategoryMaster" asp-route-categoryId="" asp-route-currentPageNo="@Model.CurrentPage" class="btn btn-danger">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </tbody>
         </table>
 
     </div>
 
+    <br />
+    <br />
+
     <div>
 
-        <nav aria-label="Page navigation example" class="justify-content-end">
+        <nav aria-label="Page navigation example" style="float: right;margin-top: -35px;margin-right: 2px;font-size: smaller;">
+
             <ul class="pagination">
                 @if (Model.CurrentPage > 1)
                 {
@@ -152,7 +168,7 @@
                 {
                     if (i == Model.CurrentPage)
                     {
-                        <li class="page-item"><a class="page-link active" href="/CategoryMaster/IndexCategoryMaster?orderBy=@Model.OrderBy&currentPage=@i"> @i</a></li>
+                        <li class="page-item active"><a class="page-link active" href="/CategoryMaster/IndexCategoryMaster?orderBy=@Model.OrderBy&currentPage=@i"> @i</a></li>
 
                     }
                     else
@@ -173,4 +189,59 @@
 
     </div>
 
+
 </div>
+
+<br />
+
+@section Scripts
+    {
+    <script>
+        var currentPageValue = @currentPage;
+
+        $(document).ready(function () {
+            // Loop through each anchor tag that needs to be updated
+            $('a[data-currentPageNo]').each(function () {
+                // Get the element's data-currentPageNo attribute value (if you set it)
+                var dataCurrentPageNo = $(this).data('currentPageNo');
+
+                // Update the asp-route-currentPageNo attribute with the currentPageValue
+                $(this).attr('asp-route-currentPageNo', currentPageValue);
+            });
+        });
+
+        // Find the last anchor tag within the loop
+        var anchor = document.querySelectorAll('a[asp-route-currentPageNo]')[document.querySelectorAll('a[asp-route-currentPageNo]').length - 1];
+
+        // Set the asp-route-currentPageNo attribute to the current page value
+        anchor.setAttribute('asp-route-currentPageNo', '@Model.CurrentPage');
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#myTable').DataTable(
+                {
+                    "paging": false
+                });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('.delete-button').click(function () {
+                var categoryId = $(this).data('categoryid');
+                console.log(categoryId);
+                $('#categoryIdToDelete').text(categoryId); // Set the StateId in the modal
+                $('#deleteModalButton').attr('href', '/CategoryMaster/RemoveCategoryMaster?categoryId=' + categoryId); // Set the Delete button's URL
+            });
+        });
+
+        $(document).ready(function () {
+            $('.enable-button').click(function () {
+                var categoryId = $(this).data('categoryid');
+                $('#categoryIdToEnable').text(categoryId); // Set the StateId in the modal
+                $('#enableModalButton').attr('href', '/CategoryMaster/EnableCategory?categoryId=' + categoryId); // Set the button's URL
+            });
+        });
+    </script>
+}

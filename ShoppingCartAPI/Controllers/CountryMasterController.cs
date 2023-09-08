@@ -64,7 +64,7 @@ namespace ShoppingCartAPI.Controllers
                     return BadRequest(_response);
                 }
 
-                var country = await _countryRepo.GetAsync(u => u.CountryId == countryId && u.IsDeleted == false);
+                var country = await _countryRepo.GetAsync(u => u.CountryId == countryId );
 
                 if (country == null)
                 {
@@ -195,7 +195,7 @@ namespace ShoppingCartAPI.Controllers
                     return BadRequest(ModelState);
                 }
 
-                if (await _countryRepo.GetAsync(u => u.CountryName == countryMasterDTO.CountryName && u.CountryId != countryMasterDTO.CountryId && u.IsDeleted == false) != null)
+                if (await _countryRepo.GetAsync(u => u.CountryName == countryMasterDTO.CountryName && u.CountryId != countryMasterDTO.CountryId) != null)
                 {
                     _response.ResponseMessage = new List<string>() { "Already Exists" };
                     return BadRequest(_response);

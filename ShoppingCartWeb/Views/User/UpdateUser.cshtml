@@ -14,10 +14,28 @@
         </style>
         <h1 class="text-dark">User</h1>
         <hr />
+
         <input hidden asp-for="User.UserId" />
+        <input hidden asp-for="User.RegistrationId" />
+        <input hidden asp-for="User.CreatedBy" />
+        <input hidden asp-for="User.CreatedOn" />
+
         <div class="row">
             <div class="col-md-6">
                 <div class="row pb-3">
+
+
+                    <div class="col-md-3">
+                        <label asp-for="User.RegistrationId" class="control-label pt-2" style="font-size:14px;">Registration Name</label>
+                    </div>
+                    <div class="col-md-9 pb-4">
+                        <select asp-for="User.RegistrationId" disabled class="form-control" asp-items="@Model.registrationList">
+                            <option disabled selected>--Select Registration--</option>
+                        </select>
+                        <span asp-validation-for="User.RegistrationId" class="text-danger"></span>
+                    </div>
+
+
                     <div class="col-md-3">
                         <label asp-for="User.UserName" class="control-label pt-2" style="font-size:14px;">User Name</label>
                     </div>
@@ -26,24 +44,15 @@
                         <span asp-validation-for="User.UserName" class="text-danger"></span>
                     </div>
 
+
                     <div class="col-md-3">
                         <label asp-for="User.Password" class="control-label pt-2" style="font-size:14px;">Password</label>
                     </div>
                     <div class="col-md-9 pb-4">
-                        <input asp-for="User.Password" placeholder="@Model.User.Password" class="form-control" />
+                        <input asp-for="User.Password" id="passwordInput" class="form-control" />
                         <span asp-validation-for="User.Password" class="text-danger"></span>
                     </div>
 
-
-                    <div class="col-md-3">
-                        <label asp-for="User.RegistrationId" class="control-label pt-2" style="font-size:14px;">Registration Name</label>
-                    </div>
-                    <div class="col-md-9 pb-4">
-                        <select asp-for="User.RegistrationId" class="form-control" asp-items="@Model.registrationList">
-                            <option disabled selected>--Select Registration--</option>
-                        </select>
-                        <span asp-validation-for="User.RegistrationId" class="text-danger"></span>
-                    </div>
 
 
                     <div class="col-md-3">
@@ -57,20 +66,16 @@
                     </div>
 
                 </div>
+
                 <div class="row">
 
-                    <div class="col-md-5"></div>
-                    <div class="col-md-6">
-
-                        <div class="row">
-                            <div class="col-4">
-                                <a asp-action="IndexUser" asp-controller="User" class="btn-primary btn form-control ">Cancel</a>
-                            </div>
-                            <div class="col-4">
-                                <input type="submit" value="Update" class="btn btn-success form-control" />
-                            </div>
-                        </div>
+                    <div class="col-3 offset-6">
+                        <a asp-action="IndexUser" asp-controller="User" class="btn-primary btn form-control ">Cancel</a>
                     </div>
+                    <div class="col-3">
+                        <input type="submit" value="Update" class="btn btn-success form-control" />
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -80,4 +85,15 @@
 @section Scripts
     {
     <partial name="_ValidationScriptsPartial" />
+
+
+    <script>
+        // Retrieve the actual password from the model or database and store it in a JavaScript variable
+        var actualPassword = '@Model.User.Password';
+
+        // Set the value attribute of the password input field to the actual password
+        document.getElementById('passwordInput').value = actualPassword;
+    </script>
+
+
 }

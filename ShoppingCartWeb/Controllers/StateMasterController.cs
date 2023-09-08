@@ -36,6 +36,7 @@ namespace ShoppingCartWeb.Controllers
             _countryService = countryService;
         }
 
+        [Authorize]
         public async Task<IActionResult> IndexStateMaster(string orderBy = "", int currentPage = 1)
         {
             StateMasterPaginationVM stateMasterPaginationVM = new StateMasterPaginationVM();   

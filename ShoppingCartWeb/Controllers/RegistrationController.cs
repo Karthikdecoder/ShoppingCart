@@ -267,57 +267,6 @@ namespace ShoppingCartWeb.Controllers
             return View();
         }
 
-
-        //public async Task<IActionResult> RemoveRegistration(int registrationId)
-        //      {
-        //          RemoveRegistrationVM removeRegistrationVM = new();
-
-        //          var registrationResponse = await _registrationService.GetRegistrationAsync<APIResponse>(registrationId, HttpContext.Session.GetString(SD.SessionToken));
-
-        //          if (registrationResponse != null && registrationResponse.IsSuccess)
-        //          {
-        //              RegistrationDTO model = JsonConvert.DeserializeObject<RegistrationDTO>(Convert.ToString(registrationResponse.Result));
-        //              removeRegistrationVM.Registration = model;
-        //          }
-
-        //          var categoryResponse = await _categoryService.GetAllCategoryAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
-
-        //          if (categoryResponse != null && categoryResponse.IsSuccess)
-        //          {
-        //              removeRegistrationVM.CategoryList = JsonConvert.DeserializeObject<List<CategoryMasterDTO>>(Convert.ToString(categoryResponse.Result)).Select(i => new SelectListItem
-        //              {
-        //                  Text = i.CategoryName,
-        //                  Value = i.CategoryId.ToString()
-        //              });
-        //          }
-
-        //          var stateResponse = await _stateService.GetAllStateAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
-
-        //          if (stateResponse != null && stateResponse.IsSuccess)
-        //          {
-        //              removeRegistrationVM.StateList = JsonConvert.DeserializeObject<List<StateMasterDTO>>(Convert.ToString(stateResponse.Result)).Select(i => new SelectListItem
-        //              {
-        //                  Text = i.StateName,
-        //                  Value = i.StateId.ToString()
-        //              });
-        //          }
-
-        //          var countryResponse = await _countryService.GetAllCountryAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
-
-        //          if (countryResponse != null && countryResponse.IsSuccess)
-        //          {
-        //              removeRegistrationVM.CountryList = JsonConvert.DeserializeObject<List<CountryMasterDTO>>(Convert.ToString(countryResponse.Result)).Select(i => new SelectListItem
-        //              {
-        //                  Text = i.CountryName,
-        //                  Value = i.CountryId.ToString()
-        //              });
-        //              return View(removeRegistrationVM);
-        //          }
-
-        //          return NotFound();
-        //      }
-
-
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RemoveRegistration(int registrationId, int currentPageNo, string orderBys)
         {

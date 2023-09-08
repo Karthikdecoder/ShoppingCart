@@ -15,7 +15,6 @@ namespace ShoppingCartWeb.Controllers
             _logger = logger;
         }
 
-        [Authorize(Roles = "Admin")]
         public IActionResult Index()
         {
             return View();

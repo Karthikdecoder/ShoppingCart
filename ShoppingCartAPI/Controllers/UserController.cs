@@ -111,8 +111,6 @@ namespace ShoppingCartAPI.Controllers
             if (loginResponse.UserRegistration == null || string.IsNullOrEmpty(loginResponse.Token))
             {
                 _response.StatusCode = HttpStatusCode.BadRequest;
-                _response.IsSuccess = false;
-                _response.ResponseMessage.Add("Username or password is incorrect");
                 return BadRequest(_response);
             }
             _response.StatusCode = HttpStatusCode.OK;
@@ -223,7 +221,7 @@ namespace ShoppingCartAPI.Controllers
                     return BadRequest(ModelState);
                 }
 
-                if (await _userRepo.GetAsync(u => u.RegistrationId == userDTO.RegistrationId && u.UserId != userDTO.UserId && u.IsDeleted == false) != null)
+                if (await _userRepo.GetAsync(u => u.RegistrationId == userDTO.RegistrationId && u.UserId != userDTO.UserId ) != null)
                 {
                     _response.ResponseMessage = new List<string>() { "Already Exists" };
                     return BadRequest(_response);

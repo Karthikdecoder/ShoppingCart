@@ -95,7 +95,7 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                if (await _dbCategory.GetAsync(u => u.CategoryName == categoryMasterDTO.CategoryName && u.IsDeleted == false) != null)
+                if (await _dbCategory.GetAsync(u => u.CategoryName == categoryMasterDTO.CategoryName) != null)
                 {
                     _response.ResponseMessage = new List<string>() { "Already Exists" };
                     return BadRequest(_response);
@@ -194,7 +194,7 @@ namespace ShoppingCartAPI.Controllers
                     return BadRequest(ModelState);
                 }
 
-                if (await _dbCategory.GetAsync(u => u.CategoryName == categoryMasterDTO.CategoryName && u.CategoryId != categoryMasterDTO.CategoryId && u.IsDeleted == false) != null)
+                if (await _dbCategory.GetAsync(u => u.CategoryName == categoryMasterDTO.CategoryName && u.CategoryId != categoryMasterDTO.CategoryId ) != null)
                 {
                     _response.ResponseMessage = new List<string>() { "Already Exists" };
                     return BadRequest(_response);

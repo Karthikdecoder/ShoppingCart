@@ -12,7 +12,7 @@ namespace ShoppingCartAPI.Controllers
 {
     [Route("api/RoleMaster")]
     [ApiController]
-    public class RoleMasterController : ControllerBase
+    public class RoleMasterController : ControllerBase  
     {
         protected APIResponse _response;
         private readonly IMapper _mapper;
@@ -95,7 +95,7 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                if (await _dbRoles.GetAsync(u => u.RoleName == roleMasterDTO.RoleName && u.IsDeleted == false) != null)
+                if (await _dbRoles.GetAsync(u => u.RoleName == roleMasterDTO.RoleName) != null)
                 {
                     //ModelState.AddModelError("ErrorMessages", "Role already exists!");
                     //return BadRequest(ModelState);
@@ -194,7 +194,7 @@ namespace ShoppingCartAPI.Controllers
                     return BadRequest(ModelState);
                 }
 
-                if (await _dbRoles.GetAsync(u => u.RoleName == roleMasterDTO.RoleName && u.RoleId != roleMasterDTO.RoleId && u.RoleId != roleMasterDTO.RoleId && u.IsDeleted == false) != null)
+                if (await _dbRoles.GetAsync(u => u.RoleName == roleMasterDTO.RoleName && u.RoleId != roleMasterDTO.RoleId && u.RoleId != roleMasterDTO.RoleId) != null)
                 {
                     _response.ResponseMessage = new List<string>() { "Already Exists" };
                     return BadRequest(_response);

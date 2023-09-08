@@ -106,13 +106,17 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateCategoryMaster(int categoryId)
+        public async Task<IActionResult> UpdateCategoryMaster(int categoryId, int currentPageNo)
         {
+            CategoryMasterDTO model = new();
+
+            //model.CurrentPage = currentPageNo;
+
             var categoryResponse = await _categoryService.GetCategoryAsync<APIResponse>(categoryId, HttpContext.Session.GetString(SD.SessionToken));
 
             if (categoryResponse != null && categoryResponse.IsSuccess)
             {
-                CategoryMasterDTO model = JsonConvert.DeserializeObject<CategoryMasterDTO>(Convert.ToString(categoryResponse.Result));
+                model = JsonConvert.DeserializeObject<CategoryMasterDTO>(Convert.ToString(categoryResponse.Result));
 
                 return View(model);
             }
@@ -132,7 +136,7 @@ namespace ShoppingCartWeb.Controllers
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Updated successfully";
-                    return RedirectToAction(nameof(IndexCategoryMaster));
+                    return RedirectToAction("IndexCategoryMaster");
                 }
 
                 TempData["error"] = response.ResponseMessage[0].ToString();
@@ -163,14 +167,14 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> RemoveCategoryMaster(int categoryId)
+        public async Task<IActionResult> RemoveCategoryMaster(int categoryId, int currentPageNo)
         {
             var response = await _categoryService.RemoveCategoryAsync<APIResponse>(categoryId, HttpContext.Session.GetString(SD.SessionToken));
 
             if (response != null && response.IsSuccess)
             {
                 TempData["success"] = "Deleted successfully";
-                return RedirectToAction(nameof(IndexCategoryMaster));
+                return RedirectToAction("IndexCategoryMaster", new { currentPage = currentPageNo });
             }
 
             TempData["success"] = "Error encountered";

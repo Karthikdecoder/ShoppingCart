@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ShoppingCartWeb.Models;
 using ShoppingCartWeb.Models.Dto;
+using ShoppingCartWeb.Models.VM;
 using ShoppingCartWeb.Services.IServices;
 using ShoppingCartWeb.Utililty;
 using System.Data;
@@ -30,8 +31,11 @@ namespace ShoppingCartWeb.Controllers
             _registrationService = registrationService;
         }
 
-        public async Task<IActionResult> IndexRoleMaster()
+        [Authorize]
+        public async Task<IActionResult> IndexRoleMaster(string orderBy = "", int currentPage = 1)
         {
+            RoleMasterPaginationVM roleMasterPaginationVM = new();
+
             List<RoleMasterDTO> list = new();
 
             var response = await _roleService.GetAllRoleAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
@@ -41,7 +45,20 @@ namespace ShoppingCartWeb.Controllers
                 list = JsonConvert.DeserializeObject<List<RoleMasterDTO>>(Convert.ToString(response.Result));
             }
 
-            return View(list);
+            int totalRecords = list.Count();
+
+            int pageSize = 5;
+
+            int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+            list = list.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+
+            roleMasterPaginationVM.RoleMasterDTO = list;
+            roleMasterPaginationVM.CurrentPage = currentPage;
+            roleMasterPaginationVM.PageSize = pageSize;
+            roleMasterPaginationVM.TotalPages = totalPages;
+
+            return View(roleMasterPaginationVM);
         }
 
         [HttpGet]
@@ -75,20 +92,23 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateRoleMaster(int roleId)
+        public async Task<IActionResult> UpdateRoleMaster(int roleId, int currentPageNo)
         {
             if(roleId == 0)
             {
                 return View();
             }
+            UpdateRoleMasterVM updateRoleMasterVM = new UpdateRoleMasterVM();
+
+            updateRoleMasterVM.CurrentPage = currentPageNo;
 
             var roleResponse = await _roleService.GetRoleAsync<APIResponse>(roleId, HttpContext.Session.GetString(SD.SessionToken));
 
             if (roleResponse != null && roleResponse.IsSuccess)
             {
-                RoleMasterDTO model = JsonConvert.DeserializeObject<RoleMasterDTO>(Convert.ToString(roleResponse.Result));
+                updateRoleMasterVM.RoleMasterDTO = JsonConvert.DeserializeObject<RoleMasterDTO>(Convert.ToString(roleResponse.Result));
 
-                return View(model);
+                return View(updateRoleMasterVM);
             }
 
             return NotFound();
@@ -97,26 +117,26 @@ namespace ShoppingCartWeb.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateRoleMaster(RoleMasterDTO roleMasterDTO)
+        public async Task<IActionResult> UpdateRoleMaster(UpdateRoleMasterVM updateRoleMasterVM)
         {
             if (ModelState.IsValid)
             {
-                var response = await _roleService.UpdateRoleAsync<APIResponse>(roleMasterDTO, HttpContext.Session.GetString(SD.SessionToken));
+                var response = await _roleService.UpdateRoleAsync<APIResponse>(updateRoleMasterVM.RoleMasterDTO, HttpContext.Session.GetString(SD.SessionToken));
 
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Updated successfully";
-                    return RedirectToAction(nameof(IndexRoleMaster));
+                    return RedirectToAction("IndexRoleMaster", new { currentPage = updateRoleMasterVM.CurrentPage });
                 }
 
                 TempData["error"] = response.ResponseMessage[0].ToString();
-                return View(roleMasterDTO);
+                return View(updateRoleMasterVM);
             }
-            return View(roleMasterDTO);
+            return View();
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> EnableRole(int roleId)
+        public async Task<IActionResult> EnableRole(int roleId, int currentPageNo)
         {
             if (ModelState.IsValid)
             {
@@ -125,7 +145,7 @@ namespace ShoppingCartWeb.Controllers
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "Enabled successfully";
-                    return RedirectToAction("IndexRoleMaster");
+                    return RedirectToAction("IndexRoleMaster", new { currentPage = currentPageNo });
                 }
 
                 TempData["error"] = response.ResponseMessage[0].ToString();
@@ -135,31 +155,16 @@ namespace ShoppingCartWeb.Controllers
             return View();
         }
 
-        //[Authorize(Roles = "Admin")]
-        //public async Task<IActionResult> RemoveRoleMaster(int roleId)
-        //{
-        //    var roleMasterResponse = await _roleService.GetRoleAsync<APIResponse>(roleId, HttpContext.Session.GetString(SD.SessionToken));
-
-        //    if (roleMasterResponse != null && roleMasterResponse.IsSuccess)
-        //    {
-        //        RoleMasterDTO model = JsonConvert.DeserializeObject<RoleMasterDTO>(Convert.ToString(roleMasterResponse.Result));
-
-        //        return View(model);
-        //    }
-
-
-        //    return NotFound();
-        //}
-
+        
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> RemoveRoleMaster(int roleId)
+        public async Task<IActionResult> RemoveRoleMaster(int roleId, int currentPageNo)
         {
             var response = await _roleService.RemoveRoleAsync<APIResponse>(roleId, HttpContext.Session.GetString(SD.SessionToken));
 
             if (response != null && response.IsSuccess)
             {
                 TempData["success"] = "Deleted successfully";
-                return RedirectToAction(nameof(IndexRoleMaster));
+                return RedirectToAction("IndexRoleMaster", new { currentPage = currentPageNo });
             }
 
             TempData["success"] = "Error encountered";
