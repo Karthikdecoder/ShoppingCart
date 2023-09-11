@@ -52,28 +52,7 @@ namespace ShoppingCartAPI.Controllers
             return _response;
         }
 
-        //[HttpGet]
-        //[Route("GetAllDeletedRegistration")]
-        //[ProducesResponseType(StatusCodes.Status403Forbidden)]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //public async Task<ActionResult<APIResponse>> GetAllDeletedRegistration()
-        //{
-        //    try
-        //    {
-        //        IEnumerable<Registration> registrationList = await _registrationRepo.GetAllAsync(u => (u.IsDeleted), includeProperties: "CategoryMaster,StateMaster,CountryMaster");
-        //        _response.Result = _mapper.Map<List<RegistrationDTO>>(registrationList);
-        //        _response.StatusCode = HttpStatusCode.OK;
-        //        return Ok(_response);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _response.IsSuccess = false;
-        //        _response.ResponseMessage = new List<string>() { ex.ToString() };
-        //    }
-
-        //    return _response;
-        //}
-
+        
         [HttpGet]
         [Route("GetRegistration")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -89,7 +68,7 @@ namespace ShoppingCartAPI.Controllers
                     return BadRequest(_response);
                 }
 
-                var registrationDetail = await _registrationRepo.GetAsync( u => u.RegistrationId == registrationId && u.IsDeleted == false);
+                var registrationDetail = await _registrationRepo.GetAsync( u => u.RegistrationId == registrationId && u.IsDeleted == false, includeProperties: "CategoryMaster,StateMaster,CountryMaster");
 
                 if (registrationDetail == null)
                 {
@@ -110,7 +89,7 @@ namespace ShoppingCartAPI.Controllers
             return _response;
         }
 
-
+        
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [Route("CreateRegistration")]

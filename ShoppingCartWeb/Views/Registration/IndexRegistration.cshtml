@@ -94,9 +94,14 @@
                                 <div class="btn-group" role="group">
 
 
-                                    <a asp-controller="Registration" data-category-id="@item.RegistrationId" data-toggle="modal" data-target="#registrationModal_@item.RegistrationId" asp-action="ViewRegistration" asp-route-registrationId="@item.RegistrationId" class="btn  btn-sm ml-1">
+                                    @*<a asp-controller="Registration" data-category-id="@item.RegistrationId" data-toggle="modal" data-target="#registrationModal_@item.RegistrationId" asp-action="ViewRegistration" asp-route-registrationId="@item.RegistrationId" class="btn  btn-sm ml-1">
+                            <span id="boot-icon" class="bi bi-eye" style="font-size: 16px; color: rgb(128, 0, 128); -webkit-text-stroke-width: 0.5px;"></span>
+                            </a>
+                            *@
+                                    <button class="btn btn-outlinelight view-button" data-registrationId="@item.RegistrationId">
                                         <span id="boot-icon" class="bi bi-eye" style="font-size: 16px; color: rgb(128, 0, 128); -webkit-text-stroke-width: 0.5px;"></span>
-                                    </a>
+                                    </button>
+
 
                                     <a asp-controller="Registration" asp-action="UpdateRegistration" asp-route-registrationId="@item.RegistrationId" asp-route-currentPageNo="@Model.CurrentPage" class="btn btn-sm ml-1">
                                         <span id="boot-icon" class="bi bi-pencil-square" style="font-size: 17px; color: rgb(0, 128, 55); -webkit-text-stroke-width: 0.6px; opacity: 0.9;"></span>
@@ -118,8 +123,7 @@
                             <td>
                                 <div class="btn-group" role="group">
 
-                                    <a 
-                                        href="#" class="btn btn-primary btn-sm ml-2 enable-button" data-toggle="modal" data-target="#enableModal" data-registrationId="@item.RegistrationId">
+                                    <a href="#" class="btn btn-primary btn-sm ml-2 enable-button" data-toggle="modal" data-target="#enableModal" data-registrationId="@item.RegistrationId">
                                         Active
                                     </a>
                                 </div>
@@ -172,20 +176,23 @@
                     </div>
                 </div>
 
-
-
-
+@*
                 @foreach (var item in Model.Registration)
                 {
                     <div class="modal fade" id="registrationModal_@item.RegistrationId" tabindex="-1" role="dialog" aria-labelledby="registrationModalLabel_@item.RegistrationId">
+
                         <div class="modal-dialog" role="document">
+
                             <div class="modal-content">
+
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="registrationModalLabel_@item.RegistrationId">Registration Details</h5>
+
+                                    <h5 class="modal-title" id="registrationModalLabel_@item.RegistrationId">Registered Person Details</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
+
                                 <div class="modal-body">
                                     <p><strong>FirstName:</strong> @item.FirstName</p>
                                     <p><strong>LastName:</strong> @item.LastName</p>
@@ -199,13 +206,14 @@
                                     <p><strong>StateName:</strong> @item.StateMaster.StateName</p>
                                     <p><strong>CountryName:</strong> @item.CountryMaster.CountryName</p>
                                 </div>
+
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                }
+                }*@
 
 
             </tbody>
@@ -255,6 +263,8 @@
 
 @section Scripts
     {
+    <partial name="_PartialViewForRegistrationPopup" />
+
     <script>
         $(document).ready(function () {
             $('#myTable').DataTable(

@@ -73,6 +73,7 @@ namespace ShoppingCartWeb.Controllers
             }
         }
 
+        [Authorize]
         public async Task<IActionResult> IndexUser(string orderBy = "", int currentPage = 1)
         {
             UserPaginationVM userPaginationVM = new UserPaginationVM();
@@ -274,13 +275,15 @@ namespace ShoppingCartWeb.Controllers
             await HttpContext.SignOutAsync();
             HttpContext.Session.SetString(SD.SessionToken, "");
 
-            
+            // Add a random query parameter to the URL to prevent caching
+            string returnUrl = Url.Action("Login", "User", new { cacheBuster = DateTime.UtcNow.Ticks });
+
             return RedirectToAction("Login", "User");
         }
 
         public IActionResult AccessDenied()
         {
-            return RedirectToAction("Login", "User");
+            return View();
         }
     }
 

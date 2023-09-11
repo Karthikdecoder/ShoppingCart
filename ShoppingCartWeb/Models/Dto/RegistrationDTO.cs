@@ -31,7 +31,6 @@ namespace ShoppingCartWeb.Models.Dto
 
         [Required(ErrorMessage = "Date of birth is required")]
         [DataType(DataType.Date, ErrorMessage = "Invalid Date Of Birth")]
-        [Range(typeof(DateTime), "1900-01-01", "9999-12-31", ErrorMessage = "Date of birth should start from year 1900")]
         public DateTime DateOfBirth { get; set; }
 
         [Required(ErrorMessage = "Email address is required")]

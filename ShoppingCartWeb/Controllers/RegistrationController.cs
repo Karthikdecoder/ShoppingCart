@@ -36,6 +36,7 @@ namespace ShoppingCartWeb.Controllers
             _mapper = mapper;
         }
 
+        [Authorize]
         public async Task<IActionResult> IndexRegistration(string orderBy = "", int currentPage = 1)
         {
             RegistrationVM registrationVM = new();
@@ -82,10 +83,11 @@ namespace ShoppingCartWeb.Controllers
             registrationVM.TotalPages = totalPages;
             
 
+
             return View(registrationVM);
         }
 
-        public async Task<IActionResult> ViewRegistration(int registrationId)
+        public async Task<JsonResult> ViewRegistration(int registrationId)
         {
             RegistrationDTO registrationDetail = new();
 
@@ -97,8 +99,10 @@ namespace ShoppingCartWeb.Controllers
                 registrationDetail = _mapper.Map<RegistrationDTO>(model);
             }
 
-            return View(registrationDetail);
+            return Json(registrationDetail);
         }
+
+
 
         [HttpGet]
         [Authorize(Roles = "Admin")]

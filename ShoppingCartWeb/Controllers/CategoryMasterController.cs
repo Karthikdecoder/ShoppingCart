@@ -32,6 +32,7 @@ namespace ShoppingCartWeb.Controllers
             _registrationService = registrationService;
         }
 
+        [Authorize]
         public async Task<IActionResult> IndexCategoryMaster(string orderBy = "", int currentPage = 1)
         {
             CategoryMasterPaginationVM categoryMasterPaginationVM = new();

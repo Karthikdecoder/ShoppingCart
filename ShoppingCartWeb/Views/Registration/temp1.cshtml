@@ -1,5 +1,5 @@
-﻿
-
+﻿@*@*For view POP-UP*@
+@*
 <div class="modal fade" id="userDetailsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -9,26 +9,21 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-
                     <div class="col-md-6">
-                        <p><strong>FirstName:</strong> <span id="FirstName"></span></p>
-                        <p><strong>LastName:</strong> <span id="LastName"></span></p>
-                        <p><strong>CategoryName:</strong><span id="CategoryMaster.CategoryName"></span></p>
-                        <p><strong>Gender:</strong> <span id="Gender"></span></p>
-                        <p><strong>DateOfBirth:</strong> <span id="DateOfBirth"></span></p>
+                        <p><strong>First Name:</strong> <span id="FirstName"></span></p>
+                        <p><strong>Last Name:</strong> <span id="LastName"></span></p>
                         <p><strong>Email:</strong> <span id="Email"></span></p>
+                        <p><strong>Phone No:</strong> <span id="PhoneNo"></span></p>
+                        <p><strong>Gender:</strong> <span id="Gender"></span></p>
 
                         <p><strong></strong></p>
                     </div>
-
                     <div class="col-md-6">
-
-                        <p><strong>ContactNo:</strong> <span id="ContactNo"></span></p>
+                        <p><strong>DoB:</strong> <span id="Dob"></span></p>
+                        <p><strong>JoiningDate:</strong> <span id="joiningDate"></span></p>
                         <p><strong>Address:</strong> <span id="Address"></span></p>
-                        <p><strong>PostalCode:</strong> <span id="PostalCode"></span></p>
-                        <p><strong>StateName:</strong> <span id="StateMaster.StateName"></span></p>
-                        <p><strong>CountryName:</strong> <span id="CountryMaster.CountryName"></span></p>
-
+                        <p><strong>Country:</strong> <span id="Country"></span></p>
+                        <p><strong>State:</strong> <span id="State"></span></p>
                     </div>
                 </div>
             </div>
@@ -38,38 +33,31 @@
         </div>
     </div>
 </div>
-
-
 <script>
-
     $(document).ready(function () {
         $(".view-button").on("click", function () {
-            var registrationId = $(this).data("registrationid"); // Note the lowercase "i"
+            var loginUserId = $(this).data("id");
             $.ajax({
                 type: "GET",
-                url: '@Url.Action("ViewRegistration", "Registration")',
-                data: { registrationId: registrationId }, // Use lowercase "i"
-                dataType: 'json',
-                success: function (user) {
-
-                    alert(JSON.stringify(user));
-
+                url: '@Url.Action("GetUserDetails", "Auth")',
+                data: { id: $(this).data("id") },
+                dataType: 'Json', success: function (user) {
                     $("#FirstName").text(user.firstName);
                     $("#LastName").text(user.lastName);
-                    $("#CategoryName").text(user.categoryMaster.categoryName);
-                    $("#Gender").text(user.gender);
                     $("#Email").text(user.email);
-                    var dobDate = new Date(user.dateOfBirth);
+                    $("#PhoneNo").text(user.phoneNumber);
+                    $("#Gender").text(user.gender);
+                    var dobDate = new Date(user.dob);
                     var formattedDob = dobDate.toLocaleDateString();
-                    $("#DateOfBirth").text(formattedDob);
-                    $("#ContactNo").text(user.contactNo);
+                    $("#Dob").text(formattedDob);
+                    var joiningDate = new Date(user.joiningDate);
+                    var formattedDate = dobDate.toLocaleDateString();
+                    $("#joiningDate").text(formattedDate);
                     $("#Address").text(user.address);
-                    $("#PostalCode").text(user.postalCode);
-                    $("#StateName").text(user.stateMaster.stateName);
-                    $("#CountryName").text(user.countryMaster.countryName);
+                    $("#Country").text(user.countryMaster.countryName);
+                    $("#State").text(user.stateMaster.stateName);
                     $("#userDetailsModal").modal("show");
                 },
-
                 error: function () {
                     alert("Failed to fetch user details.");
                 }
@@ -77,5 +65,6 @@
         });
 
     });
-
 </script>
+
+*@
