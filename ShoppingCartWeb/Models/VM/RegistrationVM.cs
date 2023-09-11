@@ -5,6 +5,7 @@ namespace ShoppingCartWeb.Models.VM
     public class RegistrationVM
     {
         public List<RegistrationDTO> Registration { get; set; }
+        public RegistrationDTO RegistrationDTO { get; set; }
         public string FirstNameSortOrder { get; set; } 
         public string LastNameSortOrder { get; set; } 
         public int PageSize { get; set; }

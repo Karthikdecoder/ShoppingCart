@@ -75,8 +75,6 @@
                 @foreach (var item in Model.Registration)
                 {
 
-
-
                     <tr>
                         <td>@item.FirstName</td>
                         <td>@item.LastName</td>
@@ -94,14 +92,11 @@
                                 <div class="btn-group" role="group">
 
 
-                                    @*<a asp-controller="Registration" data-category-id="@item.RegistrationId" data-toggle="modal" data-target="#registrationModal_@item.RegistrationId" asp-action="ViewRegistration" asp-route-registrationId="@item.RegistrationId" class="btn  btn-sm ml-1">
-                            <span id="boot-icon" class="bi bi-eye" style="font-size: 16px; color: rgb(128, 0, 128); -webkit-text-stroke-width: 0.5px;"></span>
-                            </a>
-                            *@
-                                    <button class="btn btn-outlinelight view-button" data-registrationId="@item.RegistrationId">
+                                    <a id="viewRegistrationButton_@item.RegistrationId"
+                                       data-registrationid="@item.RegistrationId"
+                                       class="btn btn-sm ml-1">
                                         <span id="boot-icon" class="bi bi-eye" style="font-size: 16px; color: rgb(128, 0, 128); -webkit-text-stroke-width: 0.5px;"></span>
-                                    </button>
-
+                                    </a>
 
                                     <a asp-controller="Registration" asp-action="UpdateRegistration" asp-route-registrationId="@item.RegistrationId" asp-route-currentPageNo="@Model.CurrentPage" class="btn btn-sm ml-1">
                                         <span id="boot-icon" class="bi bi-pencil-square" style="font-size: 17px; color: rgb(0, 128, 55); -webkit-text-stroke-width: 0.6px; opacity: 0.9;"></span>
@@ -130,7 +125,6 @@
                             </td>
                         }
                     </tr>
-
 
                 }
 
@@ -176,45 +170,29 @@
                     </div>
                 </div>
 
-@*
-                @foreach (var item in Model.Registration)
-                {
-                    <div class="modal fade" id="registrationModal_@item.RegistrationId" tabindex="-1" role="dialog" aria-labelledby="registrationModalLabel_@item.RegistrationId">
 
-                        <div class="modal-dialog" role="document">
+                <!-- Modal Code (outside the loop) -->
+                <div class="modal fade" id="registrationModal" tabindex="-1" role="dialog" aria-labelledby="registrationModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="registrationModalLabel">Registered Person Details</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
 
-                            <div class="modal-content">
+                            <!-- Placeholder for partial view -->
+                            <div id="registrationModalContent"></div>
 
-                                <div class="modal-header">
-
-                                    <h5 class="modal-title" id="registrationModalLabel_@item.RegistrationId">Registered Person Details</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-
-                                <div class="modal-body">
-                                    <p><strong>FirstName:</strong> @item.FirstName</p>
-                                    <p><strong>LastName:</strong> @item.LastName</p>
-                                    <p><strong>CategoryName:</strong> @item.CategoryMaster.CategoryName</p>
-                                    <p><strong>Gender:</strong> @item.Gender</p>
-                                    <p><strong>DateOfBirth:</strong> @item.DateOfBirth.ToString("dd-MM-yyyy")</p>
-                                    <p><strong>Email:</strong> @item.Email</p>
-                                    <p><strong>ContactNo:</strong> @item.ContactNo</p>
-                                    <p><strong>Address:</strong> @item.Address</p>
-                                    <p><strong>PostalCode:</strong> @item.PostalCode</p>
-                                    <p><strong>StateName:</strong> @item.StateMaster.StateName</p>
-                                    <p><strong>CountryName:</strong> @item.CountryMaster.CountryName</p>
-                                </div>
-
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>
-                }*@
+                </div>
 
+               
 
             </tbody>
         </table>
@@ -263,7 +241,28 @@
 
 @section Scripts
     {
-    <partial name="_PartialViewForRegistrationPopup" />
+
+    
+    <script>
+        // When a "View" button is clicked
+        $('a[id^="viewRegistrationButton_"]').on('click', function () {
+            var registrationId = $(this).data('registrationid');
+
+            // Make an AJAX request to load the partial view
+            $.ajax({
+                url: '/Registration/ViewRegistrationPartial',
+                type: 'GET',
+                data: { registrationId: registrationId },
+                success: function (data) {
+                    // Replace the content of the modal with the loaded partial view
+                    $('#registrationModalContent').html(data);
+
+                    // Show the modal
+                    $('#registrationModal').modal('show');
+                }
+            });
+        });
+    </script>
 
     <script>
         $(document).ready(function () {
@@ -291,6 +290,58 @@
                 $('#enableModalButton').attr('href', '/Registration/EnableRegistration?registrationId=' + registrationId); // Set the button's URL
             });
         });
+
+
     </script>
+
+    <script>
+        function openRegistrationModal(registrationId) {
+            // Make an AJAX request to fetch the partial view with details
+            $.ajax({
+                url: '/Registration/ViewRegistration',
+                type: 'GET',
+                data: { registrationId: registrationId },
+                success: function (data) {
+                    // Replace the modal content with the fetched partial view
+                    $('#registrationModal .modal-content').html(data);
+
+                    // Show the modal
+                    $('#registrationModal').modal('show');
+                }
+            });
+        }
+    </script>
+
+
+
+    <script>
+        $('#registrationModal').on('show.bs.modal', function (e) {
+            var registrationId = $(e.relatedTarget).data('registrationid');
+            var modal = $(this);
+
+            // Make an AJAX request to fetch details based on registrationId
+            $.ajax({
+                url: '/api/Registration/GetRegistration?registrationId=',
+                type: 'GET',
+                data: { registrationId: registrationId },
+                success: function (data) {
+                    // Populate modal with fetched data
+                    modal.find('#FirstName').text(data.firstName);
+                    modal.find('#LastName').text(data.lastName);
+                    modal.find('#CategoryName').text(data.categoryName);
+                    modal.find('#Gender').text(data.gender);
+                    modal.find('#DateOfBirth').text(data.dateOfBirth);
+                    modal.find('#Email').text(data.email);
+                    modal.find('#ContactNo').text(data.contactNo);
+                    modal.find('#Address').text(data.address);
+                    modal.find('#PostalCode').text(data.postalCode);
+                    modal.find('#StateName').text(data.stateName);
+                    modal.find('#CountryName').text(data.countryName);
+                }
+            });
+        });
+    </script>
+
+
 }
 

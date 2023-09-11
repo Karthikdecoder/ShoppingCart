@@ -16,5 +16,7 @@ namespace ShoppingCartAPI.Data
         public DbSet<StateMaster> StateMaster { get; set; }
         public DbSet<User> User { get; set; }
         public DbSet<Registration> Registration { get; set; }
+        public DbSet<Menu> Menu { get; set; }
+        public DbSet<MenuRoleMapping> MenuRoleMapping { get; set; }
     }
 }

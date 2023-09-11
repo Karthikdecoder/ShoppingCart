@@ -87,21 +87,20 @@ namespace ShoppingCartWeb.Controllers
             return View(registrationVM);
         }
 
-        public async Task<JsonResult> ViewRegistration(int registrationId)
+        public async Task<IActionResult> ViewRegistrationPartial(int registrationId)
         {
-            RegistrationDTO registrationDetail = new();
+            RegistrationVM registrationDetail = new();
 
             var registrationResponse = await _registrationService.GetRegistrationAsync<APIResponse>(registrationId, HttpContext.Session.GetString(SD.SessionToken));
 
             if (registrationResponse != null && registrationResponse.IsSuccess)
             {
                 RegistrationDTO model = JsonConvert.DeserializeObject<RegistrationDTO>(Convert.ToString(registrationResponse.Result));
-                registrationDetail = _mapper.Map<RegistrationDTO>(model);
+                registrationDetail.RegistrationDTO = _mapper.Map<RegistrationDTO>(model);
             }
 
-            return Json(registrationDetail);
+            return PartialView("_ViewRegistration", registrationDetail.RegistrationDTO);
         }
-
 
 
         [HttpGet]
