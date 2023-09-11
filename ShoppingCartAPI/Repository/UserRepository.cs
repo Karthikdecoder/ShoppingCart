@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ShoppingCartAPI.Data;
 using ShoppingCartAPI.Models;
 using ShoppingCartAPI.Models.Dto;
 using ShoppingCartAPI.Repository.IRepository;
+using System.Collections.Generic;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -11,36 +14,22 @@ using System.Text;
 
 namespace ShoppingCartAPI.Repository
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : Repository<User>, IUserRepository
     {
         private readonly ApplicationDbContext _db;
         private string secretKey;
         private readonly IMapper _mapper;
 
-        public UserRepository(ApplicationDbContext db, IConfiguration configuration, IMapper mapper) 
+        public UserRepository(ApplicationDbContext db, IConfiguration configuration, IMapper mapper) : base(db)
         {
             _db = db;
             secretKey = configuration.GetValue<string>("ApiSettings:Secret");
             _mapper = mapper;
         }
 
-        public async Task<List<User>> GetAllUserAsync()
+        public bool IsUniqueUser(UserDTO userDTO)
         {
-            var userList = _db.UserTable.Where( u => u.IsDeleted == false).ToList();
-
-            return userList;
-        }
-
-        public async Task<List<Registration>> GetAllRegistrationAsync()
-        {
-            var registrationList = _db.RegistrationTable.Where(u => u.IsDeleted == false).ToList();
-
-            return registrationList;
-        }
-
-        public bool IsUniqueUser(string username)
-        {
-            var user = _db.RegistrationTable.FirstOrDefault(u => u.Email == username);
+            var user = _db.User.FirstOrDefault(u => u.RegistrationId == userDTO.RegistrationId);
             if (user == null)
             {
                 return true;
@@ -50,13 +39,26 @@ namespace ShoppingCartAPI.Repository
 
         public async Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO)
         {
-            var userLoginFromDb = _db.UserTable.FirstOrDefault(u => u.UserName.ToLower() == loginRequestDTO.UserName.ToLower() && u.Password.ToLower() == loginRequestDTO.Password.ToLower());
+            var userNameFromDb = _db.User.FirstOrDefault(u => u.UserName.ToLower() == loginRequestDTO.UserName.ToLower() && u.IsDeleted == false);
+
+            var PasswordFromDb = _db.User.FirstOrDefault(u => u.Password.ToLower() == loginRequestDTO.Password.ToLower() && u.IsDeleted == false);
+
+            if (userNameFromDb == null && PasswordFromDb == null || userNameFromDb == null || PasswordFromDb == null) 
+            {
+                return new LoginResponseDTO()
+                {
+                    Token = "",
+                    UserRegistration = null
+                };
+            }
+
+            var userLoginFromDb = _db.User.FirstOrDefault(u => u.UserName.ToLower() == loginRequestDTO.UserName.ToLower() && u.Password.ToLower() == loginRequestDTO.Password.ToLower());
 
             string Role = string.Empty;
 
-            Role = _db.UserTable.Where(u => u.RegistrationId == userLoginFromDb.RegistrationId).Select(u => u.RoleMaster.RoleName).FirstOrDefault();
+            Role = _db.User.Where(u => u.RegistrationId == userLoginFromDb.RegistrationId).Select(u => u.RoleMaster.RoleName).FirstOrDefault();
 
-            var userRegistrationFromDb = _db.RegistrationTable.FirstOrDefault(u => u.RegistrationId == userLoginFromDb.RegistrationId);
+            var userRegistrationFromDb = _db.Registration.FirstOrDefault(u => u.RegistrationId == userLoginFromDb.RegistrationId);
 
             if (userLoginFromDb == null)
             {
@@ -98,65 +100,75 @@ namespace ShoppingCartAPI.Repository
             return loginResponseDTO;
         }
 
-        public async Task<Registration> Register(RegistrationDTO registrationRequestDTO, string userId)
+        public async Task<User> RegisterAsync(UserDTO userRegisterDTO, string userId)
         {
-            Registration userRegistration = new()
-            {
-                FirstName = registrationRequestDTO.FirstName,
-                LastName = registrationRequestDTO.LastName,
-                Gender = registrationRequestDTO.Gender,
-                Email = registrationRequestDTO.Email,
-                DateOfBirth = registrationRequestDTO.DateOfBirth,
-                ContactNo = registrationRequestDTO.ContactNo,
-                Address = registrationRequestDTO.Address,
-                PostalCode = registrationRequestDTO.PostalCode,
-                CategoryId = registrationRequestDTO.CategoryId,
-                CreatedBy = int.Parse(userId),
-                CreatedOn = DateTime.Now,
-                UpdatedBy = int.Parse(userId),
-                UpdatedOn = DateTime.Now,
-                IsDeleted = false
-            };
+            var registrationFromDb = _db.Registration.FirstOrDefault(u => u.RegistrationId == userRegisterDTO.RegistrationId);
 
-            _db.RegistrationTable.Add(userRegistration);
-            await _db.SaveChangesAsync();
-
-            //user.Password = "";
-            return userRegistration;
-        }
-
-        public async Task<User> UserRegister(UserDTO userRegisterDTO, string userId)
-        {
-            var registrationFromDb = _db.RegistrationTable.FirstOrDefault(u => u.RegistrationId == userRegisterDTO.RegistrationId);
-
-            var roleFromDb = _db.RoleMasterTable.FirstOrDefault(u => u.RoleId == userRegisterDTO.RoleId);
+            var roleFromDb = _db.RoleMaster.FirstOrDefault(u => u.RoleId == userRegisterDTO.RoleId);
 
             int userRegistrationId = 0;
-            userRegistrationId = _db.RegistrationTable.Where(u => u.RegistrationId == registrationFromDb.RegistrationId).Select(u => u.RegistrationId).FirstOrDefault();
+            userRegistrationId = _db.Registration.Where(u => u.RegistrationId == registrationFromDb.RegistrationId).Select(u => u.RegistrationId).FirstOrDefault();
 
-            string userName = _db.RegistrationTable.Where(u => u.RegistrationId == registrationFromDb.RegistrationId).Select(u => u.Email).FirstOrDefault();
+            string userName = _db.Registration.Where(u => u.RegistrationId == registrationFromDb.RegistrationId).Select(u => u.Email).FirstOrDefault();
 
-            int roleId = _db.RoleMasterTable.Where(u => u.RoleId == roleFromDb.RoleId).Select(u => u.RoleId).FirstOrDefault();
+            int roleId = _db.RoleMaster.Where(u => u.RoleId == roleFromDb.RoleId).Select(u => u.RoleId).FirstOrDefault();
 
-            User userLogin = new()
-            {
-                UserName = userName,
-                Password = userRegisterDTO.Password,
-                RoleId = roleId,
-                RegistrationId = userRegistrationId,
-                CreatedBy = int.Parse(userId),
-                CreatedOn = DateTime.Now,
-                UpdatedBy = int.Parse(userId),
-                UpdatedOn = DateTime.Now,
-                IsDeleted = false
-            };
+            User user = _mapper.Map<User>(userRegisterDTO);
 
-            _db.UserTable.Add(userLogin);
+            user.UserName = userRegisterDTO.UserName;
+            user.Password = userRegisterDTO.Password;
+            user.RoleId = roleId;
+            user.RegistrationId = userRegistrationId;
+            user.CreatedBy = int.Parse(userId);
+            user.CreatedOn = DateTime.Now;
+            user.UpdatedBy = int.Parse(userId);
+            user.UpdatedOn = DateTime.Now;
+            user.IsDeleted = false;
+
+            _db.User.Add(user);
             await _db.SaveChangesAsync();
 
-            return userLogin;
+            return user;
         }
 
-        
+        public async Task<List<User>> GetAllUserAsync()
+        {
+            var userList = await _db.User.Include(c => c.Registration).Include(u => u.RoleMaster).Where(u => u.IsDeleted == false).ToListAsync();
+            return userList;
+        }
+
+        public async Task<User> GetUserAsync(int userId)
+        {
+            var user = await _db.User.AsNoTracking().FirstOrDefaultAsync(u => u.UserId == userId && u.IsDeleted == false);
+            return user;
+        }
+
+        public async Task<User> GetUserForEnableAsync(int userId)
+        {
+            var user = await _db.User.AsNoTracking().FirstOrDefaultAsync(u => u.UserId == userId && u.IsDeleted == true);
+            return user;
+        }
+
+        public async Task<User> UpdateUserAsync(User User, string userId)
+        {
+            User.UpdatedBy = int.Parse(userId);
+            _db.Update(User);
+            await SaveAsync();
+
+            return User;
+        }
+
+        public async Task RemoveAsync(User User)
+        {
+            User.IsDeleted = true;
+            _db.Update(User);
+            await SaveAsync();
+        }
+
+        public async Task SaveAsync()
+        {
+            await _db.SaveChangesAsync();
+        }
+
     }
 }

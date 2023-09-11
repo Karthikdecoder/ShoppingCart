@@ -1,0 +1,20 @@
+﻿
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+
+    <script>
+        // Prevent the user from going back to the logout page
+        window.addEventListener('popstate', function (event) {
+            window.location.href = '/User/Login'; // Redirect to the login page
+        });
+
+        // Immediately redirect to the login page on logout
+        window.onload = function () {
+            window.history.pushState({}, '', '/User/Login'); // Add a history entry for the login page
+            window.location.href = '/User/Login'; // Redirect to the login page
+        }
+    </script>
+
+}

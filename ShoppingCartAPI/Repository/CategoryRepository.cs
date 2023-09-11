@@ -15,7 +15,7 @@ namespace ShoppingCartAPI.Repository
 
         public async Task<CategoryMaster> UpdateAsync(CategoryMaster entity)
         {
-            _db.CategoryMasterTable.Update(entity);
+            _db.CategoryMaster.Update(entity);
             await _db.SaveChangesAsync();
 
             return entity;

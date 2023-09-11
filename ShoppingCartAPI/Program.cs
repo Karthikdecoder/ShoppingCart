@@ -22,9 +22,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(option => // here the connec
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+builder.Services.AddScoped<IRegistrationRepository, RegistrationRepository>();
+
 builder.Services.AddScoped<IRoleMasterRepository, RoleMasterRepository>();
 
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+builder.Services.AddScoped<ICountryRepository, CountryRepository>();
+
+builder.Services.AddScoped<IStateRepository, StateRepository>();
+builder.Services.AddScoped<IMenuRepository, MenuRepository>();
+builder.Services.AddScoped<IMenuRoleMappingRepository, MenuRoleMappingRepository>();
 
 builder.Services.AddControllers(option =>
 {

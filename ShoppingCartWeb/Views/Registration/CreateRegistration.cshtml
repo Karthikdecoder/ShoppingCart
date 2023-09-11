@@ -1,0 +1,222 @@
+﻿@model ShoppingCartWeb.Models.VM.CreateRegistrationVM
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<br />
+<form asp-action="CreateRegistration">
+    <div class="container border p-3">
+        <style>
+            .text-dark {
+                font-size: 26px; /* You can adjust the size to your preference, e.g., 24px, 36px, etc. */
+                /* You can also use other units like em, rem, or % if you prefer. */
+            }
+        </style>
+        <h1 class="text-dark">Create Registration</h1>
+        <hr />
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="col-10 pb-3">
+                    <label asp-for="Registration.FirstName" class="control-label" style="font-size:16px;">First Name</label>
+                    <input asp-for="Registration.FirstName" class="form-control" />
+                    <span asp-validation-for="Registration.FirstName" class="text-danger"></span>
+                </div>
+
+
+                <div class="col-10 pb-3">
+                    <label asp-for="Registration.LastName" class="control-label pt-2" style="font-size:16px;">Last Name</label>
+                    <input asp-for="Registration.LastName" class="form-control" />
+                    <span asp-validation-for="Registration.LastName" class="text-danger"></span>
+                </div>
+
+
+                <div class="col-10 pb-3">
+                    <label asp-for="Registration.Gender" class="control-label pt-2" style="font-size: 16px;">Gender</label>
+
+                    <div class="form-check form-check-inline ml-2">
+
+                        <input class="form-check-input" type="radio" asp-for="Registration.Gender" value="Male" />
+
+                        <label class="form-check-label" for="Registration.Gender">Male</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" asp-for="Registration.Gender" value="Female" />
+                        <label class="form-check-label" for="Registration.Gender">Female</label>
+                    </div>
+                    <br />
+                    <span asp-validation-for="Registration.Gender" class="text-danger"></span>
+                </div>
+
+                <div class="col-10 pb-3">
+                    <label asp-for="Registration.CategoryId" class="control-label pt-2" style="font-size:16px;">Category</label>
+                    <select asp-for="Registration.CategoryId" class="form-control" asp-items="@Model.CategoryList">
+                        <option disabled selected>--Select Category--</option>
+                    </select>
+                    <span asp-validation-for="Registration.CategoryId" class="text-danger"></span>
+                </div>
+
+
+                <div class="col-10 pb-3">
+                    <label asp-for="Registration.DateOfBirth" class="control-label pt-2" style="font-size:16px;">Date Of Birth</label>
+                    <input value="" asp-for="Registration.DateOfBirth" class="form-control" required />
+                    <span asp-validation-for="Registration.DateOfBirth" class="text-danger"></span>
+                </div>
+
+
+                <div class="col-10 pb-3">
+                    <label asp-for="Registration.Email" class="control-label pt-2" style="font-size:16px;">Email</label>
+                    <input asp-for="Registration.Email" class="form-control" />
+                    <span asp-validation-for="Registration.Email" class="text-danger"></span>
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6">
+                <div class="col-10 pb-3">
+                    <label asp-for="Registration.ContactNo" class="control-label pt-2" style="font-size:16px;">Contact Number</label>
+                    <input asp-for="Registration.ContactNo" class="form-control" />
+                    <span asp-validation-for="Registration.ContactNo" class="text-danger"></span>
+                </div>
+
+                <div class="col-10 pb-3">
+                    <label asp-for="Registration.Address" class="control-label pt-2" style="font-size:16px;">Address</label>
+                    <textarea asp-for="Registration.Address" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Registration.Address" class="text-danger"></span>
+                </div>
+
+
+                <div class="col-10 pb-3">
+                    <label asp-for="Registration.PostalCode" class="control-label pt-2" style="font-size:16px;">Postal Code</label>
+                    <input asp-for="Registration.PostalCode" class="form-control" />
+                    <span asp-validation-for="Registration.PostalCode" class="text-danger"></span>
+                </div>
+
+                <div class="col-10 pb-3">
+                    <label asp-for="Registration.CountryId" class="control-label pt-2" style="font-size:16px;">Country</label>
+
+                    <select asp-for="Registration.CountryId" id="countryId" class="form-control" asp-items="@Model.CountryList" required>
+                        <option value="">--Select Country--</option>
+                    </select>
+
+                    <span asp-validation-for="Registration.CountryId" class="text-danger"></span>
+                </div>
+
+                <div class="col-2">
+                </div>
+                <div class="col-10 pb-3">
+
+                    <label asp-for="Registration.StateId" class="control-label pt-2" style="font-size:16px;">State</label>
+
+                    <select asp-for="Registration.StateId" id="stateDropdown" class="form-control" required>
+                        <option value="" disabled selected>--Select State--</option>
+                    </select>
+
+                    <span asp-validation-for="Registration.StateId" class="text-danger"></span>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+
+            <div class="col-md-7"></div>
+            <div class="col-md-4">
+
+                <br />
+                <br />
+
+                <div class="row">
+                    <div class="col-4">
+                        <a asp-action="IndexRegistration" asp-controller="Registration" class="btn-primary btn form-control">Cancel</a>
+                    </div>
+                    <div class="col-4">
+                        <input type="submit" value="Save" class="btn btn-success form-control" />
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts
+    {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        // When the document is ready (page is loaded)
+        $(document).ready(function () {
+
+            // When the "countryId" dropdown selection changes
+            $("#countryId").change(function () {
+
+                // Get the selected value of the "countryId" dropdown
+                var countryId = $(this).val();
+
+                // Set the state dropdown to have no selected value (clear the selection)
+                $("#stateDropdown").val("");
+
+                // Check if a country is selected
+                if (countryId !== "") {
+                    // If a country is selected, make an AJAX request to get the states for the selected country
+                    $.ajax({
+                        url: '@Url.Action("GetStateByCountryId", "Registration")', // URL for the AJAX request
+                        data: { countryId: countryId }, // Data to send to the server
+                        type: 'GET', // HTTP request type (GET in this case)
+                        dataType: 'json', // Expected data type in the response (JSON in this case)
+                        success: function (states) { // Function to execute when the request is successful
+
+                            // Empty the "stateDropdown" to remove existing options
+                            $("#stateDropdown").empty();
+
+                            // Add a default option for "Select State" that is disabled and selected by default
+                            $("#stateDropdown").append('<option value="" disabled selected>--Select State--</option>');
+
+                            // Loop through the retrieved states and add them as options to the "stateDropdown"
+                            $.each(states, function (i, state) {
+                                $("#stateDropdown").append('<option value="' + state.stateId + '">' + state.stateName + '</option>');
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+
+
+                //$(document).ready(function () {
+                //    $("#countryId").change(function () {
+                //        var countryId = $(this).val();
+
+                //        //$("#stateDropdown").empty();
+
+                //        if (countryId !== "") {
+                //            $.ajax({
+                //                url: '@Url.Action("GetStateByCountryId", "Registration")',
+                //                data: { countryId: countryId },
+                //                type: 'GET',
+                //                dataType: 'json',
+                //                success: function (states) {
+
+                //                    //alert(JSON.stringify(states));
+
+                //                    $.each(states, function (i, state) {
+
+                //                        //alert(state.stateId
+                //                        $("#stateDropdown").append('<option value="' + state.stateId + '">' + state.stateName + '</option>');
+
+                //                    });
+                //                }
+                //            });
+                //        }
+                //    });
+                //});
+    </script>
+}

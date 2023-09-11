@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace ShoppingCartAPI.Models
+namespace ShoppingCartAPI.Models.Dto
 {
     public class RoleMasterDTO
     {
@@ -12,9 +12,6 @@ namespace ShoppingCartAPI.Models
         [Required(ErrorMessage = "Role is required")]
         [RegularExpression(@"^[a-zA-Z '-]{2,20}$", ErrorMessage = "Invalid Role")]
         public string RoleName { get; set; }
-
-
-
         public int CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
         public int UpdatedBy { get; set; }

@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShoppingCartAPI.Models;
+using ShoppingCartAPI.Models.Dto;
 using ShoppingCartAPI.Repository.IRepository;
+using System.Data;
 using System.Net;
 using System.Security.Claims;
 
@@ -9,19 +12,19 @@ namespace ShoppingCartAPI.Controllers
 {
     [Route("api/RoleMaster")]
     [ApiController]
-    public class RoleMasterController : ControllerBase
+    public class RoleMasterController : ControllerBase  
     {
         protected APIResponse _response;
         private readonly IMapper _mapper;
         private readonly IRoleMasterRepository _dbRoles;
-        private string _userID;
+        private string _userId;
 
         public RoleMasterController(IRoleMasterRepository roleMasterRepository, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _dbRoles = roleMasterRepository;
             _mapper = mapper;
             _response = new();
-            _userID = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.SerialNumber);
+            _userId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
 
         [HttpGet]
@@ -32,7 +35,7 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                IEnumerable<RoleMaster> roleList = await _dbRoles.GetAllAsync(u => u.IsDeleted == false);
+                IEnumerable<RoleMaster> roleList = await _dbRoles.GetAllAsync();
                 _response.Result = _mapper.Map<List<RoleMasterDTO>>(roleList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
@@ -83,8 +86,8 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [Route("CreateRole")]
-        //[Authorize(Roles = "admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -92,10 +95,12 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                if (await _dbRoles.GetAsync(u => u.RoleName == roleMasterDTO.RoleName && u.IsDeleted == false) != null)
+                if (await _dbRoles.GetAsync(u => u.RoleName == roleMasterDTO.RoleName) != null)
                 {
-                    ModelState.AddModelError("ErrorMessages", "Role already exists!");
-                    return BadRequest(ModelState);
+                    //ModelState.AddModelError("ErrorMessages", "Role already exists!");
+                    //return BadRequest(ModelState);
+                    _response.ResponseMessage = new List<string>() { "Already Exists" };
+                    return BadRequest(_response);
                 }
                 
                 if (roleMasterDTO == null)
@@ -105,15 +110,22 @@ namespace ShoppingCartAPI.Controllers
 
                 RoleMaster roleMaster = _mapper.Map<RoleMaster>(roleMasterDTO);
 
+                if (_userId == null)
+                {
+                    _userId = "0";
+                }
+
                 roleMaster.CreatedOn = DateTime.Now;
+                roleMaster.CreatedBy = int.Parse(_userId);
                 roleMaster.UpdatedOn = DateTime.Now;
+                roleMaster.UpdatedBy = int.Parse(_userId);
                 roleMaster.IsDeleted = false;
                 await _dbRoles.CreateAsync(roleMaster);
 
                 _response.Result = _mapper.Map<RoleMasterDTO>(roleMaster);
                 _response.StatusCode = HttpStatusCode.Created;
 
-                return Ok();
+                return Ok(_response);
             }
             catch (Exception ex)
             {
@@ -123,8 +135,8 @@ namespace ShoppingCartAPI.Controllers
             return _response;
         }
 
-        //[Authorize(Roles = "admin")]
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
         [Route("RemoveRole")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -163,6 +175,7 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         [Route("UpdateRole")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -181,9 +194,68 @@ namespace ShoppingCartAPI.Controllers
                     return BadRequest(ModelState);
                 }
 
+                if (await _dbRoles.GetAsync(u => u.RoleName == roleMasterDTO.RoleName && u.RoleId != roleMasterDTO.RoleId && u.RoleId != roleMasterDTO.RoleId) != null)
+                {
+                    _response.ResponseMessage = new List<string>() { "Already Exists" };
+                    return BadRequest(_response);
+                }
+
                 RoleMaster model = _mapper.Map<RoleMaster>(roleMasterDTO);
 
+                if (_userId == null)
+                {
+                    _userId = "0";
+                }
+
                 model.UpdatedOn = DateTime.Now;
+                model.UpdatedBy = int.Parse(_userId);
+                model.IsDeleted = false;
+                await _dbRoles.UpdateAsync(model);
+
+                _response.StatusCode = HttpStatusCode.NoContent;
+                _response.IsSuccess = true;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
+
+        [HttpPut]
+        [Authorize(Roles = "Admin")]
+        [Route("EnableRole")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponse>> EnableRole(int roleId)
+        {
+            try
+            {
+                if (roleId == 0)
+                {
+                    _response.StatusCode = HttpStatusCode.BadRequest;
+                    return BadRequest(_response);
+                }
+
+                var roleMasterDTO = await _dbRoles.GetAsync(u => u.RoleId == roleId && u.IsDeleted == true);
+
+                if (roleMasterDTO == null)
+                {
+                    _response.StatusCode = HttpStatusCode.NotFound;
+                    return NotFound(_response);
+                }
+
+                RoleMaster model = _mapper.Map<RoleMaster>(roleMasterDTO);
+
+                if (_userId == null)
+                {
+                    _userId = "0";
+                }
+
+                model.UpdatedOn = DateTime.Now;
+                model.UpdatedBy = int.Parse(_userId);
                 model.IsDeleted = false;
                 await _dbRoles.UpdateAsync(model);
 
@@ -199,4 +271,5 @@ namespace ShoppingCartAPI.Controllers
             return _response;
         }
     }
+
 }

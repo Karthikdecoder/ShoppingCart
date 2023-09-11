@@ -10,10 +10,13 @@ namespace ShoppingCartAPI.Data
             
         }
 
-        public DbSet<Registration> RegistrationTable { get; set; }
-        public DbSet<RoleMaster> RoleMasterTable { get; set; }
-        public DbSet<CategoryMaster> CategoryMasterTable { get; set; }
-        public DbSet<User> UserTable { get; set; }
-
+        public DbSet<RoleMaster> RoleMaster { get; set; }
+        public DbSet<CategoryMaster> CategoryMaster { get; set; }
+        public DbSet<CountryMaster> CountryMaster { get; set; }
+        public DbSet<StateMaster> StateMaster { get; set; }
+        public DbSet<User> User { get; set; }
+        public DbSet<Registration> Registration { get; set; }
+        public DbSet<Menu> Menu { get; set; }
+        public DbSet<MenuRoleMapping> MenuRoleMapping { get; set; }
     }
 }

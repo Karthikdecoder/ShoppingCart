@@ -1,0 +1,22 @@
+﻿@model ShoppingCartWeb.Models.Dto.RegistrationDTO
+
+
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-6">
+            <p><strong>FirstName:</strong> <span id="FirstName">@Model.FirstName</span></p>
+            <p><strong>LastName:</strong> <span id="LastName">@Model.LastName</span></p>
+            <p><strong>CategoryName:</strong> <span id="CategoryName">@Model.CategoryMaster.CategoryName</span></p>
+            <p><strong>Gender:</strong> <span id="Gender">@Model.Gender</span></p>
+            <p><strong>DateOfBirth:</strong> <span id="DateOfBirth">@Model.DateOfBirth.ToString("dd-MM-yyyy")</span></p>
+            <p><strong>Email:</strong> <span id="Email">@Model.Email</span></p>
+        </div>
+        <div class="col-md-6">
+            <p><strong>ContactNo:</strong> <span id="ContactNo">@Model.ContactNo</span></p>
+            <p><strong>Address:</strong> <span id="Address">@Model.Address</span></p>
+            <p><strong>PostalCode:</strong> <span id="PostalCode">@Model.PostalCode</span></p>
+            <p><strong>StateName:</strong> <span id="StateName">@Model.StateMaster.StateName</span></p>
+            <p><strong>CountryName:</strong> <span id="CountryName">@Model.CountryMaster.CountryName</span></p>
+        </div>
+    </div>
+</div>

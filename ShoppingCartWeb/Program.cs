@@ -4,6 +4,7 @@ using ShoppingCartWeb.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,14 +13,24 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 
-builder.Services.AddHttpClient<IAuthService, AuthService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddHttpClient<IUserService, UserService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddHttpClient<IRoleService, RoleService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 
 builder.Services.AddHttpClient<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+builder.Services.AddHttpClient<IRegistrationService, RegistrationService>();
+builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+
+builder.Services.AddHttpClient<ICountryService, CountryService>();
+builder.Services.AddScoped<ICountryService, CountryService>();
+
+builder.Services.AddHttpClient<IStateService, StateService>();
+builder.Services.AddScoped<IStateService, StateService>();
+
 
 builder.Services.AddDistributedMemoryCache();
 
@@ -34,18 +45,24 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddHttpContextAccessor();
 
-//builder.Services.AddRazorPages(options =>
-//{
-//    options.Conventions.AddPageRoute("/Auth/Login", "");
-//});
+// check this for preventing browser back afterwards !!!!!!!!!!!
+builder.Services.AddMvc(options =>
+{
+    options.Filters.Add(new ResponseCacheAttribute
+    {
+        NoStore = true,
+        Location = ResponseCacheLocation.None
+    });
+});
+
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
               .AddCookie(options =>
               {
                   options.Cookie.HttpOnly = true;
                   options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-                  options.LoginPath = "/Auth/Login";
-                  options.AccessDeniedPath = "/Auth/AccessDenied";
+                  options.LoginPath = "/User/Login";
+                  options.AccessDeniedPath = "/User/AccessDenied";
                   options.SlidingExpiration = true;
               });
 
@@ -70,12 +87,8 @@ app.UseAuthorization();
 
 app.UseSession();
 
-//app.MapControllerRoute(
-//    name: "default",
-//    pattern: "{controller=Home}/{action=Index}/{id?}");
-
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Auth}/{action=Login}/{id?}");
+    pattern: "{controller=User}/{action=Login}/{id?}");
 
 app.Run();

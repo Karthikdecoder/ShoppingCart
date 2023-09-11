@@ -1,0 +1,51 @@
+﻿@model ShoppingCartWeb.Models.VM.UpdateRoleMasterVM
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<br />
+<form method="Post" asp-action="UpdateRoleMaster">
+    <div class="container border p-3">
+        <style>
+            .text-dark {
+                font-size: 24px; /* You can adjust the size to your preference, e.g., 24px, 36px, etc. */
+                /* You can also use other units like em, rem, or % if you prefer. */
+            }
+        </style>
+        <h1 class="text-dark">Roles</h1>
+        <hr />
+
+        <input hidden asp-for="RoleMasterDTO.RoleId" />
+        <input hidden asp-for="RoleMasterDTO.CreatedBy" />
+        <input hidden asp-for="RoleMasterDTO.CreatedOn" />
+        <input hidden asp-for="CurrentPage" />
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row pb-3">
+                    <div class="col-2">
+                        <label asp-for="RoleMasterDTO.RoleName" class="control-label pt-2" style="font-size:17px;">Role</label>
+                    </div>
+                    <div class="col-md-7 pb-4">
+                        <input asp-for="RoleMasterDTO.RoleName" class="form-control" />
+                        <span asp-validation-for="RoleMasterDTO.RoleName" class="text-danger"></span>
+                    </div>
+
+
+                    <div class="col-2 offset-5">
+                        <a asp-action="IndexRoleMaster" asp-controller="RoleMaster" class="btn-primary btn form-control " style="font-size: 14px;">Cancel</a>
+                    </div>
+                    <div class="col-2">
+                        <input type="submit" value="Update" class="btn btn-success form-control" style="font-size: 13px;">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts
+    {
+    <partial name="_ValidationScriptsPartial" />
+}

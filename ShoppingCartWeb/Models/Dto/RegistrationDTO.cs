@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace ShoppingCartWeb.Models.Dto
 {
@@ -7,7 +8,7 @@ namespace ShoppingCartWeb.Models.Dto
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int UserRegistrationId { get; set; }
+        public int RegistrationId { get; set; }
 
         [Required(ErrorMessage = "First Name is required")]
         [RegularExpression(@"^[a-zA-Z '-]{2,20}$", ErrorMessage = "Invalid First Name")]
@@ -17,12 +18,19 @@ namespace ShoppingCartWeb.Models.Dto
         [RegularExpression(@"^[a-zA-Z '-]{1,20}$", ErrorMessage = "Invalid Last Name")]
         public string LastName { get; set; }
 
+        public CategoryMasterDTO CategoryMaster { get; set; }
+
+        [Required]
+        [ValidateNever]
+        [ForeignKey("CategoryMaster")]
+        public int CategoryId { get; set; }
+
+        [Required(ErrorMessage = "Gender is required")]
         [RegularExpression("^(Male|Female|Other)$", ErrorMessage = "Gender must be 'Male', 'Female', or 'Other'.")]
         public string Gender { get; set; }
 
         [Required(ErrorMessage = "Date of birth is required")]
         [DataType(DataType.Date, ErrorMessage = "Invalid Date Of Birth")]
-        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime DateOfBirth { get; set; }
 
         [Required(ErrorMessage = "Email address is required")]
@@ -37,12 +45,24 @@ namespace ShoppingCartWeb.Models.Dto
         [StringLength(100, MinimumLength = 10, ErrorMessage = "Address must be between 10 and 100 characters")]
         public string Address { get; set; }
 
-        [RegularExpression(@"^\d{6}$", ErrorMessage = "Postal code must be a 5-digit number.")]
+        [Required(ErrorMessage = "Postal Code is required")]
+        [RegularExpression(@"^(?!000000)\d{6}$", ErrorMessage = "Postal code must be a 6-digit number and should not be '000000'.")]
         public string PostalCode { get; set; }
 
+
+        public StateMasterDTO StateMaster { get; set; }
+
         [Required]
-        [ForeignKey("CategoryMaster")]
-        public int CategoryId { get; set; }
+        [ValidateNever]
+        [ForeignKey("StateMaster")]
+        public int StateId { get; set; }
+
+        public CountryMasterDTO CountryMaster { get; set; }
+
+        [Required]
+        [ValidateNever]
+        [ForeignKey("CountryMaster")]
+        public int CountryId { get; set; }
 
         public int CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }

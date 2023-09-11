@@ -1,0 +1,229 @@
+﻿@model ShoppingCartWeb.Models.VM.RegisterVM
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br />
+<form asp-action="Register">
+    <div class="container border p-3">
+        <style>
+            .text-dark {
+                font-size: 24px; /* You can adjust the size to your preference, e.g., 24px, 36px, etc. */
+                /* You can also use other units like em, rem, or % if you prefer. */
+            }
+        </style>
+        <h1 class="text-dark">Add User</h1>
+        <hr />
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row pb-3">
+
+
+
+                    <div class="col-md-3">
+                        <label for="User.RegistrationId" class="control-label pt-2" style="font-size:14px;"> Registered Name </label>
+                    </div>
+                    <div class="col-md-9 pb-4">
+                        <input type="text" id="Name" class="form-control" />
+                        <input type="hidden" id="registrationId" asp-for="User.RegistrationId" />
+
+                    </div>
+
+
+
+                    <div class="col-md-3">
+                        <label asp-for="User.UserName" class="control-label pt-2" style="font-size:14px;">User Name</label>
+                    </div>
+                    <div class="col-md-9 pb-4">
+                        <input asp-for="User.UserName" class="form-control" />
+                        <span asp-validation-for="User.UserName" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="User.Password" class="control-label pt-2" style="font-size:14px;"> Password </label>
+                    </div>
+                    <div class="col-md-9 pb-4">
+                        <input asp-for="User.Password" class="form-control" />
+                        <span asp-validation-for="User.Password" class="text-danger"></span>
+                    </div>
+
+
+                    <div class="col-md-3">
+                        <label asp-for="User.RoleId" class="control-label pt-2" style="font-size:14px;">Role</label>
+                    </div>
+                    <div class="col-md-9 pb-4">
+                        <select asp-for="User.RoleId" class="form-control" asp-items="@Model.roleList">
+                            <option disabled selected>--Select Role--</option>
+                        </select>
+                        <span asp-validation-for="User.RoleId" class="text-danger"></span>
+                    </div>
+                </div>
+
+
+                <div class="row">
+
+                    <div class="col-3 offset-6">
+                        <a asp-action="IndexUser" asp-controller="User" class="btn-primary btn form-control ">Cancel</a>
+                    </div>
+                    <div class="col-3">
+                        <input type="submit" value="Save" class="btn btn-success form-control" />
+                    </div>
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+
+
+</form>
+
+@section Scripts
+    {
+    <partial name="_ValidationScriptsPartial" />
+
+
+    <!-- this is for auto search -->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script>
+        $(function () {
+            $("#Name").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: '@Url.Action("GetRegistrationName", "User")',
+                        type: "POST",
+                        dataType: "json",
+                        data: { prefix: request.term },
+                        success: function (nameList) {
+
+                            var mappedData = $.map(nameList, function (item) {
+                                return {
+
+                                    label: item.firstName, // Displayed in the suggestion list
+                                    value: item.firstName, // Value put in the input field
+                                    registrationId: item.registrationId // Additional data you might need
+                                };
+                            });
+
+                            // Pass the mapped data to the response
+                            response(mappedData);
+                        },
+                        error: function () {
+                            alert(response.responseText);
+                        },
+                        failure: function () {
+                            alert(response.responseText);
+                        }
+                    });
+                },
+                select: function (e, ui) {
+                    $("#Name").val(ui.item.value);
+                    $("#registrationId").val(ui.item.registrationId);
+                },
+                minLength: 1
+            });
+        });
+    </script>
+
+    <script type="text/javascript">
+
+        //$(document).ready(function () {
+        //    $("#firstName").autocomplete({
+        //        source: function (request, response) {
+        //            $.ajax({
+        //                url: "/User/GetRegistrationName",
+        //                type: "POST",
+        //                dataType: "json",
+        //                data: { Prefix: request.term },
+        //                success: function (data) {
+        //                    console.log("Data received from server:", data);
+
+
+        //                    var suggestions = $.map(data, function (item) {
+        //                        return { label: item.registrationId, value: item.firstName };
+        //                    });
+
+        //                    console.log("Suggestions:", suggestions);
+
+        //                    response(suggestions);
+        //                },
+        //                error: function (xhr, status, error) {
+        //                    console.error("AJAX Error:", status, error);
+        //                }
+        //            });
+        //        },
+        //        messages: {
+        //            noResults: "No results found",
+        //            results: "Results found"
+        //        }
+        //    });
+        //});
+
+
+                //$(document).ready(function () {
+                //    $("#Name").autocomplete({
+                //        source: function (request, response) {
+
+                //            $.ajax({
+                //                url: "/User/GetRegistrationName",
+                //                type: "POST",
+                //                dataType: "json",
+                //                data: { Prefix: request.term },
+                //                success: function (data) {
+                //                    console.log(data); // Check the data received in the console
+                //                    response($.map(data, function (item) {
+                //                        return { label: item.RegistrationId, value: item.RegistrationId };
+                //                    }));
+                //                }
+                //            })
+                //        },
+                //        messages: {
+                //            noResults: "", results: ""
+                //        }
+                //    });
+                //})
+                //$(document).ready(function () {
+                //    $("#Name").autocomplete({
+                //        source: function (request, response) {
+                //            $.ajax({
+                //                url: "/User/GetRegistrationName", // Update the URL to match your controller action
+                //                type: "POST",
+                //                dataType: "json",
+                //                data: { term: request.term },
+                //                success: function (data) {
+                //                    // Display the suggestions in the #autocomplete-suggestions div
+                //                    var suggestionsHtml = "";
+                //                    $.each(data, function (index, item) {
+                //                        suggestionsHtml += "<div class='autocomplete-suggestion'>" + item + "</div>";
+                //                    });
+                //                    $("#autocomplete-suggestions").html(suggestionsHtml);
+
+                //                    // Handle click on a suggestion to fill the input field
+                //                    $(".autocomplete-suggestion").click(function () {
+                //                        var suggestionText = $(this).text();
+                //                        $("#Name").val(suggestionText);
+                //                        $("#autocomplete-suggestions").empty();
+                //                    });
+                //                }
+                //            });
+                //        },
+                //        minLength: 2, // Minimum characters to trigger autocomplete
+                //        messages: {
+                //            noResults: "", results: ""
+                //        },
+                //        // Prevent the input field from being populated with a suggestion on focus
+                //        focus: function (event, ui) {
+                //            event.preventDefault();
+                //        }
+                //    });
+                //});
+
+        
+    </script>
+}

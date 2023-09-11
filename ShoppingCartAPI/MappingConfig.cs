@@ -12,6 +12,8 @@ namespace ShoppingCartAPI
             CreateMap<Registration, RegistrationDTO>().ReverseMap();
             CreateMap<RoleMaster, RoleMasterDTO>().ReverseMap();
             CreateMap<CategoryMaster, CategoryMasterDTO>().ReverseMap();
-        }
+			CreateMap<StateMaster, StateMasterDTO>().ReverseMap();
+			CreateMap<CountryMaster, CountryMasterDTO>().ReverseMap();
+		}
     }
 }

@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ShoppingCartWeb.Models;
+using System.Data;
 using System.Diagnostics;
 
 namespace ShoppingCartWeb.Controllers
@@ -13,6 +15,7 @@ namespace ShoppingCartWeb.Controllers
             _logger = logger;
         }
 
+        [Authorize]
         public IActionResult Index()
         {
             return View();

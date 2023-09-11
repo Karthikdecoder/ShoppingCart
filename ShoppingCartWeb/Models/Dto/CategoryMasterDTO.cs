@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace ShoppingCartWeb.Models.Dto
 {
@@ -12,9 +13,6 @@ namespace ShoppingCartWeb.Models.Dto
         [Required(ErrorMessage = "Category is required")]
         [RegularExpression(@"^[a-zA-Z '-]{2,20}$", ErrorMessage = "Invalid Category")]
         public string CategoryName { get; set; }
-
-
-
         public int CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
         public int UpdatedBy { get; set; }

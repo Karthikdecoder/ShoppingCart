@@ -1,0 +1,112 @@
+﻿@model ShoppingCartWeb.Models.VM.RemoveRegistrationVM
+
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<br />
+<form asp-action="RemoveRegistration">
+    <div class="container border p-3">
+        <h1 class="text-dark">Remove Registration</h1>
+        <hr />
+        <input hidden asp-for="Registration.RegistrationId" />
+        <div class="row">
+
+            <div class="col-2">
+                <label asp-for="Registration.RegistrationId" class="control-label pt-2" style="font-size:20px;">Id</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Registration.RegistrationId" disabled class="form-control" />
+            </div>
+
+            <div class="col-2">
+                <label asp-for="Registration.FirstName" class="control-label pt-2" style="font-size:20px;">First Name</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Registration.FirstName" disabled class="form-control" />
+            </div>
+
+            <div class="col-2">
+                <label asp-for="Registration.LastName" class="control-label pt-2" style="font-size:20px;">Last Name</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Registration.LastName" disabled class="form-control" />
+            </div>
+
+            <div class="col-2">
+                <label asp-for="Registration.Gender" class="control-label pt-2" style="font-size:20px;">Gender</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Registration.Gender" disabled class="form-control" />
+            </div>
+
+            <div class="col-2">
+                <label asp-for="Registration.DateOfBirth" class="control-label pt-2" style="font-size:20px;">Date Of Birth</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Registration.DateOfBirth" disabled class="form-control" />
+            </div>
+
+            <div class="col-2">
+                <label asp-for="Registration.CategoryId" class="control-label pt-2" style="font-size:20px;">Category</label>
+            </div>
+            <div class="col-10 pb-3">
+                <select asp-for="Registration.CategoryId" disabled class="form-select" asp-items="@Model.CategoryList">
+                    <option disabled selected>--Select Category--</option>
+                </select>
+            </div>
+
+            <div class="col-2">
+                <label asp-for="Registration.Email" class="control-label pt-2" style="font-size:20px;">Email</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Registration.Email" disabled class="form-control" />
+            </div>
+
+            <div class="col-2">
+                <label asp-for="Registration.Address" class="control-label pt-2" style="font-size:20px;">Address</label>
+            </div>
+            <div class="col-10 pb-3">
+                <textarea asp-for="Registration.Address" disabled class="form-control" rows="5"></textarea>
+            </div>
+
+            <div class="col-2">
+                <label asp-for="Registration.PostalCode" class="control-label pt-2" style="font-size:20px;">Postal Code</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Registration.PostalCode" disabled class="form-control" />
+            </div>
+
+            <div class="col-2">
+                <label asp-for="Registration.StateId" class="control-label pt-2" style="font-size:20px;">State</label>
+            </div>
+            <div class="col-10 pb-3">
+                <select asp-for="Registration.StateId" disabled class="form-select" asp-items="@Model.StateList">
+                    <option disabled selected>--Select State--</option>
+                </select>
+            </div>
+
+            <div class="col-2">
+                <label asp-for="Registration.CountryId" class="control-label pt-2" style="font-size:20px;">Country</label>
+            </div>
+            <div class="col-10 pb-3">
+                <select asp-for="Registration.CountryId" disabled class="form-select" asp-items="@Model.CountryList">
+                    <option disabled selected>--Select Country--</option>
+                </select>
+            </div>
+
+            <div class="col-5 offset-2">
+                <a asp-action="IndexRegistration" asp-controller="Registration" class="btn-primary btn form-control ">Cancel</a>
+            </div>
+            <div class="col-5">
+                <input type="submit" value="Delete" class="btn btn-danger form-control" />
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts
+    {
+    <partial name="_ValidationScriptsPartial" />
+
+}

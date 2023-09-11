@@ -1,0 +1,59 @@
+﻿@model ShoppingCartWeb.Models.VM.RemoveUserVM
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<br />
+<form asp-action="RemoveUser">
+    <div class="container border p-3">
+        <h1 class="text-dark">Remove User</h1>
+        <hr />
+        <input hidden asp-for="User.UserId" />
+        <div class="row">
+
+            <div class="col-2">
+                <label asp-for="User.UserName" class="control-label pt-2" style="font-size:20px;">User Name</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="User.UserName" disabled class="form-control" />
+            </div>
+
+            <div class="col-2">
+                <label asp-for="User.Password" class="control-label pt-2" style="font-size:20px;">Password</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="User.Password" placeholder="@Model.User.Password" disabled class="form-control" />
+            </div>
+
+            <div class="col-2">
+                <label asp-for="User.RegistrationId" class="control-label pt-2" style="font-size:20px;">Registration Name</label>
+            </div>
+            <div class="col-10 pb-3">
+                <select asp-for="User.RegistrationId" disabled class="form-select" asp-items="@Model.registrationList">
+                    <option disabled selected>--Select Registration--</option>
+                </select>
+            </div>
+
+            <div class="col-2">
+                <label asp-for="User.RoleId" class="control-label pt-2" style="font-size:20px;">Role</label>
+            </div>
+            <div class="col-10 pb-3">
+                <select asp-for="User.RoleId" disabled class="form-select" asp-items="@Model.roleList">
+                    <option disabled selected>--Select Role--</option>
+                </select>
+            </div>
+
+            <div class="col-5 offset-2">
+                <a asp-action="IndexUser" asp-controller="User" class="btn-primary btn form-control ">Cancel</a>
+            </div>
+            <div class="col-5">
+                <input type="submit" value="Delete" class="btn btn-danger form-control" />
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts
+    {
+    <partial name="_ValidationScriptsPartial" />
+}

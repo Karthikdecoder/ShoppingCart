@@ -51,7 +51,116 @@ namespace ShoppingCartAPI.Migrations
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("CategoryMasterTable");
+                    b.ToTable("CategoryMaster");
+                });
+
+            modelBuilder.Entity("ShoppingCartAPI.Models.CountryMaster", b =>
+                {
+                    b.Property<int>("CountryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CountryId"));
+
+                    b.Property<string>("CountryName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("CountryId");
+
+                    b.ToTable("CountryMaster");
+                });
+
+            modelBuilder.Entity("ShoppingCartAPI.Models.Menu", b =>
+                {
+                    b.Property<int>("MenuId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MenuId"));
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MenuName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ParentId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
+                    b.Property<int>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("MenuId");
+
+                    b.ToTable("Menu");
+                });
+
+            modelBuilder.Entity("ShoppingCartAPI.Models.MenuRoleMapping", b =>
+                {
+                    b.Property<int>("MenuRoleMappingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MenuRoleMappingId"));
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MenuId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("MenuRoleMappingId");
+
+                    b.HasIndex("MenuId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("MenuRoleMapping");
                 });
 
             modelBuilder.Entity("ShoppingCartAPI.Models.Registration", b =>
@@ -74,6 +183,9 @@ namespace ShoppingCartAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("CountryId")
+                        .HasColumnType("int");
+
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
@@ -92,6 +204,7 @@ namespace ShoppingCartAPI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Gender")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
@@ -102,7 +215,11 @@ namespace ShoppingCartAPI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PostalCode")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StateId")
+                        .HasColumnType("int");
 
                     b.Property<int>("UpdatedBy")
                         .HasColumnType("int");
@@ -114,7 +231,11 @@ namespace ShoppingCartAPI.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("RegistrationTable");
+                    b.HasIndex("CountryId");
+
+                    b.HasIndex("StateId");
+
+                    b.ToTable("Registration");
                 });
 
             modelBuilder.Entity("ShoppingCartAPI.Models.RoleMaster", b =>
@@ -146,7 +267,44 @@ namespace ShoppingCartAPI.Migrations
 
                     b.HasKey("RoleId");
 
-                    b.ToTable("RoleMasterTable");
+                    b.ToTable("RoleMaster");
+                });
+
+            modelBuilder.Entity("ShoppingCartAPI.Models.StateMaster", b =>
+                {
+                    b.Property<int>("StateId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StateId"));
+
+                    b.Property<int>("CountryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("StateName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("StateId");
+
+                    b.HasIndex("CountryId");
+
+                    b.ToTable("StateMaster");
                 });
 
             modelBuilder.Entity("ShoppingCartAPI.Models.User", b =>
@@ -192,7 +350,26 @@ namespace ShoppingCartAPI.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserTable");
+                    b.ToTable("User");
+                });
+
+            modelBuilder.Entity("ShoppingCartAPI.Models.MenuRoleMapping", b =>
+                {
+                    b.HasOne("ShoppingCartAPI.Models.Menu", "Menu")
+                        .WithMany()
+                        .HasForeignKey("MenuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ShoppingCartAPI.Models.RoleMaster", "RoleMaster")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Menu");
+
+                    b.Navigation("RoleMaster");
                 });
 
             modelBuilder.Entity("ShoppingCartAPI.Models.Registration", b =>
@@ -203,7 +380,34 @@ namespace ShoppingCartAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ShoppingCartAPI.Models.CountryMaster", "CountryMaster")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ShoppingCartAPI.Models.StateMaster", "StateMaster")
+                        .WithMany()
+                        .HasForeignKey("StateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("CategoryMaster");
+
+                    b.Navigation("CountryMaster");
+
+                    b.Navigation("StateMaster");
+                });
+
+            modelBuilder.Entity("ShoppingCartAPI.Models.StateMaster", b =>
+                {
+                    b.HasOne("ShoppingCartAPI.Models.CountryMaster", "CountryMaster")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CountryMaster");
                 });
 
             modelBuilder.Entity("ShoppingCartAPI.Models.User", b =>

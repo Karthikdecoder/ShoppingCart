@@ -1,0 +1,59 @@
+﻿<!-- Modal Code (inside the partial view) -->
+<div class="modal fade" id="registrationModal" tabindex="-1" role="dialog" aria-labelledby="registrationModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!-- Modal HTML as before -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="registrationModalLabel">Registereeed Person Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>FirstName:</strong> <span id="FirstName"></span></p>
+                <p><strong>LastName:</strong> <span id="LastName"></span></p>
+                <p><strong>CategoryName:</strong> <span id="CategoryName"></span></p>
+                <p><strong>Gender:</strong> <span id="Gender"></span></p>
+                <p><strong>DateOfBirth:</strong> <span id="DateOfBirth"></span></p>
+                <p><strong>Email:</strong> <span id="Email"></span></p>
+                <p><strong>ContactNo:</strong> <span id="ContactNo"></span></p>
+                <p><strong>Address:</strong> <span id="Address"></span></p>
+                <p><strong>PostalCode:</strong> <span id="PostalCode"></span></p>
+                <p><strong>StateName:</strong> <span id="StateName"></span></p>
+                <p><strong>CountryName:</strong> <span id="CountryName"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Passing ID to Modal (inside the partial view) -->
+<script>
+    $('#registrationModal').on('show.bs.modal', function (e) {
+        var registrationId = $(e.relatedTarget).data('registrationid');
+        var modal = $(this);
+
+        // Make an AJAX request to fetch details based on registrationId
+        $.ajax({
+            url: '/Registration/GetRegistrationDetails',
+            type: 'GET',
+            data: { registrationId: registrationId },
+            success: function (data) {
+                // Populate modal with fetched data
+                modal.find('#FirstName').text(data.firstName);
+                modal.find('#LastName').text(data.lastName);
+                modal.find('#CategoryName').text(data.categoryName);
+                modal.find('#Gender').text(data.gender);
+                modal.find('#DateOfBirth').text(data.dateOfBirth);
+                modal.find('#Email').text(data.email);
+                modal.find('#ContactNo').text(data.contactNo);
+                modal.find('#Address').text(data.address);
+                modal.find('#PostalCode').text(data.postalCode);
+                modal.find('#StateName').text(data.stateName);
+                modal.find('#CountryName').text(data.countryName);
+            }
+        });
+    });
+</script>

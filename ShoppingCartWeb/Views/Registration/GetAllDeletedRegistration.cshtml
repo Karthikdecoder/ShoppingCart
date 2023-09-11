@@ -1,0 +1,151 @@
+﻿@model ShoppingCartWeb.Models.VM.RegistrationVM
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br />
+<div class="row">
+    <div class="col">
+        <h1 class="text-dark">Registered Members</h1>
+    </div>
+
+    <div class="col-2 text-start pt-1 justify-content-start">
+        <a asp-controller="Registration" asp-action="IndexRegistration" class="btn btn-primary btn-sm ms-2">
+            <div class="d-flex align-items-center">
+                <span class="d-inline-block align-middle" style="font-size: 24px;"><i class="bi bi-backspace-fill"></i>  Back </span>
+            </div>
+        </a>
+
+    </div>
+
+</div>
+
+<div class="container p-4 border mt-4">
+
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+
+                    <th>
+                        FirstName
+                    </th>
+                    <th>
+                        LastName
+                    </th>
+                    <th>
+                        Category
+                    </th>
+                    <th>
+                        Gender
+                    </th>
+                    <th>
+                        DateOfBirth
+                    </th>
+                    <th>
+                        Email
+                    </th>
+                    <th>
+                        ContactNumber
+                    </th>
+                    <th>
+                        Country
+                    </th>
+                    <th>
+                        State
+                    </th>
+                    <th>
+                        Action
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Registration)
+                {
+                    <tr>
+                        @*<td>@item.RegistrationId</td>*@
+                        <td>@item.FirstName</td>
+                        <td>@item.LastName</td>
+                        <td>@item.CategoryMaster.CategoryName</td>
+                        <td>@item.Gender</td>
+                        <td style="white-space: nowrap;"> @item.DateOfBirth.ToString("dd-MM-yyyy")</td>
+                        <td>@item.Email</td>
+                        <td>@item.ContactNo</td>
+                        <td>@item.CountryMaster.CountryName</td>
+                        <td>@item.StateMaster.StateName</td>
+                        <td>
+
+
+                            <div class="btn-group" role="group">
+
+
+                                <a href="#" class="btn btn-success ml-2" data-toggle="modal" data-target="#enableModal_@item.RegistrationId"><i class="bi bi-check-circle-fill"></i> </a>
+
+                            </div>
+                        </td>
+                    </tr>
+
+
+                    <!-- Enable Confirmation Modal for each item -->
+                    <div class="modal fade" id="enableModal_@item.RegistrationId" tabindex="-1" role="dialog" aria-labelledby="enableModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="enableModalLabel">Confirm Enable</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to Enable this item?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    <a asp-controller="Registration" asp-action="EnableRegistration" asp-route-registrationId="@item.RegistrationId" class="btn btn-success">Enable</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+
+            </tbody>
+        </table>
+    </div>
+
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            @if (Model.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="/Registration/IndexRegistration?orderBy=@Model.OrderBy&currentPage=@(Model.CurrentPage-1)" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            }
+
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                if (i == Model.CurrentPage)
+                {
+                    <li class="page-item"><a class="page-link active" href="/Registration/IndexRegistration?orderBy=@Model.OrderBy&currentPage=@i"> @i</a></li>
+
+                }
+                else
+                {
+                    <li class="page-item"><a class="page-link" href="/Registration/IndexRegistration?orderBy=@Model.OrderBy&currentPage=@i"> @i</a></li>
+                }
+            }
+            @if (Model.CurrentPage < Model.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="/Registration/IndexRegistration?orderBy=@Model.OrderBy&currentPage=@Model.CurrentPage+1" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+
+</div>

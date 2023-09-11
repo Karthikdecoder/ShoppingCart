@@ -89,7 +89,7 @@ namespace ShoppingCartWeb.Services
             {
                 var dto = new APIResponse
                 {
-                    ErrorMessages = new List<string> { Convert.ToString(e.Message) },
+                    ResponseMessage = new List<string> { Convert.ToString(e.Message) },
                     IsSuccess = false
                 };
 

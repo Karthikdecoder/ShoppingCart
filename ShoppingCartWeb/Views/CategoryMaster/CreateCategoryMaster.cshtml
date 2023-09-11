@@ -1,0 +1,45 @@
+﻿@model ShoppingCartWeb.Models.Dto.CategoryMasterDTO
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<br />
+<form asp-action="CreateCategoryMaster">
+    <div class="container border p-3">
+        <style>
+            .text-dark {
+                font-size: 24px; /* You can adjust the size to your preference, e.g., 24px, 36px, etc. */
+                /* You can also use other units like em, rem, or % if you prefer. */
+            }
+        </style>
+        <h1 class="text-dark">Add Category</h1>
+        <hr />
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row pb-3">
+                    <div class="col-2">
+                        <label asp-for="CategoryName" class="control-label pt-2" style="font-size:17px;">Category</label>
+                    </div>
+                    <div class="col-md-7 pb-4">
+                        <input asp-for="CategoryName" class="form-control" />
+                        <span asp-validation-for="CategoryName" class="text-danger"></span>
+                    </div>
+
+
+                    <div class="col-2 offset-5">
+                        <a asp-action="IndexCategoryMaster" asp-controller="CategoryMaster" class="btn-primary btn form-control " style="font-size: 14px;">Cancel</a>
+                    </div>
+                    <div class="col-2">
+                        <input type="submit" value="Save" class="btn btn-success form-control" style="font-size: 13px;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+</form>
+
+@section Scripts
+    {
+    <partial name="_ValidationScriptsPartial" />
+}
