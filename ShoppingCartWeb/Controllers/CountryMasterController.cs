@@ -40,7 +40,6 @@ namespace ShoppingCartWeb.Controllers
 		{
             CountryPaginationVM countryPaginationVM = new CountryPaginationVM();
 
-
             List<CountryMasterDTO> list = new();
 
 			var response = await _countryService.GetAllCountryAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));

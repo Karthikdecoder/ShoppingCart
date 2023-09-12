@@ -31,6 +31,9 @@ builder.Services.AddScoped<ICountryService, CountryService>();
 builder.Services.AddHttpClient<IStateService, StateService>();
 builder.Services.AddScoped<IStateService, StateService>();
 
+builder.Services.AddHttpClient<IMenuService, MenuService>();
+builder.Services.AddScoped<IMenuRoleMappingService, MenuRoleMappingService>();
+
 
 builder.Services.AddDistributedMemoryCache();
 

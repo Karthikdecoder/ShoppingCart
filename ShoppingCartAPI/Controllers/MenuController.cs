@@ -29,10 +29,10 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpGet]
-        [Route("GetAllmenu")]
+        [Route("GetAllMenu")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<APIResponse>> GetAllmenu()
+        public async Task<ActionResult<APIResponse>> GetAllMenu()
         {
             try
             {
@@ -51,11 +51,11 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpGet]
-        [Route("Getmenu")]
+        [Route("GetMenu")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<APIResponse>> Getmenu(int MenuId)
+        public async Task<ActionResult<APIResponse>> GetMenu(int MenuId)
         {
             try
             {
@@ -87,12 +87,12 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpPost]
-        [Route("Createmenu")]
+        [Route("CreateMenu")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<APIResponse>> Createmenu([FromBody] MenuDTO MenuDTO)
+        public async Task<ActionResult<APIResponse>> CreateMenu([FromBody] MenuDTO MenuDTO)
         {
             try
             {
@@ -136,11 +136,11 @@ namespace ShoppingCartAPI.Controllers
 
         [HttpDelete]
         [Authorize(Roles = "Admin")]
-        [Route("Removemenu")]
+        [Route("RemoveMenu")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> Removemenu(int MenuId)
+        public async Task<ActionResult<APIResponse>> RemoveMenu(int MenuId)
         {
             try
             {
@@ -175,10 +175,10 @@ namespace ShoppingCartAPI.Controllers
 
         [HttpPut]
         [Authorize(Roles = "Admin")]
-        [Route("Updatemenu")]
+        [Route("UpdateMenu")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> Updatemenu([FromBody] MenuDTO MenuDTO)
+        public async Task<ActionResult<APIResponse>> UpdateMenu([FromBody] MenuDTO MenuDTO)
         {
             try
             {
@@ -227,10 +227,10 @@ namespace ShoppingCartAPI.Controllers
 
         [HttpPut]
         [Authorize(Roles = "Admin")]
-        [Route("Enablemenu")]
+        [Route("EnableMenu")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> Enablemenu(int MenuId)
+        public async Task<ActionResult<APIResponse>> EnableMenu(int MenuId)
         {
             try
             {

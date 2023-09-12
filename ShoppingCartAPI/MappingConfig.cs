@@ -14,6 +14,8 @@ namespace ShoppingCartAPI
             CreateMap<CategoryMaster, CategoryMasterDTO>().ReverseMap();
 			CreateMap<StateMaster, StateMasterDTO>().ReverseMap();
 			CreateMap<CountryMaster, CountryMasterDTO>().ReverseMap();
+			CreateMap<Menu, MenuDTO>().ReverseMap();
+			CreateMap<MenuRoleMapping, MenuRoleMappingDTO>().ReverseMap();
 		}
     }
 }

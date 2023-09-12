@@ -17,26 +17,26 @@ namespace ShoppingCartAPI.Controllers
     {
         protected APIResponse _response;
         private readonly IMapper _mapper;
-        private readonly IMenuRoleMappingRepository _dbmenuRoleMapping;
+        private readonly IMenuRoleMappingRepository _dbMenuRoleMapping;
         private string _userId;
 
-        public MenuRoleMappingController(IMenuRoleMappingRepository _menuRoleMappingRepository, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public MenuRoleMappingController(IMenuRoleMappingRepository _MenuRoleMappingRepository, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
-            _dbmenuRoleMapping = _menuRoleMappingRepository;
+            _dbMenuRoleMapping = _MenuRoleMappingRepository;
             _mapper = mapper;
             _response = new();
             _userId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
 
         [HttpGet]
-        [Route("GetAllmenuRoleMapping")]
+        [Route("GetAllMenuRoleMapping")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<APIResponse>> GetAllmenuRoleMapping()
+        public async Task<ActionResult<APIResponse>> GetAllMenuRoleMapping()
         {
             try
             {
-                IEnumerable<MenuRoleMapping> roleList = await _dbmenuRoleMapping.GetAllAsync();
+                IEnumerable<MenuRoleMapping> roleList = await _dbMenuRoleMapping.GetAllAsync();
                 _response.Result = _mapper.Map<List<MenuRoleMappingDTO>>(roleList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
@@ -51,11 +51,11 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpGet]
-        [Route("GetmenuRoleMapping")]
+        [Route("GetMenuRoleMapping")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<APIResponse>> GetmenuRoleMapping(int MenuRoleMappingId)
+        public async Task<ActionResult<APIResponse>> GetMenuRoleMapping(int MenuRoleMappingId)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace ShoppingCartAPI.Controllers
                     return BadRequest(_response);
                 }
 
-                var MenuRoleMapping = await _dbmenuRoleMapping.GetAsync(u => u.MenuRoleMappingId == MenuRoleMappingId && u.IsDeleted == false);
+                var MenuRoleMapping = await _dbMenuRoleMapping.GetAsync(u => u.MenuRoleMappingId == MenuRoleMappingId && u.IsDeleted == false);
 
                 if (MenuRoleMapping == null)
                 {
@@ -87,16 +87,16 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpPost]
-        [Route("CreatemenuRoleMapping")]
+        [Route("CreateMenuRoleMapping")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<APIResponse>> CreatemenuRoleMapping([FromBody] MenuRoleMappingDTO MenuRoleMappingDTO)
+        public async Task<ActionResult<APIResponse>> CreateMenuRoleMapping([FromBody] MenuRoleMappingDTO MenuRoleMappingDTO)
         {
             try
             {
-                //if (await _dbmenuRoleMapping.GetAsync(u => u.menuRoleMappingName == MenuRoleMappingDTO.menuRoleMappingName) != null)
+                //if (await _dbMenuRoleMapping.GetAsync(u => u.MenuRoleMappingName == MenuRoleMappingDTO.MenuRoleMappingName) != null)
                 {
                     _response.ResponseMessage = new List<string>() { "Already Exists" };
                     return BadRequest(_response);
@@ -119,7 +119,7 @@ namespace ShoppingCartAPI.Controllers
                 MenuRoleMapping.UpdatedOn = DateTime.Now;
                 MenuRoleMapping.UpdatedBy = int.Parse(_userId);
                 MenuRoleMapping.IsDeleted = false;
-                await _dbmenuRoleMapping.CreateAsync(MenuRoleMapping);
+                await _dbMenuRoleMapping.CreateAsync(MenuRoleMapping);
 
                 _response.Result = _mapper.Map<MenuRoleMappingDTO>(MenuRoleMapping);
                 _response.StatusCode = HttpStatusCode.Created;
@@ -136,11 +136,11 @@ namespace ShoppingCartAPI.Controllers
 
         [HttpDelete]
         [Authorize(Roles = "Admin")]
-        [Route("RemovemenuRoleMapping")]
+        [Route("RemoveMenuRoleMapping")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> RemovemenuRoleMapping(int MenuRoleMappingId)
+        public async Task<ActionResult<APIResponse>> RemoveMenuRoleMapping(int MenuRoleMappingId)
         {
             try
             {
@@ -150,16 +150,16 @@ namespace ShoppingCartAPI.Controllers
                     return BadRequest(_response);
                 }
 
-                var menuRoleMapping = await _dbmenuRoleMapping.GetAsync(u => u.MenuRoleMappingId == MenuRoleMappingId && u.IsDeleted == false);
+                var MenuRoleMapping = await _dbMenuRoleMapping.GetAsync(u => u.MenuRoleMappingId == MenuRoleMappingId && u.IsDeleted == false);
 
-                if (menuRoleMapping == null)
+                if (MenuRoleMapping == null)
                 {
                     _response.StatusCode = HttpStatusCode.NotFound;
                     return NotFound(_response);
                 }
 
-                menuRoleMapping.IsDeleted = true;
-                await _dbmenuRoleMapping.UpdateAsync(menuRoleMapping);
+                MenuRoleMapping.IsDeleted = true;
+                await _dbMenuRoleMapping.UpdateAsync(MenuRoleMapping);
 
                 _response.StatusCode = HttpStatusCode.NoContent;
                 _response.IsSuccess = true;
@@ -175,10 +175,10 @@ namespace ShoppingCartAPI.Controllers
 
         [HttpPut]
         [Authorize(Roles = "Admin")]
-        [Route("UpdatemenuRoleMapping")]
+        [Route("UpdateMenuRoleMapping")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> UpdatemenuRoleMapping([FromBody] MenuRoleMappingDTO MenuRoleMappingDTO)
+        public async Task<ActionResult<APIResponse>> UpdateMenuRoleMapping([FromBody] MenuRoleMappingDTO MenuRoleMappingDTO)
         {
             try
             {
@@ -189,13 +189,13 @@ namespace ShoppingCartAPI.Controllers
 
                 int MenuRoleMappingId = MenuRoleMappingDTO.MenuRoleMappingId;
 
-                if (await _dbmenuRoleMapping.GetAsync(u => u.MenuRoleMappingId == MenuRoleMappingId) == null)
+                if (await _dbMenuRoleMapping.GetAsync(u => u.MenuRoleMappingId == MenuRoleMappingId) == null)
                 {
-                    ModelState.AddModelError("ErrorMessages", "menuRoleMapping ID is Invalid!");
+                    ModelState.AddModelError("ErrorMessages", "MenuRoleMapping ID is Invalid!");
                     return BadRequest(ModelState);
                 }
 
-                //if (await _dbmenuRoleMapping.GetAsync(u => u.menuRoleMappingName == MenuRoleMappingDTO.menuRoleMappingName && u.MenuRoleMappingId != MenuRoleMappingDTO.MenuRoleMappingId) != null)
+                //if (await _dbMenuRoleMapping.GetAsync(u => u.MenuRoleMappingName == MenuRoleMappingDTO.MenuRoleMappingName && u.MenuRoleMappingId != MenuRoleMappingDTO.MenuRoleMappingId) != null)
                 {
                     _response.ResponseMessage = new List<string>() { "Already Exists" };
                     return BadRequest(_response);
@@ -211,7 +211,7 @@ namespace ShoppingCartAPI.Controllers
                 model.UpdatedOn = DateTime.Now;
                 model.UpdatedBy = int.Parse(_userId);
                 model.IsDeleted = false;
-                await _dbmenuRoleMapping.UpdateAsync(model);
+                await _dbMenuRoleMapping.UpdateAsync(model);
 
                 _response.StatusCode = HttpStatusCode.NoContent;
                 _response.IsSuccess = true;
@@ -227,10 +227,10 @@ namespace ShoppingCartAPI.Controllers
 
         [HttpPut]
         [Authorize(Roles = "Admin")]
-        [Route("EnablemenuRoleMapping")]
+        [Route("EnableMenuRoleMapping")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> EnablemenuRoleMapping(int MenuRoleMappingId)
+        public async Task<ActionResult<APIResponse>> EnableMenuRoleMapping(int MenuRoleMappingId)
         {
             try
             {
@@ -240,7 +240,7 @@ namespace ShoppingCartAPI.Controllers
                     return BadRequest(_response);
                 }
 
-                var MenuRoleMappingDTO = await _dbmenuRoleMapping.GetAsync(u => u.MenuRoleMappingId == MenuRoleMappingId && u.IsDeleted == true);
+                var MenuRoleMappingDTO = await _dbMenuRoleMapping.GetAsync(u => u.MenuRoleMappingId == MenuRoleMappingId && u.IsDeleted == true);
 
                 if (MenuRoleMappingDTO == null)
                 {
@@ -256,7 +256,7 @@ namespace ShoppingCartAPI.Controllers
                 }
 
                 model.IsDeleted = false;
-                await _dbmenuRoleMapping.UpdateAsync(model);
+                await _dbMenuRoleMapping.UpdateAsync(model);
 
                 _response.StatusCode = HttpStatusCode.NoContent;
                 _response.IsSuccess = true;

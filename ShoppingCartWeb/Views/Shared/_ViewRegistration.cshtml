@@ -1,22 +1,39 @@
 ﻿@model ShoppingCartWeb.Models.Dto.RegistrationDTO
 
+<!-- Modal Code (outside the loop) -->
+<div class="modal fade" id="registrationModal" tabindex="-1" role="dialog" aria-labelledby="registrationModalLabel" data-keyboard="false" data-bs-backdrop="static">
 
-<div class="modal-body">
-    <div class="row">
-        <div class="col-md-6">
-            <p><strong>FirstName:</strong> <span id="FirstName">@Model.FirstName</span></p>
-            <p><strong>LastName:</strong> <span id="LastName">@Model.LastName</span></p>
-            <p><strong>CategoryName:</strong> <span id="CategoryName">@Model.CategoryMaster.CategoryName</span></p>
-            <p><strong>Gender:</strong> <span id="Gender">@Model.Gender</span></p>
-            <p><strong>DateOfBirth:</strong> <span id="DateOfBirth">@Model.DateOfBirth.ToString("dd-MM-yyyy")</span></p>
-            <p><strong>Email:</strong> <span id="Email">@Model.Email</span></p>
-        </div>
-        <div class="col-md-6">
-            <p><strong>ContactNo:</strong> <span id="ContactNo">@Model.ContactNo</span></p>
-            <p><strong>Address:</strong> <span id="Address">@Model.Address</span></p>
-            <p><strong>PostalCode:</strong> <span id="PostalCode">@Model.PostalCode</span></p>
-            <p><strong>StateName:</strong> <span id="StateName">@Model.StateMaster.StateName</span></p>
-            <p><strong>CountryName:</strong> <span id="CountryName">@Model.CountryMaster.CountryName</span></p>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="registrationModalLabel">Registered Person Details</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>FirstName:</strong> <span id="FirstName">@Model.FirstName</span></p>
+                        <p><strong>LastName:</strong> <span id="LastName">@Model.LastName</span></p>
+                        <p><strong>CategoryName:</strong> <span id="CategoryName">@Model.CategoryMaster.CategoryName</span></p>
+                        <p><strong>Gender:</strong> <span id="Gender">@Model.Gender</span></p>
+                        <p><strong>DateOfBirth:</strong> <span id="DateOfBirth">@Model.DateOfBirth.ToString("dd-MM-yyyy")</span></p>
+                        <p><strong>Email:</strong> <span id="Email">@Model.Email</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>ContactNo:</strong> <span id="ContactNo">@Model.ContactNo</span></p>
+                        <p><strong>Address:</strong> <span id="Address">@Model.Address</span></p>
+                        <p><strong>PostalCode:</strong> <span id="PostalCode">@Model.PostalCode</span></p>
+                        <p><strong>StateName:</strong> <span id="StateName">@Model.StateMaster.StateName</span></p>
+                        <p><strong>CountryName:</strong> <span id="CountryName">@Model.CountryMaster.CountryName</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>

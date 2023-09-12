@@ -85,7 +85,7 @@
 
                                 <div class="btn-group" role="group">
 
-                                    <a href="#" class="btn btn-primary btn-sm ml-2 enable-button" data-toggle="modal" data-target="#enableModal"data-stateId="@item.StateId">
+                                    <a href="#" class="btn btn-primary btn-sm ml-2 enable-button" data-toggle="modal" data-target="#enableModal" data-stateId="@item.StateId">
                                         Active
                                     </a>
 
@@ -98,54 +98,56 @@
 
                 }
 
-                <!-- Enable Confirmation Modal -->
-                <div class="modal fade" id="enableModal" tabindex="-1" role="dialog" aria-labelledby="enableModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="enableModalLabel">Confirm Enable</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                Are you sure you want to enable?
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                                <a id="enableModalButton" asp-controller="StateMaster" asp-action="EnableStateMaster" asp-route-stateId="" asp-route-currentPageNo="@Model.CurrentPage" class="btn btn-success">Yes</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-                <!-- Delete Confirmation Modal -->
-                <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                Are you sure you want to delete?
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <a id="deleteModalButton" asp-controller="StateMaster" asp-action="RemoveStateMaster" asp-route-stateId="" class="btn btn-danger">Delete</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </tbody>
         </table>
 
 
     </div>
+
+
+    <!-- Enable Confirmation Modal -->
+    <div class="modal fade" id="enableModal" tabindex="-1" role="dialog" aria-labelledby="enableModalLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="enableModalLabel">Confirm Enable</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to enable?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                    <a id="enableModalButton" asp-controller="StateMaster" asp-action="EnableStateMaster" asp-route-stateId="" asp-route-currentPageNo="@Model.CurrentPage" class="btn btn-success">Yes</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <a id="deleteModalButton" asp-controller="StateMaster" asp-action="RemoveStateMaster" asp-route-stateId="" class="btn btn-danger">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <br />
     <br />
