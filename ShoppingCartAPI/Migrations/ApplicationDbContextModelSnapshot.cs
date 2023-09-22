@@ -120,6 +120,9 @@ namespace ShoppingCartAPI.Migrations
                     b.Property<DateTime>("UpdatedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("MenuId");
 
                     b.ToTable("Menu");

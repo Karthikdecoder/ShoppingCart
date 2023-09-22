@@ -12,6 +12,7 @@ using ShoppingCartWeb.Models.VM;
 using ShoppingCartWeb.Services;
 using ShoppingCartWeb.Services.IServices;
 using ShoppingCartWeb.Utililty;
+using System.Collections.Generic;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -24,9 +25,10 @@ namespace ShoppingCartWeb.Controllers
         private readonly IRegistrationService _registrationService;
         private readonly IRoleService _roleService;
         private readonly ICategoryService _categoryService;
+        private readonly IMenuRoleMappingService _MenuRoleMappingService;
         private readonly IMapper _mapper;
         private string _Role;
-        public UserController(IUserService userService, IHttpContextAccessor httpContextAccessor, IRoleService roleService, ICategoryService categoryService, IMapper mapper, IRegistrationService registrationService)
+        public UserController(IUserService userService, IHttpContextAccessor httpContextAccessor, IRoleService roleService, ICategoryService categoryService, IMapper mapper, IRegistrationService registrationService, IMenuRoleMappingService menuRoleMappingService)
         {
             _userService = userService;
             _Role = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Role);
@@ -34,6 +36,7 @@ namespace ShoppingCartWeb.Controllers
             _categoryService = categoryService;
             _mapper = mapper;
             _registrationService = registrationService;
+            _MenuRoleMappingService = menuRoleMappingService;
         }
 
         [HttpGet]
@@ -64,7 +67,26 @@ namespace ShoppingCartWeb.Controllers
 
                 HttpContext.Session.SetString(SD.SessionToken, model.Token);
 
-                return RedirectToAction("IndexRegistration", "Registration");
+
+
+
+                List<MenuRoleMappingDTO> menuRoleMappingDTO = new();
+
+                var menuResponse = await _MenuRoleMappingService.GetAllMenuByRoleIdMappingAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+
+                if (menuResponse != null && menuResponse.IsSuccess)
+                {
+                    menuRoleMappingDTO = JsonConvert.DeserializeObject<List<MenuRoleMappingDTO>>(Convert.ToString(menuResponse.Result));
+                }
+
+                HttpContext.Session.SetString("Menus", menuResponse.Result.ToString());
+
+                TempData["MenuRoleMappingList"] = menuResponse.Result.ToString();
+
+
+                //return View(menuRoleMappingDTO);
+
+                return RedirectToAction("Index", "Home");
             }
             else
             {

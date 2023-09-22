@@ -209,8 +209,6 @@ namespace ShoppingCartWeb.Controllers
                     Text = i.CountryName,
                     Value = i.CountryId.ToString()
                 });
-
-
             }
 
             var stateResponse = await _stateService.GetAllStateAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));

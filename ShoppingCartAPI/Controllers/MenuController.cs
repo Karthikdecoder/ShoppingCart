@@ -36,8 +36,30 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                IEnumerable<Menu> roleList = await _dbmenu.GetAllAsync();
-                _response.Result = _mapper.Map<List<MenuDTO>>(roleList);
+                IEnumerable<Menu> menuList = await _dbmenu.GetAllAsync();
+                _response.Result = _mapper.Map<List<MenuDTO>>(menuList);
+                _response.StatusCode = HttpStatusCode.OK;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+
+            return _response;
+        }
+
+        [HttpGet]
+        [Route("GetAllParentId")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<APIResponse>> GetAllParentId()
+        {
+            try
+            {
+                IEnumerable<Menu> menuList = await _dbmenu.GetAllAsync(u => u.ParentId == 0);
+                _response.Result = _mapper.Map<List<MenuDTO>>(menuList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
             }

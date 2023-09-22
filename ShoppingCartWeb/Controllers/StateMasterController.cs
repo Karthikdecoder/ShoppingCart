@@ -115,6 +115,7 @@ namespace ShoppingCartWeb.Controllers
         public async Task<IActionResult> UpdateStateMaster(int StateId)
         {
             StateMasterCreateVM stateMasterCreateVM = new();
+
             var stateMasterResponse = await _stateService.GetStateAsync<APIResponse>(StateId, HttpContext.Session.GetString(SD.SessionToken));
 
             if (stateMasterResponse != null && stateMasterResponse.IsSuccess)

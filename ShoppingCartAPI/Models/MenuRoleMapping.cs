@@ -22,5 +22,6 @@ namespace ShoppingCartAPI.Models
         public int UpdatedBy { get; set; }
         public DateTime UpdatedOn { get; set; }
         public bool IsDeleted { get; set; } = false;
+
     }
 }

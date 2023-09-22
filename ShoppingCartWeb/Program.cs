@@ -28,10 +28,14 @@ builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 builder.Services.AddHttpClient<ICountryService, CountryService>();
 builder.Services.AddScoped<ICountryService, CountryService>();
 
+
 builder.Services.AddHttpClient<IStateService, StateService>();
 builder.Services.AddScoped<IStateService, StateService>();
 
 builder.Services.AddHttpClient<IMenuService, MenuService>();
+builder.Services.AddScoped<IMenuService, MenuService>();
+
+builder.Services.AddHttpClient<IMenuRoleMappingService, MenuRoleMappingService>();
 builder.Services.AddScoped<IMenuRoleMappingService, MenuRoleMappingService>();
 
 

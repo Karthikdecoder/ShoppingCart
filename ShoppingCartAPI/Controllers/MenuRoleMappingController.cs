@@ -5,6 +5,7 @@ using ShoppingCartAPI.Models;
 using ShoppingCartAPI.Models.Dto;
 using ShoppingCartAPI.Repository;
 using ShoppingCartAPI.Repository.IRepository;
+using System.Collections.Generic;
 using System.Data;
 using System.Net;
 using System.Security.Claims;
@@ -18,14 +19,18 @@ namespace ShoppingCartAPI.Controllers
         protected APIResponse _response;
         private readonly IMapper _mapper;
         private readonly IMenuRoleMappingRepository _dbMenuRoleMapping;
+        private readonly IMenuRepository _dbmenu;
         private string _userId;
+        private string _roleId;
 
-        public MenuRoleMappingController(IMenuRoleMappingRepository _MenuRoleMappingRepository, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public MenuRoleMappingController(IMenuRoleMappingRepository _MenuRoleMappingRepository, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IMenuRepository dbmenu)
         {
             _dbMenuRoleMapping = _MenuRoleMappingRepository;
             _mapper = mapper;
             _response = new();
             _userId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            _roleId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Sid);
+            _dbmenu = dbmenu;
         }
 
         [HttpGet]
@@ -36,8 +41,54 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                IEnumerable<MenuRoleMapping> roleList = await _dbMenuRoleMapping.GetAllAsync();
-                _response.Result = _mapper.Map<List<MenuRoleMappingDTO>>(roleList);
+                IEnumerable<MenuRoleMapping> menuRoleMappingList = await _dbMenuRoleMapping.GetAllAsync(includeProperties: "RoleMaster,Menu");
+                _response.Result = _mapper.Map<List<MenuRoleMappingDTO>>(menuRoleMappingList);
+                _response.StatusCode = HttpStatusCode.OK;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+
+            return _response;
+        }
+
+        [HttpGet]
+        [Route("GetAllMenuByRoleId")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<APIResponse>> GetAllMenuByRoleId()
+        {
+            try
+            {
+                int roleId = int.Parse(_roleId);
+
+                IEnumerable<MenuRoleMapping> menuRoleMappingList = await _dbMenuRoleMapping.GetAllAsync(u => u.RoleId == roleId, includeProperties: "RoleMaster,Menu");
+                _response.Result = _mapper.Map<List<MenuRoleMappingDTO>>(menuRoleMappingList);
+                _response.StatusCode = HttpStatusCode.OK;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+
+            return _response;
+        }
+
+        [HttpGet]
+        [Route("GetMenuIdByRoleId")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<APIResponse>> GetMenuIdByRoleId(int roleId)
+        {
+            try
+            {
+                IEnumerable<MenuRoleMapping> menuRoleMappingList = await _dbMenuRoleMapping.GetAllAsync(u => u.RoleId == roleId && u.IsDeleted == false && u.Menu.IsDeleted == false && u.RoleMaster.IsDeleted == false, includeProperties: "RoleMaster,Menu");
+                _response.Result = _mapper.Map<List<MenuRoleMappingDTO>>(menuRoleMappingList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
             }
@@ -86,6 +137,9 @@ namespace ShoppingCartAPI.Controllers
             return _response;
         }
 
+
+
+
         [HttpPost]
         [Route("CreateMenuRoleMapping")]
         [Authorize(Roles = "Admin")]
@@ -96,7 +150,7 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                //if (await _dbMenuRoleMapping.GetAsync(u => u.MenuRoleMappingName == MenuRoleMappingDTO.MenuRoleMappingName) != null)
+                if (await _dbMenuRoleMapping.GetAsync(u => u.MenuId == MenuRoleMappingDTO.MenuId && u.RoleId == MenuRoleMappingDTO.RoleId) != null)
                 {
                     _response.ResponseMessage = new List<string>() { "Already Exists" };
                     return BadRequest(_response);
@@ -107,21 +161,21 @@ namespace ShoppingCartAPI.Controllers
                     return BadRequest(MenuRoleMappingDTO);
                 }
 
-                MenuRoleMapping MenuRoleMapping = _mapper.Map<MenuRoleMapping>(MenuRoleMappingDTO);
+                MenuRoleMapping model = _mapper.Map<MenuRoleMapping>(MenuRoleMappingDTO);
 
                 if (_userId == null)
                 {
                     _userId = "0";
                 }
 
-                MenuRoleMapping.CreatedOn = DateTime.Now;
-                MenuRoleMapping.CreatedBy = int.Parse(_userId);
-                MenuRoleMapping.UpdatedOn = DateTime.Now;
-                MenuRoleMapping.UpdatedBy = int.Parse(_userId);
-                MenuRoleMapping.IsDeleted = false;
-                await _dbMenuRoleMapping.CreateAsync(MenuRoleMapping);
+                model.CreatedOn = DateTime.Now;
+                model.CreatedBy = int.Parse(_userId);
+                model.UpdatedOn = DateTime.Now;
+                model.UpdatedBy = int.Parse(_userId);
+                model.IsDeleted = false;
+                await _dbMenuRoleMapping.CreateAsync(model);
 
-                _response.Result = _mapper.Map<MenuRoleMappingDTO>(MenuRoleMapping);
+                _response.Result = _mapper.Map<MenuRoleMappingDTO>(model);
                 _response.StatusCode = HttpStatusCode.Created;
 
                 return Ok(_response);
@@ -150,16 +204,42 @@ namespace ShoppingCartAPI.Controllers
                     return BadRequest(_response);
                 }
 
-                var MenuRoleMapping = await _dbMenuRoleMapping.GetAsync(u => u.MenuRoleMappingId == MenuRoleMappingId && u.IsDeleted == false);
+                var menuRoleMappingModelFromDb = await _dbMenuRoleMapping.GetAsync(u => u.MenuRoleMappingId == MenuRoleMappingId && u.IsDeleted == false);
 
-                if (MenuRoleMapping == null)
+
+                if (menuRoleMappingModelFromDb == null)
                 {
                     _response.StatusCode = HttpStatusCode.NotFound;
                     return NotFound(_response);
                 }
 
-                MenuRoleMapping.IsDeleted = true;
-                await _dbMenuRoleMapping.UpdateAsync(MenuRoleMapping);
+                var menuId = menuRoleMappingModelFromDb.MenuId;
+                var roleId = menuRoleMappingModelFromDb.RoleId; // Get the RoleId from menuRoleMappingModelFromDb
+
+                // Retrieve the associated menu from the Menu table
+                var menu = await _dbmenu.GetAsync(u => u.MenuId == menuId);
+
+                if (menu != null && menu.ParentId == 0)
+                {
+                    // Retrieve all child menus with ParentId = menuId
+                    var childMenus = await _dbmenu.GetAllAsync(u => u.ParentId == menuId);
+
+                    // Update IsDeleted property for child menu role mappings in the MenuRoleMapping table
+                    var childMenuIds = childMenus.Select(child => child.MenuId).ToList();
+
+                    // Filter child menu role mappings by MenuId and RoleId
+                    var childMenuRoleMappings = await _dbMenuRoleMapping.GetAllAsync(u => childMenuIds.Contains(u.MenuId) && u.RoleId == roleId);
+
+                    foreach (var childMenuRoleMapping in childMenuRoleMappings)
+                    {
+                        childMenuRoleMapping.IsDeleted = true;
+                        await _dbMenuRoleMapping.UpdateAsync(childMenuRoleMapping);
+                    }
+                }
+
+                // Soft delete the current menu role mapping
+                menuRoleMappingModelFromDb.IsDeleted = true;
+                await _dbMenuRoleMapping.UpdateAsync(menuRoleMappingModelFromDb);
 
                 _response.StatusCode = HttpStatusCode.NoContent;
                 _response.IsSuccess = true;
@@ -195,7 +275,7 @@ namespace ShoppingCartAPI.Controllers
                     return BadRequest(ModelState);
                 }
 
-                //if (await _dbMenuRoleMapping.GetAsync(u => u.MenuRoleMappingName == MenuRoleMappingDTO.MenuRoleMappingName && u.MenuRoleMappingId != MenuRoleMappingDTO.MenuRoleMappingId) != null)
+                if (await _dbMenuRoleMapping.GetAsync(u => u.MenuId == MenuRoleMappingDTO.MenuId && u.RoleId == MenuRoleMappingDTO.RoleId) != null)
                 {
                     _response.ResponseMessage = new List<string>() { "Already Exists" };
                     return BadRequest(_response);
@@ -255,8 +335,31 @@ namespace ShoppingCartAPI.Controllers
                     _userId = "0";
                 }
 
+                // Enable the current MenuRoleMapping
                 model.IsDeleted = false;
                 await _dbMenuRoleMapping.UpdateAsync(model);
+
+                // Check if the associated menu has ParentId = 0
+                var menu = await _dbmenu.GetAsync(u => u.MenuId == model.MenuId);
+
+                if (menu != null && menu.ParentId == 0)
+                {
+                    // Retrieve all child menus with ParentId = model.MenuId
+                    var childMenus = await _dbmenu.GetAllAsync(u => u.ParentId == model.MenuId);
+
+                    // Extract the MenuIds of child menus
+                    var childMenuIds = childMenus.Select(child => child.MenuId).ToList();
+
+                    // Retrieve and enable child menu role mappings for the same RoleId
+                    var childMenuRoleMappings = await _dbMenuRoleMapping.GetAllAsync(u => childMenuIds.Contains(u.MenuId) && u.RoleId == model.RoleId);
+
+                    foreach (var childMenuRoleMapping in childMenuRoleMappings)
+                    {
+                        childMenuRoleMapping.IsDeleted = false; // Set IsDeleted to false (enabled)
+                        await _dbMenuRoleMapping.UpdateAsync(childMenuRoleMapping);
+                    }
+                }
+
 
                 _response.StatusCode = HttpStatusCode.NoContent;
                 _response.IsSuccess = true;

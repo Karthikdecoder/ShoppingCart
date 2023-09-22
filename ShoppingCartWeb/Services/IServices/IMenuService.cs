@@ -6,6 +6,7 @@ namespace ShoppingCartWeb.Services.IServices
     {
         Task<T> GetAllMenuAsync<T>(string token);
         Task<T> GetMenuAsync<T>(int MenuId, string token);
+        Task<T> GetParentIdAsync<T>(string token);
         Task<T> CreateMenuAsync<T>(MenuDTO MenuDTO, string token);
         Task<T> UpdateMenuAsync<T>(MenuDTO MenuDTO, string token);
         Task<T> EnableMenuAsync<T>(int MenuId, string token);

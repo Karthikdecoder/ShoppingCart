@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace ShoppingCartWeb.Models.Dto
 {
     public class MenuRoleMappingDTO
     {
+       
         public int MenuRoleMappingId { get; set; }
 
         [Required]
@@ -22,5 +24,9 @@ namespace ShoppingCartWeb.Models.Dto
         public int UpdatedBy { get; set; }
         public DateTime UpdatedOn { get; set; }
         public bool IsDeleted { get; set; } = false;
+
+        [ValidateNever]
+        public IEnumerable<string> SelectedMenuIds { get; set; }
+
     }
 }

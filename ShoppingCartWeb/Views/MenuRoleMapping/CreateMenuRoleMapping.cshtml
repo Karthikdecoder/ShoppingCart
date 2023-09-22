@@ -1,0 +1,230 @@
+﻿
+@model ShoppingCartWeb.Models.VM.MenuRoleMappingVM
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br />
+
+<form asp-action="CreateMenuRoleMapping">
+    <div class="container border p-3">
+        <style>
+
+            .text-dark {
+                font-size: 24px; /* You can adjust the size to your preference, e.g., 24px, 36px, etc. */
+                /* You can also use other units like em, rem, or % if you prefer. */
+            }
+        </style>
+        <h1 class="text-dark">Add MenuRoleMapping</h1>
+        <hr />
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row pb-3">
+
+                    <div class="col-2">
+                        <label asp-for="MenuRoleMapping.RoleId" class="control-label pt-2" style="font-size:17px;">Role</label>
+                    </div>
+                    <div class="col-9 pb-3">
+                        <select asp-for="MenuRoleMapping.RoleId" id="roleId" class="form-control" asp-items="@Model.RoleList">
+                            <option disabled selected>--Select Role--</option>
+                        </select>
+                        <span asp-validation-for="MenuRoleMapping.RoleId" class="text-danger"></span>
+                    </div>
+
+                    
+                    <div class="form-group">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Main Menu</th>
+                                    <th>Sub Menu</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                               
+
+                                @if (Model.MenuList != null)
+                                {
+                                    @foreach (var mainMenu in Model.MenuList.Where(m => m.ParentId == "0"))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <label>
+                                                    <input type="checkbox" name="MenuRoleMapping.SelectedMenuIds" value="@mainMenu.Value" id="menu_@mainMenu.Value"/>
+
+                                                   @* @(menuListByRoleId?.Any(item => item.MenuRoleMapping.MenuId.ToString() == mainMenu.Value) == true ? "checked" : "") />
+                                                    @mainMenu.Text*@
+                                                    @mainMenu.Text
+
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <ul class="submenu-list" style="list-style-type: none;">
+
+                                                    @foreach (var subMenu in Model.MenuList.Where(m => m.ParentId == mainMenu.Value))
+                                                    {
+                                                        <li>
+                                                            <label>
+                                                                <input type="checkbox" name="MenuRoleMapping.SelectedMenuIds" value="@subMenu.Value" id="menu_@subMenu.Value"/>
+
+                                                               @* @(menuListByRoleId?.Any(item => item.MenuRoleMapping.MenuId.ToString() == subMenu.Value) == true ? "checked" : "") />@subMenu.Text*@
+                                                               @subMenu.Text
+
+                                                            </label>
+                                                        </li>
+                                                    }
+
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+
+                                <input type="hidden" asp-for="MenuRoleMapping.SelectedMenuIds" id="selectedMenuIds" />
+
+
+                                @*
+                                @if (Model.MenuList != null)
+                                {
+                                    @foreach (var mainMenu in Model.MenuList.Where(m => m.ParentId == "0"))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <label>
+                                                    <input type="checkbox" name="MenuRoleMapping.SelectedMenuIds" value="@mainMenu.Value" id="menu_@mainMenu.Value" />
+                                                    @mainMenu.Text
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <ul class="submenu-list">
+
+                                                    @foreach (var subMenu in Model.MenuList.Where(m => m.ParentId == mainMenu.Value))
+                                                    {
+                                                        <li>
+                                                            <label>
+                                                                <input type="checkbox" name="MenuRoleMapping.SelectedMenuIds" value="@subMenu.Value" id="menu_@subMenu.Value" /> 
+                                                                @subMenu.Text
+                                                            </label>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                *@
+
+
+                            </tbody>
+                        </table>
+                    </div>
+
+
+
+                    <div class="col-3 offset-5">
+                        <a asp-action="IndexMenuRoleMapping" asp-controller="MenuRoleMapping" class="btn-primary btn form-control " style="font-size: 14px;">Cancel</a>
+                    </div>
+                    <div class="col-3">
+                        <input type="submit" value="Save" class="btn btn-success form-control" style="font-size: 13px;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts
+    {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        $(document).ready(function () {
+            $("#roleId").change(function () {
+                var roleId = $(this).val();
+
+                if (roleId !== "") {
+                    $.ajax({
+                        url: '@Url.Action("GetAllMenuByRoleId", "MenuRoleMapping")',
+                        data: { roleId: roleId }, // Pass roleId as a parameter
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (menus) {
+                            // Loop through each checkbox in the table and update its state
+                            $("table.table-bordered tbody input[type='checkbox']").each(function () {
+                                var menuId = $(this).val();
+                                var isChecked = menus.some(function (menu) {
+                                    return menu.menuId === menuId && menu.isSelected;
+                                });
+                                $(this).prop('checked', isChecked);
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Trigger the change event to load mapped menus when the page loads (if a role is pre-selected)
+            $("#roleId").trigger("change");
+        });
+
+    </script>
+
+
+    <script>
+        $(document).ready(function () {
+            // Function to update the hidden field when a checkbox is changed
+            function updateSelectedMenuIds() {
+                var selectedIds = [];
+
+                // Loop through all checkboxes with the name "MenuRoleMapping.SelectedMenuIds"
+                $("input[name='MenuRoleMapping.SelectedMenuIds']:checked").each(function () {
+                    selectedIds.push($(this).val());
+                });
+
+                // Update the hidden field's value with the selected IDs
+                $("#selectedMenuIds").val(selectedIds.join(','));
+            }
+
+            // Attach the update function to checkbox change events
+            $("input[name='MenuRoleMapping.SelectedMenuIds']").change(updateSelectedMenuIds);
+
+            // Trigger the update function initially to set the initial state
+            updateSelectedMenuIds();
+        });
+    </script>
+
+    @*<script>
+
+        $(document).ready(function () {
+            $("#roleId").change(function () {
+                var roleId = $(this).val();
+
+                if (roleId !== "") {
+
+                    $.ajax({
+                        url: '@Url.Action("GetAllMenuByRoleId", "MenuRoleMapping")',
+                        data: { roleId: roleId },
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (menus) {
+                            $("#menuList").empty();
+
+                            $.each(menus, function (i, menu) {
+                                var isChecked = menu.isSelected ? 'checked' : '';
+                                $("#menuList").append('<div class="form-check"> <input class="form-check-input" type="checkbox" name="MenuRoleMapping.SelectedMenuIds" value="' + menu.menuId + '" ' + isChecked + ' id="menu_' + menu.menuId + '"><label class="form-check-label" for="menu_' + menu.menuId + '">' + menu.menu.menuName + '</label></div>');
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Trigger the change event to load mapped menus when the page loads (if a role is pre-selected)
+            $("#roleId").trigger("change");
+        });
+
+
+    </script>*@
+
+}

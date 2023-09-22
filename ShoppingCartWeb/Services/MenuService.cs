@@ -57,6 +57,16 @@ namespace ShoppingCartWeb.Services
             });
         }
 
+        public Task<T> GetParentIdAsync<T>(string token)
+        {
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.GET,
+                Url = menuURL + "/api/Menu/GetAllParentId",
+                Token = token
+            });
+        }
+
         public Task<T> RemoveMenuAsync<T>(int MenuId, string token)
         {
             return SendAsync<T>(new APIRequest()

@@ -3,6 +3,8 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     var currentPage = @Model.CurrentPage;
+    string currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    string currentAction = ViewContext.RouteData.Values["action"]?.ToString();
 }
 
 <br />
@@ -26,11 +28,11 @@
 
     <div class="col-2 d-flex justify-content-end align-items-start">
         <a asp-controller="CategoryMaster" asp-action="CreateCategoryMaster" class="btn btn-primary btn-sm ms-2">
-            <div class="d-flex align-items-center">
+        <div class="d-flex align-items-center">
 
-                <span class="d-inline-block align-middle" style="font-size: 17px;"><i class="bi bi-plus-square-fill"></i>  Create </span>
+        <span class="d-inline-block align-middle" style="font-size: 17px;"><i class="bi bi-plus-square-fill"></i>  Create </span>
 
-            </div>
+        </div>
         </a>
     </div>
 </div>

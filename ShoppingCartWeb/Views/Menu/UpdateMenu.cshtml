@@ -1,0 +1,83 @@
+﻿@model ShoppingCartWeb.Models.VM.MenuVM
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<br />
+<form asp-action="UpdateMenu">
+    <div class="container border p-3">
+        <style>
+            .text-dark {
+                font-size: 24px; /* You can adjust the size to your preference, e.g., 24px, 36px, etc. */
+                /* You can also use other units like em, rem, or % if you prefer. */
+            }
+
+            .col-2 {
+                flex: 2 0 16.666667%;
+                max-width: 90.666667%;
+            }
+        </style>
+        <h1 class="text-dark">Menu</h1>
+        <hr />
+
+        <input hidden asp-for="Menu.MenuId" />
+        <input hidden asp-for="Menu.CreatedBy" />
+        <input hidden asp-for="Menu.CreatedOn" />
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row pb-3">
+
+                    <div class="col-2" style="flex: 2 0 16.666667%;
+    max-width: 90.666667%;">
+                        <label asp-for="Menu.MenuName" class="control-label pt-2" style="font-size:17px;">Menu Name</label>
+                    </div>
+                    <div class="col-9 pb-3">
+                        <input asp-for="Menu.MenuName" class="form-control" />
+                        <span asp-validation-for="Menu.MenuName" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-2">
+                        <label asp-for="Menu.ParentId" class="control-label pt-2" style="font-size: 17px;">Parent Menu</label>
+                    </div>
+                    <div class="col-9 pb-3">
+                        <select asp-for="Menu.ParentId" class="form-control" asp-items="@Model.ParentList">
+                            <option value="" disabled selected>--Select Parent Menu--</option> <!-- Default null field -->
+                        </select>
+                        <span asp-validation-for="Menu.ParentId" class="text-danger"></span>
+                    </div>
+
+
+                    <div class="col-2">
+                        <label asp-for="Menu.Description" class="control-label pt-2" style="font-size:17px;">Description</label>
+                    </div>
+                    <div class="col-9 pb-3">
+                        <input asp-for="Menu.Description" class="form-control" />
+                        <span asp-validation-for="Menu.Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-2">
+                        <label asp-for="Menu.Url" class="control-label pt-2" style="font-size:17px;">Url</label>
+                    </div>
+                    <div class="col-9 pb-3">
+                        <input asp-for="Menu.Url" class="form-control" />
+                        <span asp-validation-for="Menu.Url" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-3 offset-6">
+                        <a asp-action="IndexMenu" asp-controller="Menu" class="btn-primary btn form-control " style="font-size: 14px;">Cancel</a>
+                    </div>
+                    <div class="col-3">
+                        <input type="submit" value="Save" class="btn btn-success form-control" style="font-size: 13px;" />
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts
+    {
+    <partial name="_ValidationScriptsPartial" />
+}

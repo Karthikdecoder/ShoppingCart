@@ -1,0 +1,31 @@
+
+                <div class="form-group">
+                    <label class="form-label">Menu</label>
+                    <div id="menuList">
+
+                        <!-- Dynamic menu checkboxes will be added here -->
+
+                    </div>
+                </div>
+
+                @foreach (var menu in Model.MenuList)
+                {
+                    <input type="checkbox" name="SelectedMenus" value="@menu.Text" @(Model.SelectedMenus.Contains(menu.Value) ? "checked" : "") /> @menu.Text <br />
+                }
+
+                @*<div class="form-group">
+                <label class="form-label">Menu</label>
+                <div id="menuList">
+                <!-- Loop through your MenuList and generate checkboxes -->
+
+                @foreach (var menu in Model.MenuList)
+                {
+                var isChecked = Model.MenuRoleMapping != null && Model.MenuRoleMapping.SelectedMenuIds.Contains(menu.Value) ? "checked" : "";
+                <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="MenuRoleMapping.SelectedMenuIds" value="@menu.Value" @isChecked id="menu_@menu.Value">
+                <label class="form-check-label" for="menu_@menu.Value">@menu.Text</label>
+                </div>
+                }
+
+                </div>
+                </div>*@

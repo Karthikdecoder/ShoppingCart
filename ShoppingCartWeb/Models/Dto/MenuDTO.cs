@@ -9,9 +9,9 @@ namespace ShoppingCartWeb.Models.Dto
         [Required]
         public string MenuName { get; set; }
 
-        [Required]
         public int? ParentId { get; set; }
         public string? Description { get; set; }
+        public string? Url { get; set; }
 
         public int CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }

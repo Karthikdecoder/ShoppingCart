@@ -75,7 +75,9 @@
                 @foreach (var item in Model.Registration)
                 {
 
-                    <tr>
+                    <tr> <!-- rows will created based on for loop count-->
+
+
                         <td>@item.FirstName</td>
                         <td>@item.LastName</td>
                         <td>@item.CategoryMaster.CategoryName</td>
@@ -124,6 +126,8 @@
                                 </div>
                             </td>
                         }
+
+
                     </tr>
 
                 }

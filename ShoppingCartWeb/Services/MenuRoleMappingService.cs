@@ -37,6 +37,16 @@ namespace ShoppingCartWeb.Services
             });
         }
 
+        public Task<T> GetAllMenuByRoleIdMappingAsync<T>( string token)
+        {
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.GET,
+                Url = menuRoleMappingURL + "/api/MenuRoleMapping/GetAllMenuByRoleId",
+                Token = token
+            });
+        }
+
         public Task<T> GetAllMenuRoleMappingAsync<T>(string token)
         {
             return SendAsync<T>(new APIRequest()
@@ -53,6 +63,16 @@ namespace ShoppingCartWeb.Services
             {
                 ApiType = SD.ApiType.GET,
                 Url = menuRoleMappingURL + "/api/MenuRoleMapping/GetMenuRoleMapping?MenuRoleMappingId=" + MenuRoleMappingId,
+                Token = token
+            });
+        }
+        
+        public Task<T> GetMenuIdByRoleIdAsync<T>(int roleId, string token)
+        {
+            return SendAsync<T>(new APIRequest()
+            {
+                ApiType = SD.ApiType.GET,
+                Url = menuRoleMappingURL + "/api/MenuRoleMapping/GetMenuIdByRoleId?roleId=" + roleId,
                 Token = token
             });
         }

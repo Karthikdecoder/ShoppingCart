@@ -38,6 +38,8 @@ namespace ShoppingCartWeb.Controllers
 
             List<RoleMasterDTO> list = new();
 
+            var roleIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Sid);
+
             var response = await _roleService.GetAllRoleAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
 
             if (response != null && response.IsSuccess)

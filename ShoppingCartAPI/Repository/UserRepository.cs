@@ -58,6 +58,10 @@ namespace ShoppingCartAPI.Repository
 
             Role = _db.User.Where(u => u.RegistrationId == userLoginFromDb.RegistrationId).Select(u => u.RoleMaster.RoleName).FirstOrDefault();
 
+            int RoleID = _db.User.Where(u => u.RegistrationId == userLoginFromDb.RegistrationId).Select(u => u.RoleMaster.RoleId).FirstOrDefault();
+
+            string RoleId = RoleID + "";
+
             var userRegistrationFromDb = _db.Registration.FirstOrDefault(u => u.RegistrationId == userLoginFromDb.RegistrationId);
 
             if (userLoginFromDb == null)
@@ -71,6 +75,7 @@ namespace ShoppingCartAPI.Repository
 
 
             string UserId = string.Empty;
+
             UserId = System.Convert.ToString(userLoginFromDb.RegistrationId);
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -83,6 +88,7 @@ namespace ShoppingCartAPI.Repository
                 {
                     new Claim(ClaimTypes.Name, userLoginFromDb.UserName.ToString()),
                     new Claim(ClaimTypes.Role, Role),
+                    new Claim(ClaimTypes.Sid, RoleId),
                     new Claim(ClaimTypes.NameIdentifier, UserId)
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),

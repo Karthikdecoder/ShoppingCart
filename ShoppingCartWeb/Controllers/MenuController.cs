@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using ShoppingCartWeb.Models;
 using ShoppingCartWeb.Models.Dto;
 using ShoppingCartWeb.Models.VM;
+using ShoppingCartWeb.Services;
 using ShoppingCartWeb.Services.IServices;
 using ShoppingCartWeb.Utililty;
 using System.Data;
@@ -19,15 +20,15 @@ namespace ShoppingCartWeb.Controllers
         private readonly IUserService _userService;
         private readonly IRegistrationService _registrationService;
         private readonly IRoleService _roleService;
-        private readonly IMenuService _MenuService;
+        private readonly IMenuService _menuService;
         private readonly IMapper _mapper;
         private string _Role;
-        public MenuController(IUserService userService, IHttpContextAccessor httpContextAccessor, IRoleService roleService, IMenuService MenuService, IMapper mapper, IRegistrationService registrationService)
+        public MenuController(IUserService userService, IHttpContextAccessor httpContextAccessor, IRoleService roleService, IMenuService menuService, IMapper mapper, IRegistrationService registrationService)
         {
             _userService = userService;
             _Role = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Role);
             _roleService = roleService;
-            _MenuService = MenuService;
+            _menuService = menuService;
             _mapper = mapper;
             _registrationService = registrationService;
         }
@@ -35,11 +36,11 @@ namespace ShoppingCartWeb.Controllers
         [Authorize]
         public async Task<IActionResult> IndexMenu(string orderBy = "", int currentPage = 1)
         {
-            //MenuPaginationVM MenuPaginationVM = new();
+            MenuPaginationVM MenuPaginationVM = new();
 
             List<MenuDTO> list = new();
 
-            var response = await _MenuService.GetAllMenuAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+            var response = await _menuService.GetAllMenuAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
 
             if (response != null && response.IsSuccess)
             {
@@ -52,21 +53,21 @@ namespace ShoppingCartWeb.Controllers
 
             int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
 
-            //list = list.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            list = list.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
 
-            //MenuPaginationVM.MenuDTO = list;
-            //MenuPaginationVM.CurrentPage = currentPage;
-            //MenuPaginationVM.PageSize = pageSize;
-            //MenuPaginationVM.TotalPages = totalPages;
+            MenuPaginationVM.MenuDTO = list;
+            MenuPaginationVM.CurrentPage = currentPage;
+            MenuPaginationVM.PageSize = pageSize;
+            MenuPaginationVM.TotalPages = totalPages;
 
-            return View(list);
+            return View(MenuPaginationVM);
         }
 
         public async Task<IActionResult> ViewMenu(int MenuId)
         {
             MenuDTO MenuDetail = new();
 
-            var MenuResponse = await _MenuService.GetMenuAsync<APIResponse>(MenuId, HttpContext.Session.GetString(SD.SessionToken));
+            var MenuResponse = await _menuService.GetMenuAsync<APIResponse>(MenuId, HttpContext.Session.GetString(SD.SessionToken));
 
             if (MenuResponse != null && MenuResponse.IsSuccess)
             {
@@ -81,17 +82,36 @@ namespace ShoppingCartWeb.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateMenu()
         {
-            return View();
+            MenuVM MenuVM = new MenuVM();
+
+            var parentIdResponse = await _menuService.GetParentIdAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+
+            if (parentIdResponse != null && parentIdResponse.IsSuccess)
+            {
+                MenuVM.ParentList = JsonConvert.DeserializeObject<List<MenuDTO>>(Convert.ToString(parentIdResponse.Result)).Select(i => new SelectListItem
+                {
+                    Text = i.MenuName,
+                    Value = i.MenuId.ToString()
+                });
+
+                return View(MenuVM);
+            }
+            return NotFound();
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateMenu(MenuDTO MenuDTO)
+        public async Task<IActionResult> CreateMenu(MenuVM MenuVM)
         {
             if (ModelState.IsValid)
             {
-                APIResponse response = await _MenuService.CreateMenuAsync<APIResponse>(MenuDTO, HttpContext.Session.GetString(SD.SessionToken));
+                if (MenuVM.Menu.ParentId == null)
+                {
+                    MenuVM.Menu.ParentId = 0;
+                }
+
+                APIResponse response = await _menuService.CreateMenuAsync<APIResponse>(MenuVM.Menu, HttpContext.Session.GetString(SD.SessionToken));
 
                 if (response != null && response.IsSuccess)
                 {
@@ -100,7 +120,7 @@ namespace ShoppingCartWeb.Controllers
                 }
 
                 TempData["error"] = response.ResponseMessage[0].ToString();
-                return View(MenuDTO);
+                return View(MenuVM);
             }
             return View();
 
@@ -109,17 +129,30 @@ namespace ShoppingCartWeb.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateMenu(int MenuId, int currentPageNo)
         {
-            MenuDTO model = new();
+            MenuVM MenuVM = new MenuVM();
 
             //model.CurrentPage = currentPageNo;
 
-            var MenuResponse = await _MenuService.GetMenuAsync<APIResponse>(MenuId, HttpContext.Session.GetString(SD.SessionToken));
+            var MenuResponse = await _menuService.GetMenuAsync<APIResponse>(MenuId, HttpContext.Session.GetString(SD.SessionToken));
 
             if (MenuResponse != null && MenuResponse.IsSuccess)
             {
-                model = JsonConvert.DeserializeObject<MenuDTO>(Convert.ToString(MenuResponse.Result));
+                MenuDTO model = JsonConvert.DeserializeObject<MenuDTO>(Convert.ToString(MenuResponse.Result));
+                MenuVM.Menu = _mapper.Map<MenuDTO>(model);
+            }
 
-                return View(model);
+            var parentIdResponse = await _menuService.GetParentIdAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+
+            if (parentIdResponse != null && parentIdResponse.IsSuccess)
+            {
+                MenuVM.ParentList = JsonConvert.DeserializeObject<List<MenuDTO>>(Convert.ToString(parentIdResponse.Result)).Select(i => new SelectListItem
+                {
+                    Text = i.MenuName,
+                    Value = i.MenuId.ToString()
+
+                });
+
+                return View(MenuVM);
             }
 
             return NotFound();
@@ -128,11 +161,16 @@ namespace ShoppingCartWeb.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateMenu(MenuDTO MenuDTO)
+        public async Task<IActionResult> UpdateMenu(MenuVM MenuVM)
         {
             if (ModelState.IsValid)
             {
-                var response = await _MenuService.UpdateMenuAsync<APIResponse>(MenuDTO, HttpContext.Session.GetString(SD.SessionToken));
+                if (MenuVM.Menu.ParentId == null)
+                {
+                    MenuVM.Menu.ParentId = 0;
+                }
+
+                var response = await _menuService.UpdateMenuAsync<APIResponse>(MenuVM.Menu, HttpContext.Session.GetString(SD.SessionToken));
 
                 if (response != null && response.IsSuccess)
                 {
@@ -141,10 +179,10 @@ namespace ShoppingCartWeb.Controllers
                 }
 
                 TempData["error"] = response.ResponseMessage[0].ToString();
-                return View(MenuDTO);
+                return View(MenuVM);
             }
 
-            return View(MenuDTO);
+            return View(MenuVM);
         }
 
         [Authorize(Roles = "Admin")]
@@ -152,7 +190,7 @@ namespace ShoppingCartWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await _MenuService.EnableMenuAsync<APIResponse>(MenuId, HttpContext.Session.GetString(SD.SessionToken));
+                var response = await _menuService.EnableMenuAsync<APIResponse>(MenuId, HttpContext.Session.GetString(SD.SessionToken));
 
                 if (response != null && response.IsSuccess)
                 {
@@ -170,7 +208,7 @@ namespace ShoppingCartWeb.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RemoveMenu(int MenuId, int currentPageNo)
         {
-            var response = await _MenuService.RemoveMenuAsync<APIResponse>(MenuId, HttpContext.Session.GetString(SD.SessionToken));
+            var response = await _menuService.RemoveMenuAsync<APIResponse>(MenuId, HttpContext.Session.GetString(SD.SessionToken));
 
             if (response != null && response.IsSuccess)
             {
