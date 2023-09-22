@@ -241,6 +241,7 @@
                 type: 'GET',
                 data: { registrationId: registrationId },
                 success: function (data) {
+                    console.log(data);
                     // Replace the content of the modal with the loaded partial view
                     $('#registrationModalContent').html(data);
 
@@ -281,7 +282,7 @@
 
     </script>
 
-    <script>
+   @* <script>
         function openRegistrationModal(registrationId) {
             // Make an AJAX request to fetch the partial view with details
             $.ajax({
@@ -327,7 +328,7 @@
                 }
             });
         });
-    </script>
+    </script>*@
 
 
 }

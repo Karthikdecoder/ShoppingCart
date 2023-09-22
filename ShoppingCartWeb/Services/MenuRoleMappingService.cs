@@ -67,7 +67,7 @@ namespace ShoppingCartWeb.Services
             });
         }
         
-        public Task<T> GetMenuIdByRoleIdAsync<T>(int roleId, string token)
+        public Task<T> GetSelectedMenuIdsForRoleAsync<T>(int roleId, string token)
         {
             return SendAsync<T>(new APIRequest()
             {

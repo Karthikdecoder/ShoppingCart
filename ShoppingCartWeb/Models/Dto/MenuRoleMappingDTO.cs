@@ -26,7 +26,7 @@ namespace ShoppingCartWeb.Models.Dto
         public bool IsDeleted { get; set; } = false;
 
         [ValidateNever]
-        public IEnumerable<string> SelectedMenuIds { get; set; }
+        public IEnumerable<int> SelectedMenuIds { get; set; }
 
     }
 }
