@@ -258,16 +258,16 @@ namespace ShoppingCartAPI.Controllers
         [Route("UpdateMenuRoleMapping")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> UpdateMenuRoleMapping([FromBody] MenuRoleMappingDTO MenuRoleMappingDTO)
+        public async Task<ActionResult<APIResponse>> UpdateMenuRoleMapping([FromBody] MenuRoleMappingDTO menuRoleMappingDTO)
         {
             try
             {
-                if (MenuRoleMappingDTO == null)
+                if (menuRoleMappingDTO == null)
                 {
                     return BadRequest();
                 }
 
-                int MenuRoleMappingId = MenuRoleMappingDTO.MenuRoleMappingId;
+                int MenuRoleMappingId = menuRoleMappingDTO.MenuRoleMappingId;
 
                 if (await _dbMenuRoleMapping.GetAsync(u => u.MenuRoleMappingId == MenuRoleMappingId) == null)
                 {
@@ -275,13 +275,33 @@ namespace ShoppingCartAPI.Controllers
                     return BadRequest(ModelState);
                 }
 
-                if (await _dbMenuRoleMapping.GetAsync(u => u.MenuId == MenuRoleMappingDTO.MenuId && u.RoleId == MenuRoleMappingDTO.RoleId) != null)
+                if (await _dbMenuRoleMapping.GetAsync(u => u.MenuId == menuRoleMappingDTO.MenuId && u.RoleId == menuRoleMappingDTO.RoleId) != null)
                 {
                     _response.ResponseMessage = new List<string>() { "Already Exists" };
                     return BadRequest(_response);
                 }
 
-                MenuRoleMapping model = _mapper.Map<MenuRoleMapping>(MenuRoleMappingDTO);
+                //foreach(int menuId in menuRoleMappingDTO.SelectedMenuIds)
+                //{
+
+
+                //    MenuRoleMapping model = _mapper.Map<MenuRoleMapping>(menuRoleMappingDTO);
+
+                //    model.MenuId = menuId;
+
+                //    if (_userId == null)
+                //    {
+                //        _userId = "0";
+                //    }
+
+                //    model.UpdatedOn = DateTime.Now;
+                //    model.UpdatedBy = int.Parse(_userId);
+                //    model.IsDeleted = false;
+                //    await _dbMenuRoleMapping.UpdateAsync(model);
+                //}
+
+                MenuRoleMapping model = _mapper.Map<MenuRoleMapping>(menuRoleMappingDTO);
+
 
                 if (_userId == null)
                 {

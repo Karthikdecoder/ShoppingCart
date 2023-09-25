@@ -1,0 +1,91 @@
+﻿@*@model ShoppingCartWeb.Models.VM.MenuRoleMappingVM
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br />
+
+<form asp-action="CreateOrUpdateMenuRoleMapping" method="post" id="menuRoleMappingForm">
+    <div class="container border p-3">
+        <style>
+            .text-dark {
+                font-size: 24px;
+            }
+        </style>
+        <h1 class="text-dark">Add MenuRoleMapping</h1>
+        <hr />
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row pb-3">
+                    <div class="col-12">
+                        <label asp-for="MenuRoleMapping.RoleId" class="control-label pt-2" style="font-size: 17px;">Role</label>
+                    </div>
+                    <div class="col-6">
+                        <select asp-for="MenuRoleMapping.RoleId" id="roleId" class="form-control" asp-items="@Model.RoleList" onchange="onRoleChange()">
+                            <option value="" disabled selected>--Select Role--</option>
+                        </select>
+                        <span asp-validation-for="MenuRoleMapping.RoleId" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                @if (Model.MenuList != null)
+                {
+                    <table class="table table-bordered" style="width: 85%;">
+                        <thead>
+                            <tr>
+                                <th>Menu</th>
+                                <th>Description</th>
+                                <th>Checkbox</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var mainMenu in Model.MenuList)
+                            {
+                                <tr>
+                                    <td>
+                                        @mainMenu.Text
+                                    </td>
+                                    <td>
+                                        @if (mainMenu.ParentId != "0")
+                                        {
+                                            var parentMenu = Model.MenuList.FirstOrDefault(m => m.Value == mainMenu.ParentId);
+                                            @parentMenu.Text
+                                        }
+                                    </td>
+                                    <td>
+                                        <label>
+                                            <input type="checkbox" asp-for="MenuRoleMapping.SelectedMenuIdsDTO" value="@mainMenu.Value" id="menu_@mainMenu.Value" />
+                                        </label>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="col-2 offset-10">
+                    <input type="submit" value="Save" class="btn btn-success form-control" style="font-size: 13px;" />
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts
+    {
+    <script>
+        function onRoleChange() {
+            document.getElementById("menuRoleMappingForm").submit();
+        }
+    </script>
+}
+*@

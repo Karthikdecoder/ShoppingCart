@@ -20,10 +20,6 @@ namespace ShoppingCartWeb.Models.VM
         [ValidateNever]
         public IEnumerable<SelectListItem> RoleList { get; set; }
 
-        // Add properties to represent the selected role and selected menu IDs
-        public string SelectedRole { get; set; }
-        public List<string> SelectedMenuIds { get; set; }
-
     }
 
 }

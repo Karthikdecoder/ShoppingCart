@@ -6,7 +6,11 @@ namespace ShoppingCartWeb.Models.Dto
 {
     public class MenuRoleMappingDTO
     {
-       
+        public MenuRoleMappingDTO()
+        {
+            SelectedMenuIds = new List<int>();
+        }
+
         public int MenuRoleMappingId { get; set; }
 
         [Required]
@@ -26,7 +30,11 @@ namespace ShoppingCartWeb.Models.Dto
         public bool IsDeleted { get; set; } = false;
 
         [ValidateNever]
-        public IEnumerable<int> SelectedMenuIds { get; set; }
+        // Add properties to represent the selected role and selected menu IDs
+        public string SelectedRole { get; set; }
+
+        [ValidateNever]
+        public List<int> SelectedMenuIds { get; set; }
 
     }
 }

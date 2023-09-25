@@ -20,5 +20,10 @@ namespace ShoppingCartAPI.Repository
 
             return entity;
         }
+
+        //public int checkMenuRoleIdAlredyExist(int roleId, int MenuId)
+        //{
+        //    _db.MenuRoleMapping.Where(c => c.MenuId == MenuId && c.RoleId == roleId).Select(c => c.MenuRoleMappingId).FirstOrDefault();
+        //}
     }
 }

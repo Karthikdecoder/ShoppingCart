@@ -17,6 +17,8 @@
         <hr />
         <div class="row">
             <div class="col-md-6">
+
+
                 <div class="row pb-3">
                     <div class="col-12">
                         <label asp-for="MenuRoleMapping.RoleId" class="control-label pt-2" style="font-size:17px;">Role</label>
@@ -28,18 +30,22 @@
                         <span asp-validation-for="MenuRoleMapping.RoleId" class="text-danger"></span>
                     </div>
                 </div>
+
+
             </div>
         </div>
 
         <div class="row">
             <div class="col-12">
+
+
                 @if (Model.MenuList != null)
                 {
                     <table class="table table-bordered" style="width:85%;">
                         <thead>
                             <tr>
                                 <th>Menu</th>
-                                <th>Description</th>
+                                <th>Main Menu</th>
                                 <th>Checkbox</th>
                             </tr>
                         </thead>
@@ -51,23 +57,30 @@
                                         @mainMenu.Text
                                     </td>
                                     <td>
-                                        @if (mainMenu.ParentId != "0")
+
+                                        @if (mainMenu.ParentId != 0)
                                         {
                                             var parentMenu = Model.MenuList.FirstOrDefault(m => m.Value == mainMenu.ParentId);
                                             @parentMenu.Text
                                         }
+
                                     </td>
                                     <td>
+
                                         <label>
-                                            <input type="checkbox" name="SelectedMenuIds" value="@mainMenu.Value" id="menu_@mainMenu.Value"
-                                            @(Model.SelectedMenuIds != null && Model.SelectedMenuIds.Contains(mainMenu.Value) ? "checked" : "") />
+                                            <input type="checkbox" name="MenuRoleMapping.SelectedMenuIds" value="@mainMenu.Value" id="menu_@mainMenu.Value"
+                                            @(Model.MenuRoleMapping.SelectedMenuIds != null && Model.MenuRoleMapping.SelectedMenuIds.Contains(mainMenu.Value) ? "checked" : "") />
                                         </label>
+
+                                        <input type="hidden" asp-for="MenuRoleMapping.SelectedMenuIds" id="selectedMenuIds" name="MenuRoleMapping.SelectedMenuIds" />
+
                                     </td>
                                 </tr>
                             }
                         </tbody>
                     </table>
                 }
+
             </div>
         </div>
 
@@ -85,7 +98,66 @@
     {
     <script>
         function onRoleChange() {
-            document.getElementById("menuRoleMappingForm").submit();
+            var roleId = $("#roleId").val(); // Get the selected RoleId
+
+            // Make an AJAX request to your controller action
+            $.ajax({
+                url: '/MenuRoleMapping/GetMenuIds',
+                type: 'GET',
+                data: { roleId: roleId },
+                //success: function (data) {
+                //    // Iterate through the returned menu IDs and check/uncheck checkboxes
+                //    $('input[type="checkbox"]').prop('checked', false); // Uncheck all checkboxes
+
+                //    $.each(data, function (index, menuId) {
+                //        $('#menu_' + menuId).prop('checked', true); // Check checkboxes for selected menu IDs
+                //    });
+                //},
+                //error: function () {
+                //    alert('An error occurred while fetching menu IDs.');
+                //}
+
+                success: function (data) {
+                    // Update the hidden input field with selected menu IDs
+                    $("#selectedMenuIds").val(data.join(',')); // Convert the array to a comma-separated string
+
+                    // Iterate through the returned menu IDs and check/uncheck checkboxes
+                    $('input[type="checkbox"]').prop('checked', false); // Uncheck all checkboxes
+
+                    $.each(data, function (index, menuId) {
+                        $('#menu_' + menuId).prop('checked', true); // Check checkboxes for selected menu IDs
+                    });
+                },
+                error: function () {
+                    alert('An error occurred while fetching menu IDs.');
+                }
+            });
         }
     </script>
+
+    <script>
+        // Function to update the hidden input with selected menu IDs
+        function updateSelectedMenuIds() {
+            var selectedIds = [];
+
+            // Iterate through the checkboxes and add the checked ones to the selectedIds array
+            $('input[type="checkbox"]:checked').each(function () {
+                selectedIds.push($(this).val());
+            });
+
+            // Set the value of the hidden input with a comma-separated string of selected IDs
+            $("#selectedMenuIds").val(selectedIds.join(','));
+        }
+
+        // Attach a change event handler to all checkboxes
+        $('input[type="checkbox"]').change(function () {
+            updateSelectedMenuIds(); // Update the hidden input whenever a checkbox is changed
+        });
+
+        // Call the function initially to populate the hidden input with any pre-checked checkboxes
+        updateSelectedMenuIds();
+    </script>
+
+
+
 }
