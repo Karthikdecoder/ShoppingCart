@@ -105,19 +105,10 @@
                 url: '/MenuRoleMapping/GetMenuIds',
                 type: 'GET',
                 data: { roleId: roleId },
-                //success: function (data) {
-                //    // Iterate through the returned menu IDs and check/uncheck checkboxes
-                //    $('input[type="checkbox"]').prop('checked', false); // Uncheck all checkboxes
-
-                //    $.each(data, function (index, menuId) {
-                //        $('#menu_' + menuId).prop('checked', true); // Check checkboxes for selected menu IDs
-                //    });
-                //},
-                //error: function () {
-                //    alert('An error occurred while fetching menu IDs.');
-                //}
 
                 success: function (data) {
+
+                    
                     // Update the hidden input field with selected menu IDs
                     $("#selectedMenuIds").val(data.join(',')); // Convert the array to a comma-separated string
 

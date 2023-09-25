@@ -66,25 +66,9 @@ namespace ShoppingCartWeb.Controllers
                 });
             }
 
-            // Set the selected role in the view model
-
+           
             menuRoleMappingVM.MenuRoleMapping.RoleId = selectedRole;
 
-            //// Populate the MenuList based on the selected role
-            //if (selectedRole != 0)
-            //{
-            //    var selectedMenuIds = await _MenuRoleMappingService.GetSelectedMenuIdsForRoleAsync<APIResponse>(selectedRole, HttpContext.Session.GetString(SD.SessionToken));
-
-            //    List<int> menuListByRoleId = JsonConvert.DeserializeObject<List<MenuRoleMappingDTO>>(selectedMenuIds.Result.ToString()).Select(c => c.MenuId).ToList();
-
-            //    List<string> menuListByRoleIdls = JsonConvert.DeserializeObject<List<MenuRoleMappingDTO>>(selectedMenuIds.Result.ToString()).Select(c => c.MenuId.ToString()).ToList();
-
-            //    if (selectedMenuIds != null)
-            //    {
-            //        menuRoleMappingVM.MenuRoleMapping.SelectedMenuIdsDTO = menuListByRoleId;
-            //        menuRoleMappingVM.SelectedMenuIds = menuListByRoleIdls;
-            //    }
-            //}
 
             return View(menuRoleMappingVM);
         }
@@ -94,7 +78,6 @@ namespace ShoppingCartWeb.Controllers
             var selectedMenuIds = await _MenuRoleMappingService.GetSelectedMenuIdsForRoleAsync<APIResponse>(roleId, HttpContext.Session.GetString(SD.SessionToken));
 
             var menuListByRoleId = JsonConvert.DeserializeObject<List<MenuRoleMappingDTO>>(selectedMenuIds.Result.ToString()).Select(c => c.MenuId).ToList();
-
 
             var menuListByRole = JsonConvert.DeserializeObject<List<MenuRoleMappingDTO>>(Convert.ToString(selectedMenuIds.Result)).Select(i => new CustomSelectListItem
             {
@@ -220,4 +203,3 @@ namespace ShoppingCartWeb.Controllers
     }
 
 }
-
