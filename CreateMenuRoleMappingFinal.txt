@@ -1,4 +1,4 @@
-﻿@model ShoppingCartWeb.Models.VM.MenuRoleMappingVM
+@model ShoppingCartWeb.Models.VM.MenuRoleMappingVM
 
 @{
     ViewData["Title"] = "RoleMenu";

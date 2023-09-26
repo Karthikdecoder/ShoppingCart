@@ -36,7 +36,7 @@ namespace ShoppingCartAPI.Controllers
         {
             try
             {
-                IEnumerable<Menu> menuList = await _dbmenu.GetAllAsync();
+                IEnumerable<Menu> menuList = await _dbmenu.GetAllAsync( u => u.IsDeleted == false);
                 _response.Result = _mapper.Map<List<MenuDTO>>(menuList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);

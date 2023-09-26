@@ -1,5 +1,4 @@
-﻿@model ShoppingCartWeb.Models.VM.MenuRoleMappingVM
-
+﻿@*@model SchoolManagementSystemWebApp.VM.ModuleMappinVM
 @{
     ViewData["Title"] = "RoleMenu";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -8,71 +7,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register MenuList</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/InventoryWebProject.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+
+
 </head>
-
-
 <body>
     <partial name="_Notification" />
     <div class="container-fluid">
+        <h2 class="text-start">Role Menu Mapping</h2>
+        <hr style="color: black;opacity:100;">
 
-        <br />
-
-        <style>
-            .text-dark {
-                font-size: 24px; /* You can adjust the size to your preference, e.g., 24px, 36px, etc. */
-                /* You can also use other units like em, rem, or % if you prefer. */
-            }
-        </style>
-        <h1 class="text-dark">Role Menu Mappings</h1>
-        <hr />
-
-        <form asp-action="CreateMenuRoleMapping">
-
+        <form asp-action="CreateModuleMapping">
             <div class="row">
                 <div class="col-md-2">
-                    <label for="roleName" class="control-label pt-2" style="font-size:17px;">Role</label>
-                    <select asp-for="MenuRoleMapping.RoleId" class="form-control" asp-items="@Model.RoleList" id="roleIdSelect">
-                        <option disabled selected>--Select Role--</option>
-                    </select>
-                    <span asp-validation-for="MenuRoleMapping.RoleId" class="text-danger"></span>
+                    <label for="roleName">Role Name</label>
                 </div>
                 <div class="col-md-5">
-                    
-                </div>
-            </div>
-
-            @*<div class="row pb-3">
-                <div class="col-12">
-            <label for="roleName" class="control-label pt-2" style="font-size:17px;">Role</label>
-                </div>
-                <div class="col-6">
-                    <select asp-for="MenuRoleMapping.RoleId" id="roleId" class="form-control" asp-items="@Model.RoleList" id="roleIdSelect">
+                    <select asp-for="ModuleMapping.RoleId" class="form-control" asp-items="@Model.RoleList" id="roleIdSelect">
                         <option disabled selected>--Select Role--</option>
                     </select>
-                    <span asp-validation-for="MenuRoleMapping.RoleId" class="text-danger"></span>
+                    <span asp-validation-for="ModuleMapping.RoleId" class="text-danger"></span>
                 </div>
-            </div>*@
-
-
+            </div>
             </br>
             <div class="row">
 
                 <div class="container-fluid">
                     <div id="menuCheckboxes" asp-for="Menus"></div>
-                    <input type="hidden" id="selectedMenusInput" name="selectedMenuIdsList" />
+                    <input type="hidden" id="selectedMenusInput" name="selectedMenuData" />
                     <div id="errorMessages" class="text-danger"></div>
                 </div>
 
             </div>
-
             </br>
 
 
@@ -86,15 +60,16 @@
     </div>
 
 
-@section Scripts {
-        <partial name="_ValidationScriptsPartial" />
-}
 
+
+
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
 
 </body>
 </html>
-
-
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -105,15 +80,17 @@
     var selectedMenus = [];
 
     $(document).ready(function () {
+        // Load the menus when the page loads
 
         var table = $('#tableDemo').DataTable({
-            paging: true,
+            paging: false,
             searching: true
         }
         );
 
         loadMenus();
 
+        // Handle "Select All" checkbox change event using event delegation
         $('#menuCheckboxes').on('change', '#selectAllCheckboxes', function () {
             var isChecked = $(this).is(':checked');
             $('input[name="selectedMenus"]').prop('checked', isChecked);
@@ -157,144 +134,79 @@
                             result = true;
                         }
                     }
+
                 });
-
                 if (!result) {
-                    // Remove the SweetAlert confirmation dialog and submit the form directly
-                    var selectedMenuIdsList = [];
-                    $('input[name="selectedMenus"]').each(function () {
-                        selectedMenuIdsList.push({
-                            Text: $(this).next('label').text(),
-                            Value: $(this).val(),
-                            Selected: $(this).prop('checked')
-                        });
+                    Swal.fire({
+                        title: 'Click Yes to Save',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes',
+                        confirmButtonColor: '#28a745', //green
+                        cancelButtonColor: '#dc3545',//red color
+                        cancelButtonText: 'Cancel',
+                        allowOutsideClick: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            var selectedMenuData = [];
+                            $('input[name="selectedMenus"]').each(function () {
+                                selectedMenuData.push({
+                                    Text: $(this).next('label').text(),
+                                    Value: $(this).val(),
+                                    Selected: $(this).prop('checked')
+                                });
+                            });
+
+                            $('#selectedMenusInput').val(JSON.stringify(selectedMenuData));
+
+                            // Now, you can submit the form programmatically
+                            $('form')[0].submit();
+                        }
                     });
-
-                    $('#selectedMenusInput').val(JSON.stringify(selectedMenuIdsList));
-
-                    $('form')[0].submit();
                 }
-            } else {
+                else {
+                    Swal.fire({
+                        title: 'SubMenu Not Selected',
+                        icon: 'warning',
+                        showCancelButton: false,
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#28a745',
+                        allowOutsideClick: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+
+                        }
+                    });
+                }
+            }
+            else {
                 Swal.fire({
-                    title: 'Choose at least one item',
+                    title: 'Select One Item',
+                    icon: 'warning',
                     showCancelButton: false,
                     confirmButtonText: 'OK',
                     confirmButtonColor: '#28a745',
                     allowOutsideClick: false
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Do nothing or handle it as needed
+
                     }
                 });
             }
         });
 
-
-        //$('form').submit(function (event) {
-        //    event.preventDefault();
-        //    var selectedMenus = {};
-        //    var selectOne = false;
-        //    var result = false;
-        //    $('input[name="selectedMenus"]').each(function () {
-        //        if ($(this).prop('checked')) {
-        //            selectOne = true;
-        //        }
-        //    });
-        //    if (selectOne) {
-        //        $('input[name="selectedMenus"]').each(function () {
-        //            var i = 0;
-        //            var menuValue = $(this).val();
-        //            var parentID = $(this).data('parentid');
-        //            if (parentID == 0 && $(this).prop('checked')) {
-        //                $('input[name="selectedMenus"]').each(function () {
-        //                    var submenu = $(this).val();
-        //                    var subparent = $(this).data('parentid');
-        //                    if (menuValue == subparent) {
-        //                        if ($(this).prop('checked'))
-        //                            i++;
-        //                    }
-        //                });
-        //                if (i == 0) {
-        //                    result = true;
-        //                }
-        //            }
-
-        //        });
-
-        //        if (!result) {
-        //            Swal.fire({
-        //                title: 'Do you want to save?',
-        //                showCancelButton: true,
-        //                confirmButtonText: 'Yes',
-        //                confirmButtonColor: '#28a745', 
-        //                cancelButtonColor: '#dc3545',
-        //                cancelButtonText: 'No',
-        //                allowOutsideClick: false
-        //            }).then((result) => {
-        //                if (result.isConfirmed) {
-        //                    var selectedMenuIdsList = [];
-        //                    $('input[name="selectedMenus"]').each(function () {
-        //                        selectedMenuIdsList.push({
-        //                            Text: $(this).next('label').text(),
-        //                            Value: $(this).val(),
-        //                            Selected: $(this).prop('checked')
-        //                        });
-        //                    });
-
-        //                    $('#selectedMenusInput').val(JSON.stringify(selectedMenuIdsList));
-
-        //                    $('form')[0].submit();
-        //                }
-        //            });
-        //        }
-
-        //        else {
-        //            Swal.fire({
-        //                title: 'Please select sub menu',
-        //                showCancelButton: false,
-        //                confirmButtonText: 'OK',
-        //                confirmButtonColor: '#28a745',
-        //                allowOutsideClick: false
-        //            }).then((result) => {
-        //                if (result.isConfirmed) {
-
-        //                }
-        //            });
-        //        }
-        //    }
-
-        //    else {
-        //        Swal.fire({
-        //            title: 'Choose atleast one item',
-        //            showCancelButton: false,
-        //            confirmButtonText: 'OK',
-        //            confirmButtonColor: '#28a745',
-        //            allowOutsideClick: false
-        //        }).then((result) => {
-        //            if (result.isConfirmed) {
-
-        //            }
-        //        });
-        //    }
-        //});
-
         function loadMenus(roleId) {
-
             $.ajax({
                 type: 'GET',
-
-                url: '@Url.Action("GetMenusByRole", "MenuRoleMapping")',
-
+                url: '@Url.Action("GetMenusByRole", "ModuleMapping")',
                 data: { roleId: roleId },
-
                 dataType: 'json',
 
                 success: function (data) {
-                    console.log(data);
                     $('#menuCheckboxes').empty();
 
                     var table = $('<table class="table" style="margin: 0; padding: 0;" style="border: 1px solid #ddd;" id="tableDemo"> ');
-                    var thead = $('<tr><thead class="bg-primary text-white"><th>Main menu</th><th>Description</th><th><label class="form-check-label" for="selectAllCheckboxes"></label>Checkbox</th></tr></thead>');
+                    var thead = $('<tr><thead class="bg-primary text-white"><th>Menu Name</th><th>Parent Name</th><th><label class="form-check-label" for="selectAllCheckboxes"><input type="checkbox" style="border: 1px solid #B3E0FF;background-color: #E6F7FF; margin-top: -11px;" id="selectAllCheckboxes" class="form-check-input"></label>Select All</th></tr></thead>');
                     var tbody = $('<tbody style="margin: 0; padding: 0;">');
 
                     var menuCheckboxes = {};
@@ -302,7 +214,7 @@
                     data.forEach(function (item) {
                         var row = $('<tr>' +
                             '<td style="margin: 0; padding: 0.5;">' + item.text + '</td>' +
-                            '<td style="margin: 0; padding: 0.5;">' + item.description + '</td>' +
+                            '<td style="margin: 0; padding: 0.5;">' + item.parentName + '</td>' +
                             '<td style="margin: 0; padding: 0.5;">' +
                             '<div class="form-check">' +
                             '<input type="checkbox" name="selectedMenus" value="' + item.value + '" data-parentid="' + item.parentId + '" class="form-check-input" ' + (item.selected ? 'checked' : '') + ' />' +
@@ -362,4 +274,4 @@
         }
 
     });
-</script>
+</script>*@
