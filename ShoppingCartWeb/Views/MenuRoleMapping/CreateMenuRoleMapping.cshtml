@@ -13,8 +13,10 @@
                 font-size: 24px;
             }
         </style>
-        <h1 class="text-dark">Add MenuRoleMapping</h1>
+        <h1 class="text-dark"> Add MenuRoleMapping </h1>
+
         <hr />
+
         <div class="row">
             <div class="col-md-6">
 
@@ -67,9 +69,15 @@
                                     </td>
                                     <td>
 
+                                        @* <label>
+                                <input type="checkbox" name="MenuRoleMapping.SelectedMenuIds" value="@mainMenu.Value" id="menu_@mainMenu.Value"
+                                @(Model.MenuRoleMapping.SelectedMenuIds != null && Model.MenuRoleMapping.SelectedMenuIds.Contains(mainMenu.Value) ? "checked" : "") />
+                                </label>*@
+
                                         <label>
                                             <input type="checkbox" name="MenuRoleMapping.SelectedMenuIds" value="@mainMenu.Value" id="menu_@mainMenu.Value"
-                                            @(Model.MenuRoleMapping.SelectedMenuIds != null && Model.MenuRoleMapping.SelectedMenuIds.Contains(mainMenu.Value) ? "checked" : "") />
+                                            @(Model.MenuRoleMapping.SelectedMenuIds != null && Model.MenuRoleMapping.SelectedMenuIds.Contains(mainMenu.Value) ? "checked" : "")
+                                                   data-parentid="@mainMenu.ParentId" onchange="onMenuChange('@mainMenu.Value', '@mainMenu.ParentId')" />
                                         </label>
 
                                         <input type="hidden" asp-for="MenuRoleMapping.SelectedMenuIds" id="selectedMenuIds" name="MenuRoleMapping.SelectedMenuIds" />
@@ -87,10 +95,13 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="col-2 offset-10">
-                    <input type="submit" value="Save" class="btn btn-success form-control" style="font-size: 13px;" />
+
+                    <input type="submit" value="Save" class="btn btn-success form-control" style="font-size: 13px;" id="submitButton" />
+
                 </div>
             </div>
         </div>
+
     </div>
 </form>
 
@@ -101,14 +112,15 @@
             var roleId = $("#roleId").val(); // Get the selected RoleId
 
             // Make an AJAX request to your controller action
+
             $.ajax({
+
                 url: '/MenuRoleMapping/GetMenuIds',
                 type: 'GET',
                 data: { roleId: roleId },
 
                 success: function (data) {
 
-                    
                     // Update the hidden input field with selected menu IDs
                     $("#selectedMenuIds").val(data.join(',')); // Convert the array to a comma-separated string
 
@@ -119,36 +131,44 @@
                         $('#menu_' + menuId).prop('checked', true); // Check checkboxes for selected menu IDs
                     });
                 },
+
                 error: function () {
                     alert('An error occurred while fetching menu IDs.');
                 }
+
             });
         }
     </script>
 
     <script>
-        // Function to update the hidden input with selected menu IDs
-        function updateSelectedMenuIds() {
-            var selectedIds = [];
+        function onMenuChange(menuId, parentId) {
 
-            // Iterate through the checkboxes and add the checked ones to the selectedIds array
-            $('input[type="checkbox"]:checked').each(function () {
-                selectedIds.push($(this).val());
-            });
+            if (parentId !== "0") {
+                // This menu has a parent; you can handle child menu selection here
+                console.log('Selected child menu with ID: ' + menuId + ', Parent ID: ' + parentId);
 
-            // Set the value of the hidden input with a comma-separated string of selected IDs
-            $("#selectedMenuIds").val(selectedIds.join(','));
+                // You can make an AJAX request or perform any other actions as needed for child menus
+            }
+
+            else {
+                // This menu is a parent menu; handle parent menu selection here
+                console.log('Selected parent menu with ID: ' + menuId);
+
+                // Check if the parent menu is checked or unchecked
+                var isChecked = $('#menu_' + menuId).prop('checked');
+
+                // Find all sub-menu checkboxes with the same parent ID
+                $('input[type="checkbox"]').each(function () {
+                    if ($(this).data('parentid') === menuId) {
+                        // Check or uncheck the sub-menu based on the parent menu's state
+                        $(this).prop('checked', isChecked);
+                    }
+                });
+
+                // You can make an AJAX request or perform any other actions as needed for parent menus
+            }
         }
-
-        // Attach a change event handler to all checkboxes
-        $('input[type="checkbox"]').change(function () {
-            updateSelectedMenuIds(); // Update the hidden input whenever a checkbox is changed
-        });
-
-        // Call the function initially to populate the hidden input with any pre-checked checkboxes
-        updateSelectedMenuIds();
     </script>
-
 
 
 }

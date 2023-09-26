@@ -33,6 +33,126 @@ namespace ShoppingCartAPI.Controllers
             _dbmenu = dbmenu;
         }
 
+        [HttpPut]
+        [Authorize(Roles = "Admin")]
+        [Route("UpdateMenuRoleMapping")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponse>> UpdateMenuRoleMapping([FromBody] MenuRoleMappingDTO menuRoleMappingDTO)
+        {
+            try
+            {
+                if (menuRoleMappingDTO == null)
+                {
+                    return BadRequest();
+                }
+
+                int MenuRoleMappingId = menuRoleMappingDTO.MenuRoleMappingId;
+
+                if (await _dbMenuRoleMapping.GetAsync(u => u.MenuId == menuRoleMappingDTO.MenuId && u.RoleId == menuRoleMappingDTO.RoleId) != null)
+                {
+                    _response.ResponseMessage = new List<string>() { "Already Exists" };
+                    return BadRequest(_response);
+                }
+
+                bool allAreParentMenus = true;
+
+                foreach (int menuId in menuRoleMappingDTO.SelectedMenuIds)
+                {
+                    var menu = await _dbmenu.GetAsync(u => u.MenuId == menuId);
+
+                    if (menu == null || menu.ParentId != 0)
+                    {
+                        allAreParentMenus = false;
+                        break; // Exit the loop as soon as we find a menu that is not a parent menu
+                    }
+                }
+
+                if (allAreParentMenus)
+                {
+                    _response.ResponseMessage = new List<string>() { "Select at least one child menu" };
+                    return BadRequest(_response);
+                    // Handle the case where only parent menus are selected and no child menus
+                }
+
+                foreach (int menuId in menuRoleMappingDTO.SelectedMenuIds)
+                {
+
+                    MenuRoleMapping model = _mapper.Map<MenuRoleMapping>(menuRoleMappingDTO);
+
+                    model.MenuId = menuId;
+
+                    if (_userId == null)
+                    {
+                        _userId = "0";
+                    }
+
+                    // Create a list of unique MenuId-RoleId pairs from the selected menuRoleMappingDTO
+                    var uniquePairs = menuRoleMappingDTO.SelectedMenuIds
+                        .Select(menuId => new { MenuId = menuId, RoleId = model.RoleId })
+                        .Distinct()
+                        .ToList();
+
+                    // Get all MenuRoleMapping records with the same RoleId
+                    var allRoleMappingsForRole = await _dbMenuRoleMapping.GetAllAsync(u => u.RoleId == model.RoleId && u.RoleMaster.IsDeleted == false && u.Menu.IsDeleted == false && u.IsDeleted == false, includeProperties: "RoleMaster,Menu");
+
+                    foreach (var roleMapping in allRoleMappingsForRole)
+                    {
+                        // Check if the MenuId-RoleId pair of the current record exists in the uniquePairs list
+                        var existsInSelectedIds = uniquePairs.Any(pair => pair.MenuId == roleMapping.MenuId);
+
+                        if (!existsInSelectedIds)
+                        {
+                            // If the pair doesn't exist in the selected IDs, mark IsDeleted as 1
+                            roleMapping.IsDeleted = true;
+                            await _dbMenuRoleMapping.UpdateAsync(roleMapping);
+                        }
+                    }
+
+                    // Get all MenuRoleMapping records with IsDeleted set to 1 for the given RoleId
+                    var markedForDeletion = await _dbMenuRoleMapping.GetAllAsync(u => u.RoleId == model.RoleId && u.RoleMaster.IsDeleted == false && u.Menu.IsDeleted == false, includeProperties: "RoleMaster,Menu");
+
+                    foreach (var roleMapping in markedForDeletion)
+                    {
+                        // Check if the MenuId of the current record exists in the selected menuRoleMappingDTO
+                        if (menuRoleMappingDTO.SelectedMenuIds.Contains(roleMapping.MenuId))
+                        {
+                            // If the MenuId is in the selected IDs, mark IsDeleted as 0
+                            roleMapping.IsDeleted = false;
+                            await _dbMenuRoleMapping.UpdateAsync(roleMapping);
+                        }
+                    }
+
+                    // Check if a MenuRoleMapping record with the same MenuId and RoleId already exists
+                    var existingRecord = await _dbMenuRoleMapping.GetAsync(u => u.MenuId == menuId && u.RoleId == model.RoleId);
+
+                    if (existingRecord != null)
+                    {
+                        // Skip the update if the record already exists
+                        continue;
+                    }
+
+                    model.UpdatedOn = DateTime.Now;
+                    model.UpdatedBy = int.Parse(_userId);
+                    model.IsDeleted = false;
+                    await _dbMenuRoleMapping.UpdateAsync(model);
+                }
+
+                _response.StatusCode = HttpStatusCode.NoContent;
+                _response.IsSuccess = true;
+                return Ok(_response);
+            }
+
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ResponseMessage = new List<string>() { ex.ToString() };
+            }
+
+            return _response;
+        }
+
+
         [HttpGet]
         [Route("GetAllMenuRoleMapping")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -92,6 +212,7 @@ namespace ShoppingCartAPI.Controllers
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
             }
+
             catch (Exception ex)
             {
                 _response.IsSuccess = false;
@@ -136,8 +257,6 @@ namespace ShoppingCartAPI.Controllers
 
             return _response;
         }
-
-
 
         [HttpPost]
         [Route("CreateMenuRoleMapping")]
@@ -252,157 +371,7 @@ namespace ShoppingCartAPI.Controllers
             return _response;
         }
 
-        [HttpPut]
-        [Authorize(Roles = "Admin")]
-        [Route("UpdateMenuRoleMapping")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> UpdateMenuRoleMapping([FromBody] MenuRoleMappingDTO menuRoleMappingDTO)
-        {
-            try
-            {
-                if (menuRoleMappingDTO == null)
-                {
-                    return BadRequest();
-                }
-
-                int MenuRoleMappingId = menuRoleMappingDTO.MenuRoleMappingId;
-
-                //if (await _dbMenuRoleMapping.GetAsync(u => u.MenuRoleMappingId == MenuRoleMappingId) == null)
-                //{
-                //    ModelState.AddModelError("ErrorMessages", "MenuRoleMapping ID is Invalid!");
-                //    return BadRequest(ModelState);
-                //}
-
-                if (await _dbMenuRoleMapping.GetAsync(u => u.MenuId == menuRoleMappingDTO.MenuId && u.RoleId == menuRoleMappingDTO.RoleId) != null)
-                {
-                    _response.ResponseMessage = new List<string>() { "Already Exists" };
-                    return BadRequest(_response);
-                }
-
-                if (menuRoleMappingDTO.SelectedMenuIds.Count == 0)
-                {
-                    var uniquePairs = menuRoleMappingDTO.SelectedMenuIds
-                        .Select(menuId => new { MenuId = menuId, RoleId = menuRoleMappingDTO.RoleId })
-                        .Distinct()
-                        .ToList();
-
-                    // Get all MenuRoleMapping records with IsDeleted set to 1 for the given RoleId
-                    // Get all MenuRoleMapping records with the same RoleId
-                    var allRoleMappingsForRole = await _dbMenuRoleMapping.GetAllAsync(u => u.RoleId == menuRoleMappingDTO.RoleId && u.RoleMaster.IsDeleted == false && u.Menu.IsDeleted == false && u.IsDeleted == false, includeProperties: "RoleMaster,Menu");
-
-                    foreach (var roleMapping in allRoleMappingsForRole)
-                    {
-                        // Check if the MenuId-RoleId pair of the current record exists in the uniquePairs list
-                        var existsInSelectedIds = uniquePairs.Any(pair => pair.MenuId == roleMapping.MenuId);
-
-                        if (!existsInSelectedIds)
-                        {
-                            // If the pair doesn't exist in the selected IDs, mark IsDeleted as 1
-                            roleMapping.IsDeleted = true;
-                            await _dbMenuRoleMapping.UpdateAsync(roleMapping);
-                        }
-                    }
-                }
-
-                foreach (int menuId in menuRoleMappingDTO.SelectedMenuIds)
-                {
-
-
-                    MenuRoleMapping model = _mapper.Map<MenuRoleMapping>(menuRoleMappingDTO);
-
-                    model.MenuId = menuId;
-
-
-                    if (_userId == null)
-                    {
-                        _userId = "0";
-                    }
-
-                    //// Assume you have retrieved menu IDs from the parameter into a List<int> parameterMenuIds
-                    //var parentMenuIds = await _dbmenu.GetAsync(u => u.ParentId == 0);
-
-                    //// Check if there are any parent menus in the parameter
-                    //var parentMenusInParam = parameterMenuIds.Intersect(parentMenuIds).Any();
-
-                    //if (parentMenusInParam)
-                    //{
-                    //    // If parent menus are found, check if there are any child menu IDs in the parameter
-                    //    var childMenusInParam = parameterMenuIds.Except(parentMenuIds).Any();
-
-                    //    if (childMenusInParam)
-                    //    {
-                    //        // Throw an error indicating that child menus cannot be passed without their parent menus
-                    //        throw new Exception("Child menus cannot be passed without their parent menus.");
-                    //    }
-                    //}
-
-
-                    // Create a list of unique MenuId-RoleId pairs from the selected menuRoleMappingDTO
-                    var uniquePairs = menuRoleMappingDTO.SelectedMenuIds
-                        .Select(menuId => new { MenuId = menuId, RoleId = model.RoleId })
-                        .Distinct()
-                        .ToList();
-
-                    // Get all MenuRoleMapping records with the same RoleId
-                    var allRoleMappingsForRole = await _dbMenuRoleMapping.GetAllAsync(u => u.RoleId == model.RoleId && u.RoleMaster.IsDeleted == false && u.Menu.IsDeleted == false && u.IsDeleted == false, includeProperties: "RoleMaster,Menu");
-
-                    foreach (var roleMapping in allRoleMappingsForRole)
-                    {
-                        // Check if the MenuId-RoleId pair of the current record exists in the uniquePairs list
-                        var existsInSelectedIds = uniquePairs.Any(pair => pair.MenuId == roleMapping.MenuId);
-
-                        if (!existsInSelectedIds)
-                        {
-                            // If the pair doesn't exist in the selected IDs, mark IsDeleted as 1
-                            roleMapping.IsDeleted = true;
-                            await _dbMenuRoleMapping.UpdateAsync(roleMapping);
-                        }
-                    }
-
-                    // Get all MenuRoleMapping records with IsDeleted set to 1 for the given RoleId
-                    var markedForDeletion = await _dbMenuRoleMapping.GetAllAsync(u => u.RoleId == model.RoleId && u.RoleMaster.IsDeleted == false && u.Menu.IsDeleted == false, includeProperties: "RoleMaster,Menu");
-
-                    foreach (var roleMapping in markedForDeletion)
-                    {
-                        // Check if the MenuId of the current record exists in the selected menuRoleMappingDTO
-                        if (menuRoleMappingDTO.SelectedMenuIds.Contains(roleMapping.MenuId))
-                        {
-                            // If the MenuId is in the selected IDs, mark IsDeleted as 0
-                            roleMapping.IsDeleted = false;
-                            await _dbMenuRoleMapping.UpdateAsync(roleMapping);
-                        }
-                    }
-
-
-                    // Check if a MenuRoleMapping record with the same MenuId and RoleId already exists
-                    var existingRecord = await _dbMenuRoleMapping.GetAsync(u => u.MenuId == menuId && u.RoleId == model.RoleId);
-
-                    if (existingRecord != null)
-                    {
-                        // Skip the update if the record already exists
-                        continue;
-                    }
-
-                    model.UpdatedOn = DateTime.Now;
-                    model.UpdatedBy = int.Parse(_userId);
-                    model.IsDeleted = false;
-                    await _dbMenuRoleMapping.UpdateAsync(model);
-                }
-
-
-
-                _response.StatusCode = HttpStatusCode.NoContent;
-                _response.IsSuccess = true;
-                return Ok(_response);
-            }
-            catch (Exception ex)
-            {
-                _response.IsSuccess = false;
-                _response.ResponseMessage = new List<string>() { ex.ToString() };
-            }
-            return _response;
-        }
+        
 
         [HttpPut]
         [Authorize(Roles = "Admin")]

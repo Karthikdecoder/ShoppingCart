@@ -66,9 +66,7 @@ namespace ShoppingCartWeb.Controllers
                 });
             }
 
-           
             menuRoleMappingVM.MenuRoleMapping.RoleId = selectedRole;
-
 
             return View(menuRoleMappingVM);
         }
@@ -86,24 +84,24 @@ namespace ShoppingCartWeb.Controllers
                 RoleId = i.RoleId
             });
 
-            var menuResponse = await _menuService.GetAllMenuAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
-
-            List<CustomSelectListItem> menuList = null;
-
-            if (menuResponse != null && menuResponse.IsSuccess)
-            {
-                menuList = JsonConvert.DeserializeObject<List<MenuDTO>>(Convert.ToString(menuResponse.Result)).Select(i => new CustomSelectListItem
-                {
-                    Text = i.MenuName,
-                    Value = i.MenuId,
-                    ParentId = (int)i.ParentId,
-                    Selected = menuListByRoleId.Contains(i.MenuId) // Set the "Selected" property based on menuListByRoleId
-                }).ToList();
-            }
-
             return Json(menuListByRoleId);
         }
 
+        public async Task<IActionResult> GetSelectedChildMenus(int parentId, int roleId)
+        {
+            var selectedMenuIds = await _MenuRoleMappingService.GetSelectedMenuIdsForRoleAsync<APIResponse>(roleId, HttpContext.Session.GetString(SD.SessionToken));
+
+            var menuListByRoleId = JsonConvert.DeserializeObject<List<MenuRoleMappingDTO>>(selectedMenuIds.Result.ToString()).Select(c => c.MenuId).ToList();
+
+            var menuListByRole = JsonConvert.DeserializeObject<List<MenuRoleMappingDTO>>(Convert.ToString(selectedMenuIds.Result)).Select(i => new CustomSelectListItem
+            {
+                MenuRoleMappingId = i.MenuRoleMappingId,
+                MenuId = i.MenuId,
+                RoleId = i.RoleId
+            });
+
+            return Json(menuListByRoleId);
+        }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
@@ -114,8 +112,11 @@ namespace ShoppingCartWeb.Controllers
 
             if (response != null && response.IsSuccess)
             {
+                TempData["success"] = "Saved successfully";
                 return RedirectToAction("CreateMenuRoleMapping");
             }
+
+            TempData["error"] = response.ResponseMessage[0].ToString();
 
             // Handle the form submission and any other logic here
 
@@ -161,7 +162,6 @@ namespace ShoppingCartWeb.Controllers
 
             return View(menuRoleMappingVM);
         }
-
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
