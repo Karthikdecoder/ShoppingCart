@@ -64,14 +64,14 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> CreateRoleMaster()
         {
             return View();
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateRoleMaster(RoleMasterDTO roleMasterDTO)
         {
@@ -93,7 +93,7 @@ namespace ShoppingCartWeb.Controllers
 
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> UpdateRoleMaster(int roleId, int currentPageNo)
         {
             if(roleId == 0)
@@ -117,7 +117,7 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateRoleMaster(UpdateRoleMasterVM updateRoleMasterVM)
         {
@@ -137,7 +137,7 @@ namespace ShoppingCartWeb.Controllers
             return View();
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> EnableRole(int roleId, int currentPageNo)
         {
             if (ModelState.IsValid)
@@ -158,7 +158,7 @@ namespace ShoppingCartWeb.Controllers
         }
 
         
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> RemoveRoleMaster(int roleId, int currentPageNo)
         {
             var response = await _roleService.RemoveRoleAsync<APIResponse>(roleId, HttpContext.Session.GetString(SD.SessionToken));

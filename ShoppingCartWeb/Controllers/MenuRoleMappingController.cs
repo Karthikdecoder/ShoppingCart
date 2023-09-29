@@ -36,7 +36,7 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> CreateMenuRoleMapping()
         {
 

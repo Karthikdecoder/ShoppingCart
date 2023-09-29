@@ -219,6 +219,13 @@
                 }
             });
 
+            // Function to update the "Select All" checkbox based on individual checkboxes
+            function updateSelectAllCheckboxStatus() {
+                var allCheckboxes = $('input[name="selectedMenus"]');
+                var allChecked = allCheckboxes.length > 0 && allCheckboxes.length === allCheckboxes.filter(':checked').length;
+                $('#selectAllCheckboxes').prop('checked', allChecked);
+            }
+
 
             function loadMenus(roleId) {
 
@@ -233,11 +240,8 @@
                     dataType: 'json',
 
                     success: function (data) {
-
                         console.log(data);
-
                         $('#menuCheckboxes').empty();
-
                         var table = $('<table class="table" style="margin: 0; padding: 0;" style="border: 1px solid #ddd;" id="tableDemo"> ');
                         var thead = $('<tr><thead class="bg-primary text-white"><th>Menu Name</th><th>Parent Name</th><th>Select All<label class="form-check-label" for="selectAllCheckboxes"><input type="checkbox" style="border: 1px solid #B3E0FF;background-color: #E6F7FF; margin-top: -12px; margin-left: 9px;" id="selectAllCheckboxes" class="form-check-input"></label></tr></thead>');
                         var tbody = $('<tbody style="margin: 0; padding: 0;">');
@@ -296,6 +300,9 @@
 
                                     }
                                 }
+
+                                // Call the function to update the "Select All" checkbox status
+                                updateSelectAllCheckboxStatus();
                             });
 
                             $('#menuCheckboxes').append(table);
@@ -305,6 +312,9 @@
                         table.append(tbody);
 
                         $('#menuCheckboxes').append(table);
+
+                        // After all rows have been created, update the "Select All" checkbox initially
+                        updateSelectAllCheckboxStatus();
                     },
 
                     error: function () {

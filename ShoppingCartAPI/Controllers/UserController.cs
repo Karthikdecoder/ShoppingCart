@@ -120,7 +120,7 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpPost("Register")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> Register([FromBody] UserDTO userDTO)
         {
             bool ifUserNameUnique = _userRepo.IsUniqueUser(userDTO);
@@ -157,7 +157,7 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpDelete]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [Route("RemoveUser")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -202,7 +202,7 @@ namespace ShoppingCartAPI.Controllers
 
 
         [HttpPut]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [Route("UpdateUser")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -252,7 +252,7 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [Route("EnableUser")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]

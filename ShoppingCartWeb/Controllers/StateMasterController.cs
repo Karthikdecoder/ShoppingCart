@@ -67,7 +67,7 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> CreateStateMaster()
         {
             StateMasterCreateVM stateMasterCreateVM = new StateMasterCreateVM();
@@ -88,7 +88,7 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateStateMaster(StateMasterCreateVM stateMasterCreateVM)
         {
@@ -111,7 +111,7 @@ namespace ShoppingCartWeb.Controllers
 
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> UpdateStateMaster(int StateId)
         {
             StateMasterCreateVM stateMasterCreateVM = new();
@@ -142,7 +142,7 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStateMaster(StateMasterCreateVM stateMasterCreateVM)
         {
@@ -163,7 +163,7 @@ namespace ShoppingCartWeb.Controllers
             return View(stateMasterCreateVM);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> EnableStateMaster(int stateId, int currentPageNo)
         {
             if (ModelState.IsValid)
@@ -183,7 +183,7 @@ namespace ShoppingCartWeb.Controllers
             return View();
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> RemoveStateMaster(int stateId)
         {
             var response = await _stateService.RemoveStateAsync<APIResponse>(stateId, HttpContext.Session.GetString(SD.SessionToken));

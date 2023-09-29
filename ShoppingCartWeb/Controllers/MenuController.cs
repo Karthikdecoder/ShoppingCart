@@ -79,7 +79,7 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> CreateMenu()
         {
             MenuVM MenuVM = new MenuVM();
@@ -100,7 +100,7 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateMenu(MenuVM MenuVM)
         {
@@ -126,7 +126,7 @@ namespace ShoppingCartWeb.Controllers
 
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> UpdateMenu(int MenuId, int currentPageNo)
         {
             MenuVM MenuVM = new MenuVM();
@@ -159,7 +159,7 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateMenu(MenuVM MenuVM)
         {
@@ -185,7 +185,7 @@ namespace ShoppingCartWeb.Controllers
             return View(MenuVM);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> EnableMenu(int MenuId, int currentPageNo)
         {
             if (ModelState.IsValid)
@@ -205,7 +205,7 @@ namespace ShoppingCartWeb.Controllers
             return View();
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> RemoveMenu(int MenuId, int currentPageNo)
         {
             var response = await _menuService.RemoveMenuAsync<APIResponse>(MenuId, HttpContext.Session.GetString(SD.SessionToken));

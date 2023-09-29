@@ -104,7 +104,7 @@ namespace ShoppingCartWeb.Controllers
 
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> CreateRegistration()
         {
             CreateRegistrationVM createRegisterationVM = new();
@@ -152,7 +152,7 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateRegistration(CreateRegistrationVM createRegistrationVM)
         {
@@ -174,7 +174,7 @@ namespace ShoppingCartWeb.Controllers
 
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> UpdateRegistration(int registrationId, int currentPageNo)
         {
             UpdateRegistrationVM updateRegistrationVM = new();
@@ -228,7 +228,7 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> UpdateRegistration(UpdateRegistrationVM updateRegistrationVM)
         {
             if (ModelState.IsValid)
@@ -248,7 +248,7 @@ namespace ShoppingCartWeb.Controllers
             return View(updateRegistrationVM);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> EnableRegistration(int registrationId, int currentPageNo)
         {
             if (ModelState.IsValid)
@@ -268,7 +268,7 @@ namespace ShoppingCartWeb.Controllers
             return View();
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> RemoveRegistration(int registrationId, int currentPageNo, string orderBys)
         {
             var response = await _registrationService.RemoveRegistrationAsync<APIResponse>(registrationId, HttpContext.Session.GetString(SD.SessionToken));

@@ -91,7 +91,7 @@ namespace ShoppingCartAPI.Controllers
 
         
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [Route("CreateRegistration")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -139,7 +139,7 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpDelete]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [Route("RemoveRegistration")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -178,7 +178,7 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [Route("UpdateRegistration")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -231,7 +231,7 @@ namespace ShoppingCartAPI.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [Route("EnableRegistration")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]

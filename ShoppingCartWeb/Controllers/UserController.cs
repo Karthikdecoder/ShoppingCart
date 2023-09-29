@@ -28,6 +28,7 @@ namespace ShoppingCartWeb.Controllers
         private readonly IMenuRoleMappingService _MenuRoleMappingService;
         private readonly IMapper _mapper;
         private string _Role;
+
         public UserController(IUserService userService, IHttpContextAccessor httpContextAccessor, IRoleService roleService, ICategoryService categoryService, IMapper mapper, IRegistrationService registrationService, IMenuRoleMappingService menuRoleMappingService)
         {
             _userService = userService;
@@ -89,6 +90,22 @@ namespace ShoppingCartWeb.Controllers
             }
         }
 
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync();
+            HttpContext.Session.SetString(SD.SessionToken, "");
+
+            // Add a random query parameter to the URL to prevent caching
+            string returnUrl = Url.Action("Login", "User", new { cacheBuster = DateTime.UtcNow.Ticks });
+
+            return RedirectToAction("Login", "User");
+        }
+
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
         [Authorize]
         public async Task<IActionResult> IndexUser(string orderBy = "", int currentPage = 1)
         {
@@ -120,7 +137,7 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> Register()
         {
             RegisterVM registerVM = new();
@@ -169,7 +186,7 @@ namespace ShoppingCartWeb.Controllers
 
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterVM registerVM)
         {
@@ -190,7 +207,7 @@ namespace ShoppingCartWeb.Controllers
             return View();
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> UpdateUser(int userId)
         {
             UpdateUserVM updateUserVM = new();
@@ -230,7 +247,7 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateUser(UpdateUserVM updateUserVM)
         {
@@ -250,7 +267,7 @@ namespace ShoppingCartWeb.Controllers
             return View(updateUserVM);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> EnableUser(int userId)
         {
             if (ModelState.IsValid)
@@ -270,7 +287,7 @@ namespace ShoppingCartWeb.Controllers
             return View();
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> RemoveUser(int userId)
         {
             var response = await _userService.RemoveUserAsync<APIResponse>(userId, HttpContext.Session.GetString(SD.SessionToken));
@@ -285,22 +302,6 @@ namespace ShoppingCartWeb.Controllers
             return View(); 
         }
 
-        
-        public async Task<IActionResult> Logout()
-        {
-            await HttpContext.SignOutAsync();
-            HttpContext.Session.SetString(SD.SessionToken, "");
-
-            // Add a random query parameter to the URL to prevent caching
-            string returnUrl = Url.Action("Login", "User", new { cacheBuster = DateTime.UtcNow.Ticks });
-
-            return RedirectToAction("Login", "User");
-        }
-
-        public IActionResult AccessDenied()
-        {
-            return View();
-        }
     }
 
 }

@@ -78,14 +78,14 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> CreateCategoryMaster()
         {
             return View();
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateCategoryMaster(CategoryMasterDTO categoryMasterDTO)
         {
@@ -106,7 +106,7 @@ namespace ShoppingCartWeb.Controllers
 
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> UpdateCategoryMaster(int categoryId, int currentPageNo)
         {
             CategoryMasterDTO model = new();
@@ -126,7 +126,7 @@ namespace ShoppingCartWeb.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateCategoryMaster(CategoryMasterDTO categoryMasterDTO)
         {
@@ -147,7 +147,7 @@ namespace ShoppingCartWeb.Controllers
             return View(categoryMasterDTO);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> EnableCategory(int categoryId, int currentPageNo)
         {
             if (ModelState.IsValid)
@@ -167,7 +167,7 @@ namespace ShoppingCartWeb.Controllers
             return View();
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> RemoveCategoryMaster(int categoryId, int currentPageNo)
         {
             var response = await _categoryService.RemoveCategoryAsync<APIResponse>(categoryId, HttpContext.Session.GetString(SD.SessionToken));
@@ -182,64 +182,7 @@ namespace ShoppingCartWeb.Controllers
             return View();
         }
 
-        //public async Task<IActionResult> CreateRoleMenu(RoleMenuVM obj, string selectedMenuData)
-        //{
-        //    try
-        //    {
-        //        List<RoleMenuMapping> list = new();
-
-        //        List<CustomSelectListItem> selectedMenusList = JsonConvert.DeserializeObject<List<CustomSelectListItem>>(selectedMenuData);
-
-        //        var response = await _rolemenuService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
-
-        //        if (response != null && response.IsSuccess)
-        //        {
-        //            list = JsonConvert.DeserializeObject<List<RoleMenuMapping>>(Convert.ToString(response.Result));
-
-        //        }
-
-        //        if (ModelState.IsValid)
-        //        {
-        //            foreach (var selectedItem in selectedMenusList)
-        //            {
-
-        //                var matchingItem = list.FirstOrDefault(item =>
-        //                  item.MenuId.ToString() == selectedItem.Value &&
-        //                  item.RoleId == obj.menu.RoleId
-        //                );
-        //                if (matchingItem != null)
-        //                {
-        //                    if (selectedItem.Selected && matchingItem.StatusFlag == true)
-        //                    {
-        //                        var update = await _rolemenuService.UpdateStatus<APIResponse>(matchingItem.Id, HttpContext.Session.GetString(SD.SessionToken));
-        //                    }
-        //                    else if (selectedItem.Selected == false && matchingItem.StatusFlag == false)
-        //                    {
-        //                        var delete = await _rolemenuService.DeleteAsync<APIResponse>(matchingItem.Id, HttpContext.Session.GetString(SD.SessionToken));
-        //                    }
-        //                }
-        //                else
-        //                {
-        //                    if (selectedItem.Selected)
-        //                    {
-        //                        obj.menu.MenuId = int.Parse(selectedItem.Value);
-        //                        APIResponse create = await _rolemenuService.CreateAsync<APIResponse>(obj.menu, HttpContext.Session.GetString(SD.SessionToken));
-        //                    }
-        //                }
-        //            }
-
-        //            TempData["success"] = "Updated successfully";
-        //            return RedirectToAction(nameof(CreateRoleMenu));
-
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        TempData["error"] = e.Message;
-        //    }
-        //    TempData["error"] = "Error encountered";
-        //    return View(obj);
-        //}
+       
     }
 
 }

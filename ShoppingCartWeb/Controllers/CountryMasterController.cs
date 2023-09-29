@@ -66,14 +66,14 @@ namespace ShoppingCartWeb.Controllers
         }
 
 		[HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> CreateCountryMaster()
 		{
 			return View();
 		}
 
 		[HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [ValidateAntiForgeryToken]
 		public async Task<IActionResult> CreateCountryMaster(CountryMasterDTO CountryMasterDTO)
 		{
@@ -94,7 +94,7 @@ namespace ShoppingCartWeb.Controllers
 
 		}
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> UpdateCountryMaster(int CountryId)
 		{
 			var CountryResponse = await _countryService.GetCountryAsync<APIResponse>(CountryId, HttpContext.Session.GetString(SD.SessionToken));
@@ -110,7 +110,7 @@ namespace ShoppingCartWeb.Controllers
 		}
 
 		[HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [ValidateAntiForgeryToken]
 		public async Task<IActionResult> UpdateCountryMaster(CountryMasterDTO countryMasterDTO)
 		{
@@ -130,7 +130,7 @@ namespace ShoppingCartWeb.Controllers
 			return View(countryMasterDTO);
 		}
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> EnableCountry(int countryId)
         {
             if (ModelState.IsValid)
@@ -150,7 +150,7 @@ namespace ShoppingCartWeb.Controllers
             return View();
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> RemoveCountryMaster(int countryId)
 		{
             var response = await _countryService.RemoveCountryAsync<APIResponse>(countryId, HttpContext.Session.GetString(SD.SessionToken));
