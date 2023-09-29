@@ -23,12 +23,7 @@ namespace ShoppingCartAPI.Models
         public DateTime UpdatedOn { get; set; }
         public bool IsDeleted { get; set; } = false;
 
-        [NotMapped]
-        // Add properties to represent the selected role and selected menu IDs
-        public string SelectedRole { get; set; }
-
-        [NotMapped]
-        public List<string> SelectedMenuIds { get; set; }
+        
 
     }
 }

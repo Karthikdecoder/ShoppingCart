@@ -65,7 +65,7 @@ namespace ShoppingCartAPI.Controllers
             {
                 int roleId = int.Parse(_roleId);
 
-                IEnumerable<MenuRoleMapping> menuRoleMappingList = await _dbMenuRoleMapping.GetAllAsync(u => u.RoleId == roleId, includeProperties: "RoleMaster,Menu");
+                IEnumerable<MenuRoleMapping> menuRoleMappingList = await _dbMenuRoleMapping.GetAllAsync(u => u.RoleId == roleId && u.IsDeleted == false, includeProperties: "RoleMaster,Menu");
                 _response.Result = _mapper.Map<List<MenuRoleMappingDTO>>(menuRoleMappingList);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);

@@ -11,5 +11,6 @@
         public string MenuName { get; set; }
         public int ParentId { get; set; }
         public bool Selected { get; set; }
+        public bool HasChildMenu { get; set; }
     }
 }

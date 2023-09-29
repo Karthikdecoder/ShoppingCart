@@ -67,9 +67,6 @@ namespace ShoppingCartWeb.Controllers
 
                 HttpContext.Session.SetString(SD.SessionToken, model.Token);
 
-
-
-
                 List<MenuRoleMappingDTO> menuRoleMappingDTO = new();
 
                 var menuResponse = await _MenuRoleMappingService.GetAllMenuByRoleIdMappingAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
@@ -82,9 +79,6 @@ namespace ShoppingCartWeb.Controllers
                 HttpContext.Session.SetString("Menus", menuResponse.Result.ToString());
 
                 TempData["MenuRoleMappingList"] = menuResponse.Result.ToString();
-
-
-                //return View(menuRoleMappingDTO);
 
                 return RedirectToAction("Index", "Home");
             }

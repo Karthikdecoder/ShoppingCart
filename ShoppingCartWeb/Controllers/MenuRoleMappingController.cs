@@ -35,44 +35,6 @@ namespace ShoppingCartWeb.Controllers
             _menuService = menuService;
         }
 
-
-
-        //[HttpGet]
-        //[Authorize(Roles = "Admin")]
-        //public async Task<IActionResult> CreateMenuRoleMapping()
-        //{
-        //    MenuRoleMappingVM menuRoleMappingVM = new();
-
-        //    var menuResponse = await _menuService.GetAllMenuAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
-
-        //    if (menuResponse != null && menuResponse.IsSuccess)
-        //    {
-        //        menuRoleMappingVM.MenuList = JsonConvert.DeserializeObject<List<MenuDTO>>(Convert.ToString(menuResponse.Result)).Select(i => new CustomSelectListItem
-        //        {
-        //            Text = i.MenuName,
-        //            Value = i.MenuId,
-        //            ParentId = (int)i.ParentId,
-        //            Selected = false
-        //        });
-        //    }
-
-        //    var roleResponse = await _roleService.GetAllRoleAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
-
-        //    if (roleResponse != null && roleResponse.IsSuccess)
-        //    {
-        //        menuRoleMappingVM.RoleList = JsonConvert.DeserializeObject<List<RoleMasterDTO>>(Convert.ToString(roleResponse.Result)).Select(i => new SelectListItem
-        //        {
-        //            Text = i.RoleName,
-        //            Value = i.RoleId.ToString()
-        //        });
-        //    }
-
-        //    menuRoleMappingVM.MenuRoleMapping.RoleId = selectedRole;
-
-        //    return View(menuRoleMappingVM);
-        //}
-
-
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateMenuRoleMapping()
@@ -94,36 +56,21 @@ namespace ShoppingCartWeb.Controllers
             return View(menuRoleMappingVM);
         }
 
-        //public async Task<IActionResult> GetMenuIds(int roleId)
-        //{
-        //    var selectedMenuIds = await _MenuRoleMappingService.GetSelectedMenuIdsForRoleAsync<APIResponse>(roleId, HttpContext.Session.GetString(SD.SessionToken));
-
-        //    var menuListByRoleId = JsonConvert.DeserializeObject<List<MenuRoleMappingDTO>>(selectedMenuIds.Result.ToString()).Select(c => c.MenuId).ToList();
-
-        //    var menuListByRole = JsonConvert.DeserializeObject<List<MenuRoleMappingDTO>>(Convert.ToString(selectedMenuIds.Result)).Select(i => new CustomSelectListItem
-        //    {
-        //        MenuRoleMappingId = i.MenuRoleMappingId,
-        //        MenuId = i.MenuId,
-        //        RoleId = i.RoleId
-        //    });
-
-        //    return Json(menuListByRoleId);
-        //}
-
+      
         [HttpGet]
         public async Task<IActionResult> GetMenusByRole(int roleId)
         {
-            var result = await _MenuRoleMappingService.GetSelectedMenuIdsForRoleAsync<APIResponse>(roleId, HttpContext.Session.GetString(SD.SessionToken));
+            var menuByRoleId = await _MenuRoleMappingService.GetSelectedMenuIdsForRoleAsync<APIResponse>(roleId, HttpContext.Session.GetString(SD.SessionToken));
 
-            List<MenuDTO> menus = JsonConvert.DeserializeObject<List<MenuDTO>>(Convert.ToString(result.Result));
+            List<MenuDTO> menuByRoleIdList = JsonConvert.DeserializeObject<List<MenuDTO>>(Convert.ToString(menuByRoleId.Result));
 
-            MenuRoleMappingVM roleMenu = new();
+            MenuRoleMappingVM menuRoleMappingVM = new();
 
-            var menu = await _menuService.GetAllMenuAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+            var menuList = await _menuService.GetAllMenuAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
 
-            if (menu != null)
+            if (menuList != null)
             {
-                roleMenu.MenuList = JsonConvert.DeserializeObject<List<MenuDTO>>(Convert.ToString(menu.Result)).Select(i => new CustomSelectListItem
+                menuRoleMappingVM.MenuList = JsonConvert.DeserializeObject<List<MenuDTO>>(Convert.ToString(menuList.Result)).Select(i => new CustomSelectListItem
                 {
                     Text = i.MenuName,
                     Value = i.MenuId.ToString(),
@@ -133,13 +80,13 @@ namespace ShoppingCartWeb.Controllers
 
                 }).ToList();
 
-                foreach (var item in roleMenu.MenuList)
+                foreach (var fromMenuList in menuRoleMappingVM.MenuList)
                 {
-                    foreach (var men in menus)
+                    foreach (var fromMenuByRoleList in menuByRoleIdList)
                     {
-                        if (men.MenuId.ToString() == item.Value)
+                        if (fromMenuByRoleList.MenuId.ToString() == fromMenuList.Value)
                         {
-                            item.Selected = true;
+                            fromMenuList.Selected = true;
                         }
                     }
                 }
@@ -147,25 +94,24 @@ namespace ShoppingCartWeb.Controllers
 
             List<CustomSelectListItem> roleMenuMappingList = new();
 
-            foreach (var item in roleMenu.MenuList)
+            foreach (var parentMenu in menuRoleMappingVM.MenuList)
             {
-                if (item.ParentId == 0)
+                if (parentMenu.ParentId == 0)
                 {
-                    roleMenuMappingList.Add(item);
+                    roleMenuMappingList.Add(parentMenu);
                 }
             }
 
-            foreach (var item in roleMenu.MenuList)
+            foreach (var parentMenu in menuRoleMappingVM.MenuList)
             {
-                if (item.ParentId == 0)
+                if (parentMenu.ParentId == 0)
                 {
-                    foreach (var subitem in roleMenu.MenuList)
+                    foreach (var childMenu in menuRoleMappingVM.MenuList)
                     {
-                        if (subitem.ParentId.ToString() == item.Value)
+                        if (childMenu.ParentId.ToString() == parentMenu.Value)
                         {
-                            roleMenuMappingList.Add(subitem);
+                            roleMenuMappingList.Add(childMenu);
                         }
-
                     }
                 }
             }
@@ -173,29 +119,7 @@ namespace ShoppingCartWeb.Controllers
             return Json(roleMenuMappingList);
         }
 
-        //[HttpPost]
-        //[Authorize(Roles = "Admin")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> CreateMenuRoleMapping(MenuRoleMappingVM menuRoleMappingVM)
-        //{
-        //    APIResponse response = await _MenuRoleMappingService.UpdateMenuRoleMappingAsync<APIResponse>(menuRoleMappingVM.MenuRoleMapping, HttpContext.Session.GetString(SD.SessionToken));
-
-        //    if (response != null && response.IsSuccess)
-        //    {
-        //        TempData["success"] = "Saved successfully";
-        //        return RedirectToAction("CreateMenuRoleMapping");
-        //    }
-
-        //    TempData["error"] = response.ResponseMessage[0].ToString();
-
-        //    // Handle the form submission and any other logic here
-
-        //    // Redirect back to the GET action to refresh the page with the selected role
-
-        //    return RedirectToAction("CreateMenuRoleMapping");
-        //}
-
-
+       
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -260,81 +184,6 @@ namespace ShoppingCartWeb.Controllers
             return View(menuRoleMappingVM);
         }
 
-        //[Authorize(Roles = "Admin")]
-        //public async Task<IActionResult> UpdateMenuRoleMapping(int menuRoleMappingId)
-        //{
-        //    MenuRoleMappingVM menuRoleMappingVM = new();
-
-        //    var menuRoleMappingResponse = await _MenuRoleMappingService.GetMenuRoleMappingAsync<APIResponse>(menuRoleMappingId, HttpContext.Session.GetString(SD.SessionToken));
-
-        //    if (menuRoleMappingResponse != null && menuRoleMappingResponse.IsSuccess)
-        //    {
-        //        MenuRoleMappingDTO model = JsonConvert.DeserializeObject<MenuRoleMappingDTO>(Convert.ToString(menuRoleMappingResponse.Result));
-        //        menuRoleMappingVM.MenuRoleMapping = _mapper.Map<MenuRoleMappingDTO>(model);
-        //    }
-
-        //    var menuResponse = await _menuService.GetAllMenuAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
-
-        //    if (menuResponse != null && menuResponse.IsSuccess)
-        //    {
-        //        menuRoleMappingVM.MenuList = JsonConvert.DeserializeObject<List<MenuDTO>>(Convert.ToString(menuResponse.Result)).Select(i => new CustomSelectListItem
-        //        {
-        //            Text = i.MenuName,
-        //            Value = i.MenuId
-        //        });
-        //    }
-
-        //    var roleResponse = await _roleService.GetAllRoleAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
-
-        //    if (roleResponse != null && roleResponse.IsSuccess)
-        //    {
-        //        menuRoleMappingVM.RoleList = JsonConvert.DeserializeObject<List<RoleMasterDTO>>(Convert.ToString(roleResponse.Result)).Select(i => new SelectListItem
-        //        {
-        //            Text = i.RoleName,
-        //            Value = i.RoleId.ToString()
-        //        });
-        //    }
-
-        //    return View(menuRoleMappingVM);
-        //}
-
-        //    [HttpPost]
-        //    [Authorize(Roles = "Admin")]
-        //    [ValidateAntiForgeryToken]
-        //    public async Task<IActionResult> UpdateMenuRoleMapping(MenuRoleMappingVM menuRoleMappingVM)
-        //    {
-        //        if (ModelState.IsValid)
-        //        {
-        //            var response = await _MenuRoleMappingService.UpdateMenuRoleMappingAsync<APIResponse>(menuRoleMappingVM.MenuRoleMapping, HttpContext.Session.GetString(SD.SessionToken));
-
-        //            if (response != null && response.IsSuccess)
-        //            {
-        //                TempData["success"] = "Updated successfully";
-        //                return RedirectToAction("IndexMenuRoleMapping");
-        //            }
-
-        //            TempData["error"] = response.ResponseMessage[0].ToString();
-        //            return View(menuRoleMappingVM);
-        //        }
-
-        //        return View(menuRoleMappingVM);
-        //    }
-
-
-        //    [Authorize(Roles = "Admin")]
-        //    public async Task<IActionResult> RemoveMenuRoleMapping(int menuRoleMappingId)
-        //    {
-        //        var response = await _MenuRoleMappingService.RemoveMenuRoleMappingAsync<APIResponse>(menuRoleMappingId, HttpContext.Session.GetString(SD.SessionToken));
-
-        //        if (response != null && response.IsSuccess)
-        //        {
-        //            TempData["success"] = "Disabled successfully";
-        //            return RedirectToAction("IndexMenuRoleMapping");
-        //        }
-
-        //        TempData["success"] = "Error encountered";
-        //        return View();
-        //    }
     }
 
 }

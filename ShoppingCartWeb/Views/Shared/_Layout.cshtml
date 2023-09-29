@@ -104,105 +104,64 @@
                         <!-- Add icons to the links using the .nav-icon class
                              with font-awesome or any other icon font library -->
                         <!-- Access the TempData values in your HTML file -->
+                       
+
                         @{
                             string currentController = ViewContext.RouteData.Values["controller"] as string;
                             string currentAction = ViewContext.RouteData.Values["action"] as string;
+                            <!-- Find the "Dashboard" parent menu -->
+                            var dashboardMenu = Menus.FirstOrDefault(menu => menu.Menu.MenuName == "Dashboard");
                         }
 
-                        @foreach (var parentMenu in Menus.Where(menu => menu.Menu.ParentId == 0))
+                        <!-- Separate the "Dashboard" menu from the rest -->
+                        @if (dashboardMenu != null)
+                        {
+                            <li class="nav-item @(currentController == dashboardMenu.Menu.Url ? "menu-open" : "")">
+                                <a href="javascript:void(0);" class="nav-link @(currentController == dashboardMenu.Menu.Url ? "active" : "")">
+                                    <i class="fas fa-tree"></i>
+                                    <p>
+                                        @dashboardMenu.Menu.MenuName
+                                        <i class="fas fa-angle-left right"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    @foreach (var childMenu in Menus.Where(menu => menu.Menu.ParentId == dashboardMenu.MenuId))
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@($"{defaultURI}{childMenu.Menu.Url}")" class="nav-link @(currentController == childMenu.Menu.Url ? "active" : "")">
+                                                @childMenu.Menu.MenuName
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+
+                        <!-- Display the other menus in their general order -->
+                        @foreach (var parentMenu in Menus.Where(menu => menu.Menu.MenuName != "Dashboard" && menu.Menu.ParentId == 0))
                         {
                             <li class="nav-item @(currentController == parentMenu.Menu.Url ? "menu-open" : "")">
-
                                 <a href="javascript:void(0);" class="nav-link @(currentController == parentMenu.Menu.Url ? "active" : "")">
-
                                     <i class="fas fa-tree"></i>
                                     <p>
                                         @parentMenu.Menu.MenuName
                                         <i class="fas fa-angle-left right"></i>
                                     </p>
                                 </a>
-
                                 <ul class="nav nav-treeview">
-
                                     @foreach (var childMenu in Menus.Where(menu => menu.Menu.ParentId == parentMenu.MenuId))
                                     {
                                         <li class="nav-item">
-
-                                            <a href="@($"{defaultURI}{childMenu.Menu.Url}" )" class="nav-link @(currentController == childMenu.Menu.Url  ? "active" : "")">
+                                            <a href="@($"{defaultURI}{childMenu.Menu.Url}")" class="nav-link @(currentController == childMenu.Menu.Url ? "active" : "")">
                                                 @childMenu.Menu.MenuName
                                             </a>
-
                                         </li>
                                     }
-
                                 </ul>
                             </li>
                         }
 
-
-                        @*@foreach (var parentMenu in Menus.Where(menu => menu.Menu.ParentId == 0))
-                        {
-                        <li class="nav-item @(currentController == parentMenu.Menu.Url ? "menu-open" : "")">
-                        <a href="javascript:void(0);" class="nav-link @(currentController == parentMenu.Menu.Url ? "active" : "")">
-                        <i class="fas fa-tree"></i>
-                        <p>
-                        @parentMenu.Menu.MenuName
-                        <i class="fas fa-angle-left right"></i>
-                        </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                        @foreach (var childMenu in Menus.Where(menu => menu.Menu.ParentId == parentMenu.MenuId))
-                        {
-                        <li class="nav-item">
-                        <a href="@($"{defaultURI}{childMenu.Menu.Url}")" class="nav-link @(currentController == childMenu.Menu.Url ? "active" : "")">
-                        @childMenu.Menu.MenuName
-                        </a>
-                        </li>
-                        }
-                        </ul>
-                        </li>
-                        }
-                        *@
-
-                        @* @foreach (var parentMenu in Menus.Where(menu => menu.Menu.ParentId == 0))
-                        {
-                        var parentMenuUrlParts = parentMenu.Menu.Url.Split('/');
-                        if (parentMenuUrlParts.Length >= 3)
-                        {
-                        string parentController = parentMenuUrlParts[1];
-                        string parentAction = parentMenuUrlParts[2];
-
-                        <li class="nav-item @(currentController == parentController || currentAction == parentAction ? "menu-open" : "")">
-                        <a href="javascript:void(0);" class="nav-link @(currentController == parentController ? "active" : "")">
-                        <i class="fas fa-tree"></i>
-                        <p>
-                        @parentMenu.Menu.MenuName
-                        <i class="fas fa-angle-left right"></i>
-                        </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                        @foreach (var childMenu in Menus.Where(menu => menu.Menu.ParentId == parentMenu.MenuId && menu.Menu.Url.StartsWith($"/{parentController}")))
-                        {
-                        var childUrlParts = childMenu.Menu.Url.Split('/');
-                        if (childUrlParts.Length >= 3)
-                        {
-                        string childController = childUrlParts[1];
-                        string childAction = childUrlParts[2];
-
-                        <li class="nav-item">
-                        <a href="@($"{defaultURI}{childMenu.Menu.Url}")" class="nav-link @(currentController == childController || currentAction == childAction ? "active" : "")">
-                        @childMenu.Menu.MenuName
-                        </a>
-                        </li>
-                        }
-                        }
-                        </ul>
-                        </li>
-                        }
-                        }
-                        *@
-
-
+                      
                         @*<li class="nav-item @(currentController == "Registration" || currentController == "User" && (currentAction == "IndexRegistration" || currentAction == "IndexUser"|| currentAction == "CreateRegistration" || currentAction == "UpdateRegistration" || currentAction == "Register" || currentAction == "UpdateUser") ? "menu-open" : "")">
 
                         <a href="#" class="nav-link @(currentController == "Registration" || currentController == "User" && (currentAction == "IndexRegistration" || currentAction == "IndexUser" || currentAction == "CreateRegistration" || currentAction == "UpdateRegistration" || currentAction == "Register" ||currentAction == "UpdateUser") ? "active" : "")">

@@ -17,14 +17,16 @@ namespace ShoppingCartAPI.Controllers
         protected APIResponse _response;
         private readonly IMapper _mapper;
         private readonly IRoleMasterRepository _dbRoles;
+        private readonly IMenuRoleMappingRepository _dbMenuRoleMapping;
         private string _userId;
 
-        public RoleMasterController(IRoleMasterRepository roleMasterRepository, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public RoleMasterController(IRoleMasterRepository roleMasterRepository, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor,IMenuRoleMappingRepository dbMenuRoleMapping)
         {
             _dbRoles = roleMasterRepository;
             _mapper = mapper;
             _response = new();
             _userId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            _dbMenuRoleMapping = dbMenuRoleMapping;
         }
 
         [HttpGet]
@@ -102,7 +104,7 @@ namespace ShoppingCartAPI.Controllers
                     _response.ResponseMessage = new List<string>() { "Already Exists" };
                     return BadRequest(_response);
                 }
-                
+
                 if (roleMasterDTO == null)
                 {
                     return BadRequest(roleMasterDTO);
@@ -121,6 +123,24 @@ namespace ShoppingCartAPI.Controllers
                 roleMaster.UpdatedBy = int.Parse(_userId);
                 roleMaster.IsDeleted = false;
                 await _dbRoles.CreateAsync(roleMaster);
+
+                RoleMaster createdRole = await _dbRoles.GetAsync(u => u.RoleName == roleMasterDTO.RoleName);
+
+                // Now you can access the RoleId
+                int RoleIdfromDb = createdRole.RoleId;
+
+                MenuRoleMapping menuRoleMapping = new()
+                {
+                    RoleId = RoleIdfromDb,
+                    MenuId = 12,
+                    CreatedOn = DateTime.Now,
+                    CreatedBy = int.Parse(_userId),
+                    UpdatedOn = DateTime.Now,
+                    UpdatedBy = int.Parse(_userId),
+                    IsDeleted = false
+                };
+
+                await _dbMenuRoleMapping.CreateAsync(menuRoleMapping);
 
                 _response.Result = _mapper.Map<RoleMasterDTO>(roleMaster);
                 _response.StatusCode = HttpStatusCode.Created;

@@ -1,7 +1,6 @@
 ﻿@model ShoppingCartWeb.Models.VM.MenuRoleMappingVM
 
 @{
-    ViewData["Title"] = "RoleMenu";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -15,6 +14,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
 
 </head>
 
@@ -31,7 +36,7 @@
                 /* You can also use other units like em, rem, or % if you prefer. */
             }
         </style>
-        <h1 class="text-dark">Role Menu Mappings</h1>
+        <h1 class="text-dark">Menu Role Mappings</h1>
         <hr />
 
         <form asp-action="CreateMenuRoleMapping">
@@ -39,30 +44,18 @@
             <div class="row">
                 <div class="col-md-2">
                     <label for="roleName" class="control-label pt-2" style="font-size:17px;">Role</label>
-                    <select asp-for="MenuRoleMapping.RoleId" class="form-control" asp-items="@Model.RoleList" id="roleIdSelect">
+                    <select asp-for="MenuRoleMapping.RoleId" class="form-control" asp-items="@Model.RoleList" id="selectedRoleID">
                         <option disabled selected>--Select Role--</option>
                     </select>
                     <span asp-validation-for="MenuRoleMapping.RoleId" class="text-danger"></span>
                 </div>
                 <div class="col-md-5">
-                    
                 </div>
             </div>
 
-            @*<div class="row pb-3">
-                <div class="col-12">
-            <label for="roleName" class="control-label pt-2" style="font-size:17px;">Role</label>
-                </div>
-                <div class="col-6">
-                    <select asp-for="MenuRoleMapping.RoleId" id="roleId" class="form-control" asp-items="@Model.RoleList" id="roleIdSelect">
-                        <option disabled selected>--Select Role--</option>
-                    </select>
-                    <span asp-validation-for="MenuRoleMapping.RoleId" class="text-danger"></span>
-                </div>
-            </div>*@
-
 
             </br>
+
             <div class="row">
 
                 <div class="container-fluid">
@@ -76,290 +69,253 @@
             </br>
 
 
-            <div class="row justify-content-end" id="saveButtonRow" style="display:none;">
+            <div class="row justify-content-end" id="saveButtonRow">
+                @*style="display:none;*@
+
                 <div class="col-2 text-center">
                     <button type="submit" class="btn btn-success btn-block" style="width:80%;">Save</button>
                 </div>
+
             </div>
 
         </form>
     </div>
 
 
-@section Scripts {
-        <partial name="_ValidationScriptsPartial" />
-}
-
 
 </body>
 </html>
 
+@section Scripts {
 
-<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="~/js/site.js" asp-append-version="true"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
 
-<script>
-    var selectedMenus = [];
+    <partial name="_ValidationScriptsPartial" />
 
-    $(document).ready(function () {
-
-        var table = $('#tableDemo').DataTable({
-            paging: true,
-            searching: true
-        }
-        );
-
-        loadMenus();
-
-        $('#menuCheckboxes').on('change', '#selectAllCheckboxes', function () {
-            var isChecked = $(this).is(':checked');
-            $('input[name="selectedMenus"]').prop('checked', isChecked);
+    <script>
+        $(document).ready(function () {
+            $('#myTable').DataTable(
+                {
+                    "paging": false
+                });
         });
+    </script>
 
-        $('#roleIdSelect').change(function () {
-            var selectedRoleId = $(this).val();
-            if (selectedRoleId) {
-                $('#saveButtonRow').show();
-                loadMenus(selectedRoleId);
-            } else {
-                $('#saveButtonRow').hide();
+    <script>
+
+        var selectedMenus = [];
+
+        $(document).ready(function () {
+
+            var table = $('#tableDemo').DataTable({
+                paging: true,
+                searching: true
             }
-        });
+            );
 
-        $('form').submit(function (event) {
-            event.preventDefault();
-            var selectedMenus = {};
-            var selectOne = false;
-            var result = false;
-            $('input[name="selectedMenus"]').each(function () {
-                if ($(this).prop('checked')) {
-                    selectOne = true;
+            loadMenus();
+
+            $('#menuCheckboxes').on('change', '#selectAllCheckboxes', function () {
+                var isChecked = $(this).is(':checked');
+                $('input[name="selectedMenus"]').prop('checked', isChecked);
+            });
+
+            $('#selectedRoleID').change(function () {
+
+                var selectedRoleId = $(this).val();
+
+                if (selectedRoleId) {
+                    $('#saveButtonRow').show();
+                    loadMenus(selectedRoleId);
+                }
+                else {
+                    $('#saveButtonRow').hide();
                 }
             });
-            if (selectOne) {
+
+            $('form').submit(function (event) {
+                event.preventDefault();
+                var selectedMenus = {};
+                var selectOne = false;
+                var result = false;
+
                 $('input[name="selectedMenus"]').each(function () {
-                    var i = 0;
-                    var menuValue = $(this).val();
-                    var parentID = $(this).data('parentid');
-                    if (parentID == 0 && $(this).prop('checked')) {
-                        $('input[name="selectedMenus"]').each(function () {
-                            var submenu = $(this).val();
-                            var subparent = $(this).data('parentid');
-                            if (menuValue == subparent) {
-                                if ($(this).prop('checked'))
-                                    i++;
-                            }
-                        });
-                        if (i == 0) {
-                            result = true;
-                        }
+                    if ($(this).prop('checked')) {
+                        selectOne = true;
                     }
                 });
 
-                if (!result) {
-                    // Remove the SweetAlert confirmation dialog and submit the form directly
-                    var selectedMenuIdsList = [];
+                if (selectOne) {
+                    var skipPopUp = false; // Flag to skip the pop-up
+
                     $('input[name="selectedMenus"]').each(function () {
-                        selectedMenuIdsList.push({
-                            Text: $(this).next('label').text(),
-                            Value: $(this).val(),
-                            Selected: $(this).prop('checked')
-                        });
+                        var i = 0;
+                        var menuValue = $(this).val();
+                        var parentId = $(this).data('parentid');
+
+                        // Check if parent menu has no submenus
+                        if (parentId == 0 && $(this).prop('checked')) {
+                            var hasSubmenu = false; // Flag to check if there are submenus
+
+                            // Check if any submenu has the current menu as its parent
+                            $('input[name="selectedMenus"]').each(function () {
+                                var submenu = $(this).val();
+                                var subparent = $(this).data('parentid');
+                                if (menuValue == subparent) {
+                                    hasSubmenu = true;
+                                    if ($(this).prop('checked'))
+                                        i++;
+                                }
+                            });
+
+                            if (!hasSubmenu) {
+                                skipPopUp = true;
+                                return false; // Exit the loop
+                            }
+
+                            if (i == 0) {
+                                result = true;
+                            }
+                        }
                     });
 
-                    $('#selectedMenusInput').val(JSON.stringify(selectedMenuIdsList));
+                    if (!result) {
+                        var selectedMenuIdsList = [];
+                        $('input[name="selectedMenus"]').each(function () {
+                            selectedMenuIdsList.push({
+                                Text: $(this).next('label').text(),
+                                Value: $(this).val(),
+                                Selected: $(this).prop('checked')
+                            });
+                        });
 
-                    $('form')[0].submit();
+                        $('#selectedMenusInput').val(JSON.stringify(selectedMenuIdsList));
+
+                        $('form')[0].submit();
+                    } else if (!skipPopUp) { // Show pop-up only if not skipping
+                        Swal.fire({
+                            title: 'Choose the corresponding sub menu',
+                            showCancelButton: false,
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#28a745',
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Handle confirmation as needed
+                            }
+                        });
+                    }
+                } else {
+                    Swal.fire({
+                        title: 'Choose at least one menu',
+                        showCancelButton: false,
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#28a745',
+                        allowOutsideClick: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Do nothing or handle it as needed
+                        }
+                    });
                 }
-            } else {
-                Swal.fire({
-                    title: 'Choose at least one item',
-                    showCancelButton: false,
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#28a745',
-                    allowOutsideClick: false
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Do nothing or handle it as needed
+            });
+
+
+            function loadMenus(roleId) {
+
+                $.ajax({
+
+                    type: 'GET',
+
+                    url: '@Url.Action("GetMenusByRole", "MenuRoleMapping")',
+
+                    data: { roleId: roleId },
+
+                    dataType: 'json',
+
+                    success: function (data) {
+
+                        console.log(data);
+
+                        $('#menuCheckboxes').empty();
+
+                        var table = $('<table class="table" style="margin: 0; padding: 0;" style="border: 1px solid #ddd;" id="tableDemo"> ');
+                        var thead = $('<tr><thead class="bg-primary text-white"><th>Menu Name</th><th>Parent Name</th><th>Select All<label class="form-check-label" for="selectAllCheckboxes"><input type="checkbox" style="border: 1px solid #B3E0FF;background-color: #E6F7FF; margin-top: -12px; margin-left: 9px;" id="selectAllCheckboxes" class="form-check-input"></label></tr></thead>');
+                        var tbody = $('<tbody style="margin: 0; padding: 0;">');
+
+                        var menuCheckboxes = {};
+
+                        data.forEach(function (item) {
+
+                            var isCheckedAndDisabled = (item.text === "Dashboard") ? 'checked disabled' : (item.selected ? 'checked' : '');
+
+                            var row = $('<tr>' +
+                                '<td style="margin: 0; padding: 0.5;">' + item.text + '</td>' +
+                                '<td style="margin: 0; padding: 0.5;">' + item.description + '</td>' +
+                                '<td style="margin: 0; padding: 0.5;">' +
+                                '<div class="form-check">' +
+                                '<input type="checkbox" name="selectedMenus" value="' + item.value + '" data-parentid="' + item.parentId + '" class="form-check-input" ' + isCheckedAndDisabled + ' />' +
+                                '</div>' +
+                                '</td>' +
+                                '</tr>');
+
+                            tbody.append(row);
+
+
+                            menuCheckboxes[item.value] = row.find('input');
+
+                            row.find('input').change(function () {
+
+                                var status = this.checked ? 'Selected' : 'Unselected';
+                                row.find('.form-check-label').text(status);
+                                var menuValue = $(this).val();
+
+                                if (this.checked) {
+                                    if (item.parentId !== 0) {
+                                        data.forEach(function (mainmenu) {
+                                            if (mainmenu.value == item.parentId) {
+                                                if (!menuCheckboxes[mainmenu.value].prop('checked')) {
+                                                    menuCheckboxes[mainmenu.value].prop('checked', true);
+
+                                                }
+                                            }
+                                        });
+
+                                    }
+                                }
+
+                                if (!this.checked) {
+                                    if (item.parentId == 0) {
+                                        data.forEach(function (submenu) {
+                                            if (item.value == submenu.parentId) {
+                                                if (menuCheckboxes[submenu.value].prop('checked')) {
+                                                    menuCheckboxes[submenu.value].prop('checked', false);
+
+                                                }
+                                            }
+                                        });
+
+                                    }
+                                }
+                            });
+
+                            $('#menuCheckboxes').append(table);
+                        });
+
+                        table.append(thead);
+                        table.append(tbody);
+
+                        $('#menuCheckboxes').append(table);
+                    },
+
+                    error: function () {
+
                     }
                 });
             }
+
         });
+    </script>
 
 
-        //$('form').submit(function (event) {
-        //    event.preventDefault();
-        //    var selectedMenus = {};
-        //    var selectOne = false;
-        //    var result = false;
-        //    $('input[name="selectedMenus"]').each(function () {
-        //        if ($(this).prop('checked')) {
-        //            selectOne = true;
-        //        }
-        //    });
-        //    if (selectOne) {
-        //        $('input[name="selectedMenus"]').each(function () {
-        //            var i = 0;
-        //            var menuValue = $(this).val();
-        //            var parentID = $(this).data('parentid');
-        //            if (parentID == 0 && $(this).prop('checked')) {
-        //                $('input[name="selectedMenus"]').each(function () {
-        //                    var submenu = $(this).val();
-        //                    var subparent = $(this).data('parentid');
-        //                    if (menuValue == subparent) {
-        //                        if ($(this).prop('checked'))
-        //                            i++;
-        //                    }
-        //                });
-        //                if (i == 0) {
-        //                    result = true;
-        //                }
-        //            }
+}
 
-        //        });
-
-        //        if (!result) {
-        //            Swal.fire({
-        //                title: 'Do you want to save?',
-        //                showCancelButton: true,
-        //                confirmButtonText: 'Yes',
-        //                confirmButtonColor: '#28a745', 
-        //                cancelButtonColor: '#dc3545',
-        //                cancelButtonText: 'No',
-        //                allowOutsideClick: false
-        //            }).then((result) => {
-        //                if (result.isConfirmed) {
-        //                    var selectedMenuIdsList = [];
-        //                    $('input[name="selectedMenus"]').each(function () {
-        //                        selectedMenuIdsList.push({
-        //                            Text: $(this).next('label').text(),
-        //                            Value: $(this).val(),
-        //                            Selected: $(this).prop('checked')
-        //                        });
-        //                    });
-
-        //                    $('#selectedMenusInput').val(JSON.stringify(selectedMenuIdsList));
-
-        //                    $('form')[0].submit();
-        //                }
-        //            });
-        //        }
-
-        //        else {
-        //            Swal.fire({
-        //                title: 'Please select sub menu',
-        //                showCancelButton: false,
-        //                confirmButtonText: 'OK',
-        //                confirmButtonColor: '#28a745',
-        //                allowOutsideClick: false
-        //            }).then((result) => {
-        //                if (result.isConfirmed) {
-
-        //                }
-        //            });
-        //        }
-        //    }
-
-        //    else {
-        //        Swal.fire({
-        //            title: 'Choose atleast one item',
-        //            showCancelButton: false,
-        //            confirmButtonText: 'OK',
-        //            confirmButtonColor: '#28a745',
-        //            allowOutsideClick: false
-        //        }).then((result) => {
-        //            if (result.isConfirmed) {
-
-        //            }
-        //        });
-        //    }
-        //});
-
-        function loadMenus(roleId) {
-
-            $.ajax({
-                type: 'GET',
-
-                url: '@Url.Action("GetMenusByRole", "MenuRoleMapping")',
-
-                data: { roleId: roleId },
-
-                dataType: 'json',
-
-                success: function (data) {
-                    console.log(data);
-                    $('#menuCheckboxes').empty();
-
-                    var table = $('<table class="table" style="margin: 0; padding: 0;" style="border: 1px solid #ddd;" id="tableDemo"> ');
-                    var thead = $('<tr><thead class="bg-primary text-white"><th>Main menu</th><th>Description</th><th><label class="form-check-label" for="selectAllCheckboxes"></label>Checkbox</th></tr></thead>');
-                    var tbody = $('<tbody style="margin: 0; padding: 0;">');
-
-                    var menuCheckboxes = {};
-
-                    data.forEach(function (item) {
-                        var row = $('<tr>' +
-                            '<td style="margin: 0; padding: 0.5;">' + item.text + '</td>' +
-                            '<td style="margin: 0; padding: 0.5;">' + item.description + '</td>' +
-                            '<td style="margin: 0; padding: 0.5;">' +
-                            '<div class="form-check">' +
-                            '<input type="checkbox" name="selectedMenus" value="' + item.value + '" data-parentid="' + item.parentId + '" class="form-check-input" ' + (item.selected ? 'checked' : '') + ' />' +
-                            '</div>' +
-                            '</td>' +
-                            '</tr>');
-                        tbody.append(row);
-
-                        menuCheckboxes[item.value] = row.find('input');
-
-                        row.find('input').change(function () {
-                            var status = this.checked ? 'Selected' : 'Unselected';
-                            row.find('.form-check-label').text(status);
-                            var menuValue = $(this).val();
-                            if (this.checked) {
-                                // Uncheck submenus if a parent menu is unchecked
-                                if (item.parentId !== 0) {
-                                    // Find the matching menu
-                                    data.forEach(function (mainmenu) {
-                                        if (mainmenu.value == item.parentId) {
-                                            if (!menuCheckboxes[mainmenu.value].prop('checked')) {
-                                                menuCheckboxes[mainmenu.value].prop('checked', true);
-
-                                            }
-                                        }
-                                    });
-
-                                }
-                            }
-                            if (!this.checked) {
-                                if (item.parentId == 0) {
-                                    // Find the matching menu
-                                    data.forEach(function (submenu) {
-                                        if (item.value == submenu.parentId) {
-                                            if (menuCheckboxes[submenu.value].prop('checked')) {
-                                                menuCheckboxes[submenu.value].prop('checked', false);
-
-                                            }
-                                        }
-                                    });
-
-                                }
-                            }
-                        });
-                        $('#menuCheckboxes').append(table);
-                    });
-
-                    table.append(thead);
-                    table.append(tbody);
-
-                    $('#menuCheckboxes').append(table);
-                },
-                error: function () {
-
-                }
-            });
-        }
-
-    });
-</script>

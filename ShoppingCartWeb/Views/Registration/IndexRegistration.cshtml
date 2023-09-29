@@ -16,7 +16,7 @@
             }
         </style>
 
-        <h1 class="text-dark">Registered Persons</h1>
+        <h1 class="text-dark"> Users</h1>
     </div>
     <div class="col-2 d-flex justify-content-end align-items-start">
         <a asp-controller="Registration" asp-action="CreateRegistration" class="btn btn-primary btn-sm ms-2">
@@ -282,54 +282,6 @@
 
     </script>
 
-   @* <script>
-        function openRegistrationModal(registrationId) {
-            // Make an AJAX request to fetch the partial view with details
-            $.ajax({
-                url: '/Registration/ViewRegistration',
-                type: 'GET',
-                data: { registrationId: registrationId },
-                success: function (data) {
-                    // Replace the modal content with the fetched partial view
-                    $('#registrationModal .modal-content').html(data);
-
-                    // Show the modal
-                    $('#registrationModal').modal('show');
-                }
-            });
-        }
-    </script>
-
-
-
-    <script>
-        $('#registrationModal').on('show.bs.modal', function (e) {
-            var registrationId = $(e.relatedTarget).data('registrationid');
-            var modal = $(this);
-
-            // Make an AJAX request to fetch details based on registrationId
-            $.ajax({
-                url: '/api/Registration/GetRegistration?registrationId=',
-                type: 'GET',
-                data: { registrationId: registrationId },
-                success: function (data) {
-                    // Populate modal with fetched data
-                    modal.find('#FirstName').text(data.firstName);
-                    modal.find('#LastName').text(data.lastName);
-                    modal.find('#CategoryName').text(data.categoryName);
-                    modal.find('#Gender').text(data.gender);
-                    modal.find('#DateOfBirth').text(data.dateOfBirth);
-                    modal.find('#Email').text(data.email);
-                    modal.find('#ContactNo').text(data.contactNo);
-                    modal.find('#Address').text(data.address);
-                    modal.find('#PostalCode').text(data.postalCode);
-                    modal.find('#StateName').text(data.stateName);
-                    modal.find('#CountryName').text(data.countryName);
-                }
-            });
-        });
-    </script>*@
-
-
+  
 }
 
